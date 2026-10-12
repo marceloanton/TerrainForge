@@ -1,0 +1,10 @@
+{
+  "name": "TerrainForge",
+  "version_number": "0.1.0",
+  "website_url": "",
+  "description": "Free-form terrain brush for Valheim: flatten, raise/lower beyond +/-8 m, smooth, paint and restore with no radius or cost limits. Server + client.",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2202",
+    "ValheimModding-Jotunn-2.30.2"
+  ]
+}

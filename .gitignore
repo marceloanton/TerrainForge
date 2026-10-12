@@ -1,0 +1,16 @@
+# Build output
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Local builds / packages
+dist/
+packages/
+*.nupkg
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
