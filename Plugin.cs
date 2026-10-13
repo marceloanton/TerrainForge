@@ -31,6 +31,8 @@ namespace TerrainForge
         public ConfigEntry<TerrainOperation> DefaultOperation;
         public ConfigEntry<TerrainShape> Shape;
         public ConfigEntry<TerrainPaint> Paint;
+        public ConfigEntry<RampMode> RampMode;
+        public ConfigEntry<float> SlopeAngle;
 
         // Limits
         public ConfigEntry<bool> UnlockDeltaLimit;
@@ -47,6 +49,8 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> AimHeightModifierKey;
         public ConfigEntry<KeyboardShortcut> RebindMenuKey;
         public ConfigEntry<KeyboardShortcut> GiveToolKey;
+        public ConfigEntry<KeyboardShortcut> EyedropKey;
+        public ConfigEntry<KeyboardShortcut> RampModeKey;
         public ConfigEntry<ToolRequirement> RequiredTool;
         public ConfigEntry<bool> AutoGiveTool;
 
@@ -101,6 +105,13 @@ namespace TerrainForge
                 "Brush shape selected on startup.");
             Paint = Config.Bind("Brush", "Paint", TerrainPaint.Dirt,
                 "Paint type selected on startup.");
+            RampMode = Config.Bind("Brush", "RampMode", global::TerrainForge.RampMode.TwoPoint,
+                "Ramp mode: TwoPoint joins the heights at A and B; FixedAngle builds " +
+                "from A at a fixed slope (SlopeAngle) toward B.");
+            SlopeAngle = Config.Bind("Brush", "SlopeAngle", 30f,
+                new ConfigDescription("Slope used by fixed-angle ramps (degrees). " +
+                    "Adjust in-game with Alt + radius keys/wheel while Ramp is selected.",
+                    new AcceptableValueRange<float>(5f, 60f)));
 
             UnlockDeltaLimit = Config.Bind("Limits", "UnlockDeltaLimit", true,
                 "Replace the hard-coded +/-8 m clamp so edits beyond 8 m survive terrain regeneration. " +
@@ -128,6 +139,10 @@ namespace TerrainForge
                 "Open the in-game key rebinding menu. Note: F5 is also Valheim's developer console key (only if the game runs with -console).");
             GiveToolKey = Config.Bind("Input", "GiveToolKey", new KeyboardShortcut(KeyCode.F8),
                 "Hand out the TerrainForge tool to your inventory.");
+            EyedropKey = Config.Bind("Input", "EyedropKey", new KeyboardShortcut(KeyCode.G),
+                "Fix the Flatten target height at the aimed point (press again to release).");
+            RampModeKey = Config.Bind("Input", "RampModeKey", new KeyboardShortcut(KeyCode.H),
+                "Toggle ramp mode: two-point / fixed angle.");
             RequiredTool = Config.Bind("Input", "RequiredTool", ToolRequirement.TerrainForgeTool,
                 "Which equipped item enables the brush: Any (no requirement), Pickaxe, or the mod's TerrainForgeTool.");
             AutoGiveTool = Config.Bind("Input", "AutoGiveTool", true,

@@ -28,6 +28,8 @@ namespace TerrainForge
         private float _slopeDeg;
         private bool _serverAllowed = true;
         private string _serverWhy;
+        private bool _hasPicked;
+        private float _pickedHeight;
 
         private void OnDestroy()
         {
@@ -53,6 +55,8 @@ namespace TerrainForge
                 _toolGiven = false;
                 _preview.Hide();
                 TerrainEngine.ClearHistory();
+                _rampHasA = false;
+                _hasPicked = false;
                 return;
             }
 
@@ -111,6 +115,17 @@ namespace TerrainForge
                     DoUndo();
                 if (p.RedoKey.Value.IsDown())
                     DoRedo();
+                if (p.EyedropKey.Value.IsDown())
+                    ToggleEyedrop(groundCenter);
+                if (p.RampModeKey.Value.IsDown())
+                {
+                    p.RampMode.Value = p.RampMode.Value == RampMode.TwoPoint
+                        ? RampMode.FixedAngle : RampMode.TwoPoint;
+                    _rampHasA = false;
+                    Flash("Modo de rampa: " + (p.RampMode.Value == RampMode.FixedAngle
+                        ? "ángulo fijo " + p.SlopeAngle.Value.ToString("0") + "°"
+                        : "dos puntos"));
+                }
             }
 
             TerrainOperation op = p.DefaultOperation.Value;
@@ -189,11 +204,16 @@ namespace TerrainForge
                 ground = new Vector3(pos.x, GroundHeight(pos), pos.z);
             }
 
+            bool fixedAngle = p.RampMode.Value == RampMode.FixedAngle;
+
             if (!_rampHasA)
             {
                 _rampA = ground;
                 _rampHasA = true;
-                TerrainForgePlugin.Message("Rampa: punto A marcado. Apunta al punto B y volve a pulsar aplicar.");
+                TerrainForgePlugin.Message(fixedAngle
+                    ? "Rampa ángulo " + p.SlopeAngle.Value.ToString("0") +
+                      "°: punto A marcado. Apunta la dirección y volve a pulsar aplicar."
+                    : "Rampa: punto A marcado. Apunta al punto B y volve a pulsar aplicar.");
                 return;
             }
 
@@ -219,9 +239,28 @@ namespace TerrainForge
                 RampB = ground
             };
 
+            string doneMsg = "Rampa creada de A a B.";
+            if (fixedAngle)
+            {
+                // B sets direction + length; the height follows the fixed angle,
+                // climbing or descending depending on where B sits vs A.
+                float hA = GroundHeight(a);
+                float dx = ground.x - a.x;
+                float dz = ground.z - a.z;
+                float dist = Mathf.Sqrt(dx * dx + dz * dz);
+                float sign = GroundHeight(ground) >= hA ? 1f : -1f;
+                float hB = hA + sign * dist * Mathf.Tan(p.SlopeAngle.Value * Mathf.Deg2Rad);
+                spec.UseFixedHeights = true;
+                spec.FixedHA = hA;
+                spec.FixedHB = hB;
+                doneMsg = string.Format("Rampa {0:0}° creada ({1} {2:0.0} m en {3:0.0} m).",
+                    p.SlopeAngle.Value, sign >= 0f ? "sube" : "baja",
+                    Mathf.Abs(hB - hA), dist);
+            }
+
             Vector3 mid = (a + ground) * 0.5f;
             if (TerrainEngine.Apply(mid, spec))
-                TerrainForgePlugin.Message("Rampa creada de A a B.");
+                TerrainForgePlugin.Message(doneMsg);
             else
                 TerrainForgePlugin.Message("Rampa: no se pudo crear (puntos muy cortos o sin terreno).");
         }
@@ -233,9 +272,9 @@ namespace TerrainForge
 
             float playerGround = GroundHeight(player.transform.position);
 
-            // Flatten / Smooth follow the height under the crosshair by default so
-            // they conform to whatever you aim at (e.g. a ramp). Hold the modifier to
-            // level to your own feet instead.
+            // Flatten follows the height under the crosshair by default so it
+            // conforms to whatever you aim at (e.g. a ramp). Hold the modifier to
+            // level to your own feet instead; a fixed eyedrop height wins over both.
             bool ownHeight = Held(p.AimHeightModifierKey.Value);
 
             var spec = new BrushSpec
@@ -247,7 +286,7 @@ namespace TerrainForge
                 Softness = p.Softness.Value,
                 Power = p.FalloffPower.Value,
                 RaiseDelta = p.RaiseDelta.Value,
-                TargetWorld = ownHeight ? playerGround : center.y,
+                TargetWorld = _hasPicked ? _pickedHeight : (ownHeight ? playerGround : center.y),
                 PaintStrength = p.PaintStrength.Value,
                 MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
                 MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f
@@ -259,18 +298,43 @@ namespace TerrainForge
 
         private void HandleRadius(TerrainForgePlugin p)
         {
+            // Alt + radius controls adjust the fixed ramp angle instead of the
+            // radius when a fixed-angle ramp is selected.
+            bool angleMode = (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) &&
+                             p.DefaultOperation.Value == TerrainOperation.Ramp &&
+                             p.RampMode.Value == RampMode.FixedAngle;
+
             bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-            if (ctrl)
+            float scroll = Input.mouseScrollDelta.y;
+            if (Mathf.Abs(scroll) > 0.01f)
             {
-                float scroll = Input.mouseScrollDelta.y;
-                if (Mathf.Abs(scroll) > 0.01f)
+                if (angleMode)
+                    AdjustAngle(p, Mathf.Sign(scroll) * 2.5f);
+                else if (ctrl)
                     AdjustRadius(p, Mathf.Sign(scroll) * p.RadiusStep.Value);
             }
 
             if (p.RadiusUpKey.Value.IsDown())
-                AdjustRadius(p, p.RadiusStep.Value);
+            {
+                if (angleMode)
+                    AdjustAngle(p, 2.5f);
+                else
+                    AdjustRadius(p, p.RadiusStep.Value);
+            }
             if (p.RadiusDownKey.Value.IsDown())
-                AdjustRadius(p, -p.RadiusStep.Value);
+            {
+                if (angleMode)
+                    AdjustAngle(p, -2.5f);
+                else
+                    AdjustRadius(p, -p.RadiusStep.Value);
+            }
+        }
+
+        private void AdjustAngle(TerrainForgePlugin p, float delta)
+        {
+            float v = Mathf.Clamp(p.SlopeAngle.Value + delta, 5f, 60f);
+            p.SlopeAngle.Value = v;
+            Flash("Ángulo de rampa: " + v.ToString("0") + "°");
         }
 
         private static void AdjustRadius(TerrainForgePlugin p, float delta)
@@ -347,12 +411,29 @@ namespace TerrainForge
             _flashUntil = Time.time + 2.5f;
         }
 
+        private void ToggleEyedrop(Vector3 center)
+        {
+            if (_hasPicked)
+            {
+                _hasPicked = false;
+                Flash("Altura liberada (Flatten vuelve a la apuntada)");
+            }
+            else
+            {
+                _hasPicked = true;
+                _pickedHeight = center.y;
+                Flash("Altura fijada: " + _pickedHeight.ToString("0.0") + " m (Flatten la usará)");
+            }
+        }
+
         private string TargetText(TerrainForgePlugin p, Player player, Vector3 center)
         {
             switch (p.DefaultOperation.Value)
             {
                 case TerrainOperation.Flatten:
                 {
+                    if (_hasPicked)
+                        return string.Format("fija {0:0.0} m", _pickedHeight);
                     bool own = Held(p.AimHeightModifierKey.Value);
                     float t = own ? GroundHeight(player.transform.position) : center.y;
                     return string.Format("objetivo {0:0.0} m", t);
@@ -368,6 +449,10 @@ namespace TerrainForge
                 case TerrainOperation.Restore:
                     return "original";
                 case TerrainOperation.Ramp:
+                    if (p.RampMode.Value == RampMode.FixedAngle)
+                        return _rampHasA
+                            ? string.Format("{0:0}°: A \u2192 B", p.SlopeAngle.Value)
+                            : string.Format("rampa {0:0}°: marca A", p.SlopeAngle.Value);
                     if (_rampHasA)
                         return string.Format("A {0:0.0} \u2192 B {1:0.0} m",
                             GroundHeight(_rampA), center.y);

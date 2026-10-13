@@ -58,6 +58,9 @@ target and the local slope in degrees. Guides can be turned off with
 | Use aimed height (instead of your own) for Flatten | Hold `Left Shift` |
 | Undo last brush application | `Ctrl+Z` |
 | Redo an undone application | `Ctrl+Y` |
+| Fix / release Flatten height at aim (eyedropper) | `G` |
+| Toggle ramp mode (two-point / fixed angle) | `H` |
+| Adjust fixed ramp angle (Ramp selected) | Hold `Alt` + radius keys / wheel |
 | Give yourself the TerrainForge Rod | `F8` |
 | Open the key binding + help menu | `F5` |
 
@@ -91,7 +94,8 @@ All hotkeys are also editable directly in `BepInEx/config/com.terrainforge.valhe
 Config file: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 - **Brush**: `Radius`, `RadiusMin/Max`, `RadiusStep`, `Softness`, `FalloffPower`,
-  `RaiseLowerMeters`, `PaintStrength`, `DefaultOperation`, `Shape`, `Paint`.
+  `RaiseLowerMeters`, `PaintStrength`, `DefaultOperation`, `Shape`, `Paint`,
+  `RampMode` (`TwoPoint` / `FixedAngle`), `SlopeAngle` (5-60°).
 - **Limits**: `UnlockDeltaLimit` (default **true**), `MaxUpDelta`, `MaxDownDelta`.
   Raising these allows terrain edits past the vanilla +/-8 m; keep them equal on
   server and clients.

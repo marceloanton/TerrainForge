@@ -563,8 +563,9 @@ namespace TerrainForge
 
             // Endpoint heights are world-space so a ramp that crosses several
             // heightmap tiles still uses the same two heights on every tile.
-            float hA = GroundHeight(spec.RampA);
-            float hB = GroundHeight(spec.RampB);
+            // Fixed-angle ramps pass literal heights instead of sampling.
+            float hA = spec.UseFixedHeights ? spec.FixedHA : GroundHeight(spec.RampA);
+            float hB = spec.UseFixedHeights ? spec.FixedHB : GroundHeight(spec.RampB);
 
             // Uniform scale, so working in "vertex * scale" space keeps distances in
             // meters; the constant world origin cancels out in every difference.

@@ -69,6 +69,8 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = "Nivelar a tus pies (mod.)", Bind = p.AimHeightModifierKey });
             _entries.Add(new Entry { Label = "Deshacer", Bind = p.UndoKey });
             _entries.Add(new Entry { Label = "Rehacer", Bind = p.RedoKey });
+            _entries.Add(new Entry { Label = "Fijar altura (eyedrop)", Bind = p.EyedropKey });
+            _entries.Add(new Entry { Label = "Modo de rampa", Bind = p.RampModeKey });
             _entries.Add(new Entry { Label = "Obtener herramienta", Bind = p.GiveToolKey });
             _entries.Add(new Entry { Label = "Abrir este menu", Bind = p.RebindMenuKey });
         }
@@ -302,7 +304,9 @@ namespace TerrainForge
                  "de verdad (bordes, escalones y ruido). Mantenelo para suavizar mas.\n" +
                  "\u2022 Ramp: marca un punto A y luego un punto B con la tecla Aplicar; se " +
                  "crea una rampa recta entre ambos que une las dos alturas. El ancho es " +
-                 "el radio de la brocha y \"Softness\" suaviza solo los bordes laterales.\n" +
+                 "el radio de la brocha y \"Softness\" suaviza solo los bordes laterales. " +
+                 "Con \"Modo de rampa\" en angulo fijo, B solo da direccion y largo: la " +
+                 "altura sigue el angulo (sube o baja segun donde apuntes).\n" +
                  "\u2022 Paint: pinta el terreno (Dirt, Cultivated, Paved, hierba/vegetacion...).\n" +
                  "\u2022 Restore: devuelve el terreno a su estado original.");
 
@@ -315,6 +319,10 @@ namespace TerrainForge
                  "\u2022 \"Cambiar pintura\": tipo de pintura.\n" +
                  "\u2022 \"Nivelar a tus pies\" (Shift): Flatten toma esa altura en " +
                  "vez de la apuntada.\n" +
+                 "\u2022 \"Fijar altura\": copia la altura apuntada y Flatten la usa " +
+                 "siempre hasta liberarla (gana a Shift).\n" +
+                 "\u2022 \"Modo de rampa\": dos puntos o angulo fijo. Con angulo fijo, " +
+                 "Alt + teclas de radio (o rueda) ajusta los grados.\n" +
                  "\u2022 El HUD (arriba a la izquierda) muestra operacion, radio, forma y " +
                  "pintura actuales, mas una segunda linea con altura apuntada, objetivo " +
                  "y pendiente en grados.\n" +

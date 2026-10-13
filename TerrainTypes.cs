@@ -19,6 +19,12 @@ namespace TerrainForge
         Square
     }
 
+    public enum RampMode
+    {
+        TwoPoint,
+        FixedAngle
+    }
+
     /// <summary>
     /// Which equipped item enables the brush.
     /// </summary>
@@ -63,6 +69,12 @@ namespace TerrainForge
         public bool HasRampLine;
         public Vector3 RampA;
         public Vector3 RampB;
+
+        // Fixed-angle ramp: when set, endpoint heights are taken literally
+        // instead of sampling the terrain (B = A ± dist * tan(angle)).
+        public bool UseFixedHeights;
+        public float FixedHA;
+        public float FixedHB;
 
         public TerrainPaint PaintType => Paint;
     }

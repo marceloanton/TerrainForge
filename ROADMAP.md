@@ -103,20 +103,26 @@ But keep minimal: maybe `SmoothMode { Full, UpOnly, DownOnly }` in enum + config
 
 **Effort:** S | **Risk:** low
 
-## Phase 5 – Eyedropper (copy height)
-Key e.g. `Alt+Click` or cycleable? Or new submode.
-
-- In `TerrainBrush.cs`: if `EyedropKey` down → read `GroundHeight(center)` and store `LastHeight`; set `TargetWorld = LastHeight` for Flatten? Or new `SetTarget` action.
-- Also allow "level to this object": raycast to `Piece`, `Structure` etc get its base height? More fuzzy.
+## Phase 5 – Eyedropper (copy height) — DONE
+`EyedropKey` (default `G`) toggles a fixed Flatten height captured at the aim
+point (HUD shows `fija X m`, wins over Shift); press again to release. State
+clears on world exit. "Level to object" left out (fuzzy, low value).
 
 **Effort:** S | **Risk:** low
 
-## Phase 6 – Slope fixed (angle-based ramp)
-Add `SlopeMode { TwoPoint, FixedAngle }` for Ramp op? Or new op `Slope`.
+## Phase 6 – Slope fixed (angle-based ramp) — DONE
+`RampMode { TwoPoint, FixedAngle }` + `SlopeAngle` (5-60°, default 30°).
+Fixed-angle ramps pass literal endpoint heights (`BrushSpec.UseFixedHeights` /
+`FixedHA` / `FixedHB`): B sets direction + length, height = A ± dist·tan(angle),
+climbing or descending by aim. Mode toggled with `RampModeKey` (default `H`);
+angle adjusted with `Alt` + radius keys/wheel (no extra keys). Existing corridor
+preview reused (shows path + width).
 
-Compute target along direction from A: `deltaZ = dist * tan(angle * deg2rad)` to get hB from hA.
-
-**Files:** `TerrainTypes.cs` (`BrushSpec.Angle`, `SlopeMode`), `TerrainEngine.cs` (`ApplyRampLine` branch), `TerrainBrush.cs` (UI to set angle), `TerrainPreview.cs` draw projected line by angle.
+**Acceptance**
+- [x] Fixed-angle ramp builds at the configured slope
+- [x] Direction/length from B, up/down from aim
+- [x] Angle adjustable in-game, HUD shows mode + angle
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** M | **Risk:** low
 
