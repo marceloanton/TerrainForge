@@ -54,6 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Live measurements**: while marking, the HUD shows line/ramp length, rise and
   angle, rectangle W×D + area, polygon perimeter + area; final numbers are also
   appended to the confirmation messages.
+- **Path ramps**: `RampMode.Path` marks a curve A→B→C… (double-press with 3+
+  points closes) and builds a smooth Catmull-Rom ramp along it, width = radius;
+  next-segment corridor + trail preview, live length, undo support.
 - **Typed target height**: the eyedropper is now config-backed (`Brush >
   UseFixedHeight` / `FixedHeight`) with a textbox + Fix/Release row in AJUSTES;
   `G` captures into the same state, which persists and drives HUD + level ring.

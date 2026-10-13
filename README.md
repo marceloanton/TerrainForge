@@ -59,7 +59,7 @@ target and the local slope in degrees. Guides can be turned off with
 | Undo last brush application | `Ctrl+Z` |
 | Redo an undone application | `Ctrl+Y` |
 | Fix / release Flatten height at aim (eyedropper) | `G` |
-| Toggle ramp mode (two-point / fixed angle) | `H` |
+| Toggle ramp mode (two-point / fixed angle / path) | `H` |
 | Adjust fixed ramp angle (Ramp selected) | Hold `Alt` + radius keys / wheel |
 | Operation radial menu (hold, release to confirm) | `Q` |
 

@@ -76,6 +76,18 @@ namespace TerrainForge
             {
                 searchRadius = Mathf.Max(spec.Radius, Vector3.Distance(spec.RampA, spec.RampB) * 0.5f + spec.Radius) + 4f;
             }
+            else if (spec.HasRampPath && spec.RampPath != null && spec.RampPath.Length >= 3)
+            {
+                Vector3 c = Vector3.zero;
+                float maxD = 0f;
+                for (int k = 0; k < spec.RampPath.Length; k++)
+                    c += spec.RampPath[k];
+                c /= spec.RampPath.Length;
+                for (int k = 0; k < spec.RampPath.Length; k++)
+                    maxD = Mathf.Max(maxD, Vector3.Distance(c, spec.RampPath[k]));
+                searchCenter = c;
+                searchRadius = maxD + spec.Radius + 4f;
+            }
             else if (spec.HasLine)
             {
                 searchCenter = (spec.LineA + spec.LineB) * 0.5f;
@@ -375,6 +387,8 @@ namespace TerrainForge
         {
             if (spec.Operation == TerrainOperation.Ramp && spec.HasRampLine)
                 return ApplyRampLine(comp, hm, spec, frame);
+            if (spec.HasRampPath)
+                return ApplyRampPath(comp, hm, spec, frame);
             if (spec.HasLine || spec.HasRect || spec.HasPoly)
                 return ApplyFootprint(comp, hm, spec, frame);
 
@@ -736,6 +750,152 @@ namespace TerrainForge
             }
 
             return any;
+        }
+
+        /// <summary>
+        /// Builds a smooth ramp along a 3+ point path. Control points are densified
+        /// with Catmull-Rom (≈0.5 vertex between samples); every vertex takes the
+        /// height of its nearest sample, with the usual flat-core + side-fade
+        /// profile across the corridor (width = 2 * Radius). One-shot call.
+        /// </summary>
+        private static bool ApplyRampPath(TerrainComp comp, Heightmap hm, BrushSpec spec, List<UndoEntry> frame)
+        {
+            int width = hm.m_width;
+            int pitch = width + 1;
+            float scale = hm.m_scale;
+            if (scale <= 0f)
+                return false;
+            if (spec.RampPath == null || spec.RampPath.Length < 3 ||
+                spec.RampPathH == null || spec.RampPathH.Length != spec.RampPath.Length)
+                return false;
+
+            int n = spec.RampPath.Length;
+            float[] vx = new float[n];
+            float[] vy = new float[n];
+            for (int k = 0; k < n; k++)
+            {
+                hm.WorldToVertex(spec.RampPath[k], out int qx, out int qy);
+                vx[k] = qx;
+                vy[k] = qy;
+            }
+
+            var sPts = new List<Vector2>();
+            var sH = new List<float>();
+            for (int i = 0; i < n - 1; i++)
+            {
+                int i0 = Mathf.Max(0, i - 1);
+                int i3 = Mathf.Min(n - 1, i + 2);
+                float segLen = Vector2.Distance(new Vector2(vx[i], vy[i]), new Vector2(vx[i + 1], vy[i + 1]));
+                int steps = Mathf.Max(2, Mathf.CeilToInt(segLen / 0.5f));
+                for (int s = (i == 0 ? 0 : 1); s <= steps; s++)
+                {
+                    float t = (float)s / steps;
+                    sPts.Add(new Vector2(
+                        CR(vx[i0], vx[i], vx[i + 1], vx[i3], t),
+                        CR(vy[i0], vy[i], vy[i + 1], vy[i3], t)));
+                    sH.Add(Mathf.Lerp(spec.RampPathH[i], spec.RampPathH[i + 1], t));
+                }
+            }
+            if (sPts.Count < 2)
+                return false;
+
+            float halfWidth = Mathf.Max(0.5f, spec.Radius);
+            float sideFade = halfWidth * 0.5f * Mathf.Clamp01(spec.Softness / 100f);
+
+            float minx = float.MaxValue, maxx = float.MinValue;
+            float minz = float.MaxValue, maxz = float.MinValue;
+            for (int k = 0; k < sPts.Count; k++)
+            {
+                if (sPts[k].x < minx) minx = sPts[k].x;
+                if (sPts[k].x > maxx) maxx = sPts[k].x;
+                if (sPts[k].y < minz) minz = sPts[k].y;
+                if (sPts[k].y > maxz) maxz = sPts[k].y;
+            }
+            int pad = Mathf.CeilToInt(halfWidth / scale) + 1;
+            int x0 = Mathf.Max(0, (int)minx - pad);
+            int x1 = Mathf.Min(width, (int)maxx + pad);
+            int y0 = Mathf.Max(0, (int)minz - pad);
+            int y1 = Mathf.Min(width, (int)maxz + pad);
+
+            float[] level = LevelDelta(comp);
+            bool[] modHeight = (bool[])f_modifiedHeight.GetValue(comp);
+            if (level == null || modHeight == null)
+                return false;
+
+            Recorder rec = frame != null
+                ? new Recorder(level, null, modHeight, null, null)
+                : null;
+
+            bool any = false;
+            for (int i = y0; i <= y1; i++)
+            {
+                for (int j = x0; j <= x1; j++)
+                {
+                    float best = float.MaxValue;
+                    float bestH = 0f;
+                    for (int k = 0; k < sPts.Count - 1; k++)
+                    {
+                        Vector2 A = sPts[k];
+                        Vector2 B = sPts[k + 1];
+                        float dx = B.x - A.x, dz = B.y - A.y;
+                        float len2 = dx * dx + dz * dz;
+                        float t = len2 < 0.000001f ? 0f : ((j - A.x) * dx + (i - A.y) * dz) / len2;
+                        t = Mathf.Clamp01(t);
+                        float nx = A.x + t * dx, nz = A.y + t * dz;
+                        float ddx = j - nx, ddz = i - nz;
+                        float d = Mathf.Sqrt(ddx * ddx + ddz * ddz);
+                        if (d < best)
+                        {
+                            best = d;
+                            bestH = Mathf.Lerp(sH[k], sH[k + 1], t);
+                        }
+                    }
+
+                    float latDist = best * scale;
+                    if (latDist > halfWidth)
+                        continue;
+
+                    float lat = 1f;
+                    if (sideFade > 0.001f)
+                        lat = Mathf.Clamp01((halfWidth - latDist) / sideFade);
+                    float wl = lat * lat * (3f - 2f * lat);
+
+                    float curWorld = hm.GetHeight(j, i);
+                    float newWorld = Mathf.Lerp(curWorld, bestH, wl);
+
+                    int idx = i * pitch + j;
+                    if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !modHeight[idx])
+                    {
+                        if (rec != null)
+                            rec.Add(idx);
+                        level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
+                        modHeight[idx] = true;
+                        any = true;
+                    }
+                }
+            }
+
+            if (any && frame != null && rec != null && rec.Cells.Count > 0)
+            {
+                frame.Add(new UndoEntry
+                {
+                    Comp = comp,
+                    Hm = hm,
+                    WithSmooth = false,
+                    WithPaint = false,
+                    Before = rec.Cells
+                });
+            }
+
+            return any;
+        }
+
+        private static float CR(float p0, float p1, float p2, float p3, float t)
+        {
+            float t2 = t * t, t3 = t2 * t;
+            return 0.5f * ((2f * p1) + (-p0 + p2) * t +
+                (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 +
+                (-p0 + 3f * p1 - 3f * p2 + p3) * t3);
         }
 
         /// <summary>

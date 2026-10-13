@@ -37,6 +37,9 @@ namespace TerrainForge
         private Vector3 _rectA;
         private readonly List<Vector3> _polyPoints = new List<Vector3>();
         private float _polyLastClick = -999f;
+        private readonly List<Vector3> _rampPath = new List<Vector3>();
+        private readonly List<float> _rampPathH = new List<float>();
+        private float _rampPathLast = -999f;
         private static bool s_clearMarks;
 
         internal static void RequestClearMarks() => s_clearMarks = true;
@@ -68,6 +71,7 @@ namespace TerrainForge
                 _rampHasA = false;
                 p.UseFixedHeight.Value = false;
                 ClearShapeMarks();
+                ClearRampPath();
                 return;
             }
 
@@ -88,6 +92,7 @@ namespace TerrainForge
                 s_clearMarks = false;
                 _rampHasA = false;
                 ClearShapeMarks();
+                ClearRampPath();
             }
 
             if (p.AutoGiveTool.Value && !_toolGiven)
@@ -131,6 +136,7 @@ namespace TerrainForge
                     CycleOperation(p);
                     _rampHasA = false;
                     ClearShapeMarks();
+                    ClearRampPath();
                 }
                 if (p.CycleShapeKey.Value.IsDown())
                 {
@@ -147,18 +153,30 @@ namespace TerrainForge
                     ToggleEyedrop(groundCenter);
                 if (p.RampModeKey.Value.IsDown())
                 {
-                    p.RampMode.Value = p.RampMode.Value == RampMode.TwoPoint
-                        ? RampMode.FixedAngle : RampMode.TwoPoint;
+                    p.RampMode.Value = (RampMode)(((int)p.RampMode.Value + 1) % 3);
                     _rampHasA = false;
-                    Flash(p.RampMode.Value == RampMode.FixedAngle
-                        ? Loc.F("flash.rampmode.fixed", p.SlopeAngle.Value.ToString("0"))
-                        : Loc.T("flash.rampmode.two"));
+                    ClearRampPath();
+                    switch (p.RampMode.Value)
+                    {
+                        case RampMode.FixedAngle:
+                            Flash(Loc.F("flash.rampmode.fixed", p.SlopeAngle.Value.ToString("0")));
+                            break;
+                        case RampMode.Path:
+                            Flash(Loc.T("flash.rampmode.path"));
+                            break;
+                        default:
+                            Flash(Loc.T("flash.rampmode.two"));
+                            break;
+                    }
                 }
             }
 
             TerrainOperation op = p.DefaultOperation.Value;
             if (op != TerrainOperation.Ramp)
+            {
                 _rampHasA = false;
+                ClearRampPath();
+            }
 
             // Server authority: when the server runs the mod, its Server-section
             // values (synced to clients) decide whether this client may write
@@ -227,17 +245,19 @@ namespace TerrainForge
                 bool guides = p.ShowGuides.Value;
                 float fullRadius = p.Radius.Value * (1f - 0.5f * Mathf.Clamp01(p.Softness.Value / 100f));
                 bool isRamp = p.DefaultOperation.Value == TerrainOperation.Ramp;
+                bool pathMarking = isRamp && p.RampMode.Value == RampMode.Path && _rampPath.Count > 0;
                 // The line footprint reuses the ramp corridor projection.
                 bool lineMarking = !isRamp && p.Shape.Value == TerrainShape.Line && _lineHasA;
                 bool rectMarking = !isRamp && p.Shape.Value == TerrainShape.Rect && _rectHasA;
                 bool polyMarking = !isRamp && p.Shape.Value == TerrainShape.Poly && _polyPoints.Count > 0;
                 Vector3[] polyPreview = null;
-                if (polyMarking)
+                if (polyMarking || pathMarking)
                 {
-                    polyPreview = new Vector3[_polyPoints.Count + 1];
-                    for (int k = 0; k < _polyPoints.Count; k++)
-                        polyPreview[k] = _polyPoints[k];
-                    polyPreview[_polyPoints.Count] = groundCenter;
+                    List<Vector3> src = pathMarking ? _rampPath : _polyPoints;
+                    polyPreview = new Vector3[src.Count + 1];
+                    for (int k = 0; k < src.Count; k++)
+                        polyPreview[k] = src[k];
+                    polyPreview[src.Count] = groundCenter;
                 }
                 _preview.Update(new PreviewState
                 {
@@ -250,9 +270,13 @@ namespace TerrainForge
                     Shape = p.Shape.Value,
                     Color = BrushColor(p).WithAlpha(0.95f),
                     IsRamp = isRamp,
-                    HasRampA = isRamp ? _rampHasA : _lineHasA,
-                    RampA = isRamp ? _rampA : _lineA,
-                    SuppressCircles = lineMarking || rectMarking || polyMarking,
+                    HasRampA = isRamp
+                        ? (p.RampMode.Value == RampMode.Path ? pathMarking : _rampHasA)
+                        : _lineHasA,
+                    RampA = isRamp
+                        ? (p.RampMode.Value == RampMode.Path && pathMarking ? _rampPath[_rampPath.Count - 1] : _rampA)
+                        : _lineA,
+                    SuppressCircles = lineMarking || rectMarking || polyMarking || pathMarking,
                     HasRect = rectMarking,
                     RectA = _rectA,
                     RectB = groundCenter,
@@ -279,6 +303,12 @@ namespace TerrainForge
             {
                 Vector3 pos = player.transform.position;
                 ground = new Vector3(pos.x, GroundHeight(pos), pos.z);
+            }
+
+            if (p.RampMode.Value == RampMode.Path)
+            {
+                HandleRampPath(p, ground);
+                return;
             }
 
             bool fixedAngle = p.RampMode.Value == RampMode.FixedAngle;
@@ -347,11 +377,70 @@ namespace TerrainForge
                 TerrainForgePlugin.Message(Loc.T("msg.ramp.fail"));
         }
 
+        /// <summary>
+        /// Path ramps: each press adds a point (with its ground height); a
+        /// double-press with 3+ points builds a smooth ramp along the curve.
+        /// </summary>
+        private void HandleRampPath(TerrainForgePlugin p, Vector3 point)
+        {
+            if (_rampPath.Count >= 3 && Time.time - _rampPathLast < 0.5f)
+            {
+                BrushSpec spec = new BrushSpec
+                {
+                    Operation = TerrainOperation.Ramp,
+                    Radius = p.Radius.Value,
+                    Softness = p.Softness.Value,
+                    MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
+                    MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f,
+                    HasRampPath = true,
+                    RampPath = _rampPath.ToArray(),
+                    RampPathH = _rampPathH.ToArray()
+                };
+
+                Vector3 c = Vector3.zero;
+                float total = 0f;
+                for (int k = 0; k < _rampPath.Count; k++)
+                {
+                    c += _rampPath[k];
+                    if (k > 0)
+                        total += HorizDist(_rampPath[k - 1], _rampPath[k]);
+                }
+                c /= _rampPath.Count;
+                float rise = _rampPathH[_rampPathH.Count - 1] - _rampPathH[0];
+                int n = _rampPath.Count;
+                ClearRampPath();
+
+                bool ok = TerrainEngine.Apply(c, spec);
+                TerrainForgePlugin.Message(ok
+                    ? Loc.F("msg.path.done", n) + string.Format(" ({0}, {1})",
+                        M(total), Rise(rise))
+                    : Loc.T("msg.path.fail"));
+                if (ok)
+                    TerrainFx.Play(c, true);
+                return;
+            }
+
+            if (_rampPath.Count == 0 ||
+                (_rampPath[_rampPath.Count - 1] - point).sqrMagnitude > 0.25f)
+            {
+                _rampPath.Add(point);
+                _rampPathH.Add(GroundHeight(point));
+                TerrainForgePlugin.Message(Loc.F("msg.path.point", _rampPath.Count));
+            }
+            _rampPathLast = Time.time;
+        }
+
         private void ClearShapeMarks()
         {
             _lineHasA = false;
             _rectHasA = false;
             _polyPoints.Clear();
+        }
+
+        private void ClearRampPath()
+        {
+            _rampPath.Clear();
+            _rampPathH.Clear();
         }
 
         private BrushSpec BaseSpec(TerrainForgePlugin p, Player player, Vector3 center)
@@ -670,6 +759,10 @@ namespace TerrainForge
                 case TerrainOperation.Restore:
                     return Loc.T("hud.original");
                 case TerrainOperation.Ramp:
+                    if (p.RampMode.Value == RampMode.Path)
+                        return _rampPath.Count > 0
+                            ? string.Format("{0} {1}", Loc.T("hud.path"), M(ChainLength(_rampPath, center, false)))
+                            : Loc.T("hud.path.idle");
                     if (p.RampMode.Value == RampMode.FixedAngle)
                         return _rampHasA
                             ? Loc.F("hud.ramp.fixed.mark", p.SlopeAngle.Value) +
@@ -997,8 +1090,15 @@ namespace TerrainForge
 
             string status = string.Format("TerrainForge   {0}   |   {1} {2:0.#} m   |   {3}   |   {4}",
                 p.DefaultOperation.Value, Loc.T("hud.radius"), p.Radius.Value, p.Shape.Value, p.Paint.Value);
-            if (p.DefaultOperation.Value == TerrainOperation.Ramp && _rampHasA)
-                status += "   |   " + Loc.T("hud.rampA");
+            if (p.DefaultOperation.Value == TerrainOperation.Ramp)
+            {
+                if (p.RampMode.Value == RampMode.Path)
+                    status += "   |   " + (_rampPath.Count > 0
+                        ? Loc.F("hud.path.mark", _rampPath.Count)
+                        : Loc.T("hud.path.idle"));
+                else if (_rampHasA)
+                    status += "   |   " + Loc.T("hud.rampA");
+            }
             if (p.DefaultOperation.Value != TerrainOperation.Ramp)
             {
                 switch (p.Shape.Value)

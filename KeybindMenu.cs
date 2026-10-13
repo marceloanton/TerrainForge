@@ -566,9 +566,9 @@ namespace TerrainForge
             {
                 p.Paint.Value = (TerrainPaint)(((int)p.Paint.Value + 1) % 6);
             });
-            CycleRow(Loc.T("set.rampmode"), p.RampMode.Value == RampMode.FixedAngle ? Loc.T("rampmode.fixed") : Loc.T("rampmode.two"), () =>
+            CycleRow(Loc.T("set.rampmode"), RampModeText(p.RampMode.Value), () =>
             {
-                p.RampMode.Value = p.RampMode.Value == RampMode.FixedAngle ? RampMode.TwoPoint : RampMode.FixedAngle;
+                p.RampMode.Value = (RampMode)(((int)p.RampMode.Value + 1) % 3);
                 TerrainBrush.RequestClearMarks();
             });
             CycleRow(Loc.T("set.smoothmode"), SmoothModeText(p.SmoothMode.Value), () =>
@@ -657,6 +657,16 @@ namespace TerrainForge
                 case TerrainShape.Rect: return Loc.T("shape.rect");
                 case TerrainShape.Poly: return Loc.T("shape.poly");
                 default: return Loc.T("shape.circle");
+            }
+        }
+
+        private static string RampModeText(RampMode m)
+        {
+            switch (m)
+            {
+                case RampMode.FixedAngle: return Loc.T("rampmode.fixed");
+                case RampMode.Path: return Loc.T("rampmode.path");
+                default: return Loc.T("rampmode.two");
             }
         }
 

@@ -100,10 +100,17 @@ and spec read the configs.
 - `TerrainBrush.cs`: marking state, dispatch, HUD. `TerrainPreview.cs`: nothing
   new (reuse). `KeybindMenu.cs`: help.
 
+Implemented: `RampMode.Path` (+`HasRampPath`/`RampPath`/`RampPathH` in spec),
+`ApplyRampPath` (Catmull-Rom densify ≈0.5 vertex, per-vertex segment projection,
+flat-core + side-fade, sparse undo), mode cycles TwoPoint→FixedAngle→Path
+(`H` + AJUSTES), next-segment corridor + closed-trail preview, live chain length,
+length+rise in done message, marks cleared everywhere.
+
 **Acceptance**
-- [ ] 3+ point path builds a smooth continuous ramp, width = radius
-- [ ] Works across heightmap tiles, undoable, preview matches
-- [ ] Both languages
+- [x] 3+ point path builds a smooth continuous ramp, width = radius
+- [x] Works across heightmap tiles, undoable, preview matches
+- [x] Both languages
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** M–L | **Risk:** medium (geometry)
 
