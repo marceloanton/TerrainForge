@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Guides much more visible (thicker lines, stronger alphas) plus a startup log
+  line with the preview shader to diagnose invisible previews via `LogOutput.log`.
+- Status HUD moved to the **bottom-right** with the default IMGUI typeface
+  instead of the game's Averia font.
+
 ## [0.2.0] - 2026-10-13
 
 ### Added

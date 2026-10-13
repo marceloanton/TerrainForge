@@ -1203,17 +1203,11 @@ namespace TerrainForge
             string prefix = _applying ? "\u25B6  " : "\u2022  ";
             string full = prefix + status;
 
+            // Bottom-right block: second line at the bottom, main line above it.
             Vector2 size = _hud.CalcSize(new GUIContent(full));
             float w = Mathf.Max(320f, size.x + 28f);
             w = Mathf.Min(w, Mathf.Max(200f, Screen.width - 24f));
             float h = Mathf.Max(30f, size.y + 12f);
-            var rect = new Rect(12f, 12f, w, h);
-
-            GUI.color = new Color(0f, 0f, 0f, 0.55f);
-            GUI.DrawTexture(rect, _hudBg);
-            GUI.color = prev;
-
-            GUI.Label(new Rect(rect.x + 12f, rect.y, rect.width - 20f, rect.height), full, _hud);
 
             string line2 = string.Format("{0} {1:0.0} m   |   {2}   |   {3} {4:0}\u00B0",
                 Loc.T("hud.aimed"), _aimY, _targetTxt, Loc.T("hud.slope"), _slopeDeg);
@@ -1221,7 +1215,16 @@ namespace TerrainForge
             float w2 = Mathf.Max(320f, size2.x + 28f);
             w2 = Mathf.Min(w2, Mathf.Max(200f, Screen.width - 24f));
             float h2 = Mathf.Max(30f, size2.y + 12f);
-            var rect2 = new Rect(12f, rect.y + rect.height + 4f, w2, h2);
+
+            float margin = 12f;
+            var rect2 = new Rect(Screen.width - w2 - margin, Screen.height - h2 - margin, w2, h2);
+            var rect = new Rect(Screen.width - w - margin, rect2.y - 4f - h, w, h);
+
+            GUI.color = new Color(0f, 0f, 0f, 0.55f);
+            GUI.DrawTexture(rect, _hudBg);
+            GUI.color = prev;
+
+            GUI.Label(new Rect(rect.x + 8f, rect.y, rect.width - 20f, rect.height), full, _hud);
 
             GUI.color = new Color(0f, 0f, 0f, 0.55f);
             GUI.DrawTexture(rect2, _hudBg);
@@ -1229,7 +1232,7 @@ namespace TerrainForge
 
             Color prevText = _hud.normal.textColor;
             _hud.normal.textColor = Color.white;
-            GUI.Label(new Rect(rect2.x + 12f, rect2.y, rect2.width - 20f, rect2.height), line2, _hud);
+            GUI.Label(new Rect(rect2.x + 8f, rect2.y, rect2.width - 20f, rect2.height), line2, _hud);
             _hud.normal.textColor = prevText;
         }
 
@@ -1243,12 +1246,14 @@ namespace TerrainForge
             _hudBg.Apply();
             _hudBg.hideFlags = HideFlags.HideAndDontSave;
 
+            // Default IMGUI typeface (not the game's Averia): cleaner at small
+            // sizes and visually distinct from vanilla text.
             _hud = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 15,
                 fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleLeft,
-                font = GameFont()
+                alignment = TextAnchor.MiddleRight,
+                font = null
             };
         }
 

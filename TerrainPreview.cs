@@ -80,6 +80,7 @@ namespace TerrainForge
             _root = new GameObject("TerrainForgePreview") { hideFlags = HideFlags.HideAndDontSave };
             _lineMat = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
             _lineMat.color = Color.white;
+            TerrainForgePlugin.Log?.LogInfo("TerrainPreview: initialised with shader '" + shader.name + "'.");
 
             _edge = MakeLine("edge", 2, false);
             _full = MakeLine("full", 2, false);
@@ -165,7 +166,7 @@ namespace TerrainForge
                 SetRing(_reach, s.ReachRadius, s.Shape);
             }
 
-            float w = Mathf.Clamp(s.Radius * 0.03f, 0.05f, 0.6f);
+            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
             SetWidth(_edge, w);
             SetWidth(_full, w * 0.45f);
             SetWidth(_reach, w * 0.35f);
@@ -186,9 +187,9 @@ namespace TerrainForge
                     Mathf.Clamp01((s.SlopeDeg - 15f) / 30f));
             }
             SetColor(_edge, edgeC);
-            SetColor(_full, Col(c, 0.42f));
-            SetColor(_reach, Col(c, 0.20f));
-            SetColor(_aim, Col(c, 0.15f));
+            SetColor(_full, Col(c, 0.55f));
+            SetColor(_reach, Col(c, 0.35f));
+            SetColor(_aim, Col(c, 0.28f));
 
             // Once a corridor / footprint projection exists it replaces the round
             // footprint, so hide the circular guides to avoid clutter.
@@ -216,7 +217,7 @@ namespace TerrainForge
                 SetActive(_aim, false);
             }
 
-            Color cCorr = Col(c, 0.55f);
+            Color cCorr = Col(c, 0.70f);
             if (s.HasRampA)
             {
                 Vector3 a = s.RampA;
@@ -334,7 +335,7 @@ namespace TerrainForge
                     _level.SetPosition(Segments, _level.GetPosition(0));
                 }
                 SetWidth(_level, w * 0.45f);
-                SetColor(_level, Col(c, 0.55f));
+                SetColor(_level, Col(c, 0.65f));
                 SetActive(_level, true);
             }
             else
