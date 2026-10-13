@@ -28,6 +28,7 @@ namespace TerrainForge
         private string _targetTxt = "";
         private float _slopeDeg;
         private float _levelY = float.NaN;
+        private Vector3 _aimPoint;
         private bool _serverAllowed = true;
         private string _serverWhy;
         private bool _hasPicked;
@@ -203,6 +204,7 @@ namespace TerrainForge
             if (equipped)
             {
                 _aimY = groundCenter.y;
+                _aimPoint = groundCenter;
                 _targetTxt = TargetText(p, player, groundCenter);
                 _slopeDeg = SlopeDeg(groundCenter);
 
@@ -315,7 +317,10 @@ namespace TerrainForge
                 RampB = ground
             };
 
-            string doneMsg = Loc.T("msg.ramp.doneAB");
+            float rlen = HorizDist(a, ground);
+            float rrise = ground.y - a.y;
+            string doneMsg = Loc.T("msg.ramp.doneAB") + string.Format(" ({0}, {1}, {2})",
+                M(rlen), Rise(rrise), Deg(PathAngle(rlen, rrise)));
             if (fixedAngle)
             {
                 // B sets direction + length; the height follows the fixed angle,
@@ -423,7 +428,10 @@ namespace TerrainForge
                     spec.LineB = point;
                     Vector3 mid = (a + point) * 0.5f;
                     bool ok = TerrainEngine.Apply(mid, spec);
-                    TerrainForgePlugin.Message(ok ? Loc.T("msg.line.done") : Loc.T("msg.line.fail"));
+                    string msg = ok
+                        ? Loc.T("msg.line.done") + " (" + M(HorizDist(a, point)) + ")"
+                        : Loc.T("msg.line.fail");
+                    TerrainForgePlugin.Message(msg);
                     if (ok)
                         TerrainFx.Play(mid, true);
                     return ok;
@@ -452,7 +460,11 @@ namespace TerrainForge
                     spec.RectB = point;
                     Vector3 mid = (ra + point) * 0.5f;
                     bool ok = TerrainEngine.Apply(mid, spec);
-                    TerrainForgePlugin.Message(ok ? Loc.T("msg.rect.done") : Loc.T("msg.rect.fail"));
+                    string msg = ok
+                        ? Loc.T("msg.rect.done") + string.Format(" ({0}×{1} m, {2} m²)",
+                            dx.ToString("0.#"), dz.ToString("0.#"), (dx * dz).ToString("0.#"))
+                        : Loc.T("msg.rect.fail");
+                    TerrainForgePlugin.Message(msg);
                     if (ok)
                         TerrainFx.Play(mid, true);
                     return ok;
@@ -469,10 +481,12 @@ namespace TerrainForge
                             c += _polyPoints[k];
                         c /= _polyPoints.Count;
                         int n = _polyPoints.Count;
+                        float pper = ChainLength(_polyPoints, Vector3.zero, true);
+                        float parea = PolyArea(_polyPoints, Vector3.zero, false);
                         _polyPoints.Clear();
                         bool ok = TerrainEngine.Apply(c, spec);
                         TerrainForgePlugin.Message(ok
-                            ? Loc.F("msg.poly.done", n)
+                            ? Loc.F("msg.poly.done", n) + string.Format(" ({0}, {1} m²)", M(pper), parea.ToString("0.#"))
                             : Loc.T("msg.poly.fail"));
                         if (ok)
                             TerrainFx.Play(c, true);
@@ -657,11 +671,16 @@ namespace TerrainForge
                 case TerrainOperation.Ramp:
                     if (p.RampMode.Value == RampMode.FixedAngle)
                         return _rampHasA
-                            ? Loc.F("hud.ramp.fixed.mark", p.SlopeAngle.Value)
+                            ? Loc.F("hud.ramp.fixed.mark", p.SlopeAngle.Value) +
+                              " (" + M(HorizDist(_rampA, center)) + ")"
                             : Loc.F("hud.ramp.fixed.idle", p.SlopeAngle.Value);
                     if (_rampHasA)
-                        return string.Format("A {0:0.0} \u2192 B {1:0.0} m",
-                            GroundHeight(_rampA), center.y);
+                    {
+                        float len = HorizDist(_rampA, center);
+                        float rise = center.y - GroundHeight(_rampA);
+                        return string.Format("A {0:0.0} → B {1:0.0} m ({2}, {3})",
+                            GroundHeight(_rampA), center.y, M(len), Deg(PathAngle(len, rise)));
+                    }
                     return Loc.T("hud.markAB");
                 default:
                     return "";
@@ -675,6 +694,67 @@ namespace TerrainForge
             float hz = GroundHeight(c + new Vector3(0f, 0f, e)) - GroundHeight(c - new Vector3(0f, 0f, e));
             float grad = Mathf.Sqrt(hx * hx + hz * hz) / (2f * e);
             return Mathf.Atan(grad) * Mathf.Rad2Deg;
+        }
+
+        // ---- live measurements (language-neutral numbers) ----------------------
+
+        private static float HorizDist(Vector3 a, Vector3 b)
+        {
+            float dx = b.x - a.x, dz = b.z - a.z;
+            return Mathf.Sqrt(dx * dx + dz * dz);
+        }
+
+        private static string M(float v)
+        {
+            return v.ToString("0.#") + " m";
+        }
+
+        private static string Rise(float dh)
+        {
+            return (dh >= 0f ? "+" : "") + dh.ToString("0.0") + " m";
+        }
+
+        private static string Deg(float ang)
+        {
+            return ang.ToString("0") + "°";
+        }
+
+        private static float PathAngle(float dist, float dh)
+        {
+            return Mathf.Atan2(Mathf.Abs(dh), Mathf.Max(dist, 0.001f)) * Mathf.Rad2Deg;
+        }
+
+        private static float ChainLength(List<Vector3> pts, Vector3 end, bool closed)
+        {
+            if (pts.Count == 0)
+                return 0f;
+            float total = 0f;
+            for (int i = 1; i < pts.Count; i++)
+                total += HorizDist(pts[i - 1], pts[i]);
+            total += closed ? HorizDist(pts[pts.Count - 1], pts[0]) : HorizDist(pts[pts.Count - 1], end);
+            return total;
+        }
+
+        private static float PolyArea(List<Vector3> pts, Vector3 extra, bool useExtra)
+        {
+            int n = pts.Count + (useExtra ? 1 : 0);
+            if (n < 3)
+                return 0f;
+            double a = 0.0;
+            for (int i = 0; i < n; i++)
+            {
+                Vector3 p1 = PtAt(pts, extra, useExtra, i);
+                Vector3 p2 = PtAt(pts, extra, useExtra, (i + 1) % n);
+                a += (double)p1.x * p2.z - (double)p2.x * p1.z;
+            }
+            return (float)(System.Math.Abs(a) * 0.5);
+        }
+
+        private static Vector3 PtAt(List<Vector3> pts, Vector3 extra, bool useExtra, int i)
+        {
+            if (useExtra && i == pts.Count)
+                return extra;
+            return pts[i];
         }
 
         private static void CyclePaint(TerrainForgePlugin p)
@@ -923,15 +1003,37 @@ namespace TerrainForge
                 switch (p.Shape.Value)
                 {
                     case TerrainShape.Line:
-                        status += "   |   " + Loc.T(_lineHasA ? "hud.line.mark" : "hud.line.idle");
+                        if (_lineHasA)
+                        {
+                            float len = HorizDist(_lineA, _aimPoint);
+                            float rise = _aimPoint.y - _lineA.y;
+                            status += "   |   " + Loc.T("hud.line.mark") + string.Format(" ({0}, {1}, {2})",
+                                M(len), Rise(rise), Deg(PathAngle(len, rise)));
+                        }
+                        else
+                            status += "   |   " + Loc.T("hud.line.idle");
                         break;
                     case TerrainShape.Rect:
-                        status += "   |   " + Loc.T(_rectHasA ? "hud.rect.mark" : "hud.rect.idle");
+                        if (_rectHasA)
+                        {
+                            float wdt = Mathf.Abs(_aimPoint.x - _rectA.x);
+                            float dep = Mathf.Abs(_aimPoint.z - _rectA.z);
+                            status += "   |   " + Loc.T("hud.rect.mark") + string.Format(" ({0}×{1} m, {2} m²)",
+                                wdt.ToString("0.#"), dep.ToString("0.#"), (wdt * dep).ToString("0.#"));
+                        }
+                        else
+                            status += "   |   " + Loc.T("hud.rect.idle");
                         break;
                     case TerrainShape.Poly:
-                        status += "   |   " + (_polyPoints.Count > 0
-                            ? Loc.F("hud.poly.mark", _polyPoints.Count)
-                            : Loc.T("hud.poly.idle"));
+                        if (_polyPoints.Count > 0)
+                        {
+                            float perim = ChainLength(_polyPoints, _aimPoint, false);
+                            float area = PolyArea(_polyPoints, _aimPoint, true);
+                            status += "   |   " + Loc.F("hud.poly.mark", _polyPoints.Count) +
+                                string.Format(" ({0}, {1} m²)", M(perim), area.ToString("0.#"));
+                        }
+                        else
+                            status += "   |   " + Loc.T("hud.poly.idle");
                         break;
                 }
             }

@@ -40,10 +40,15 @@ poly perimeter + area.
 - `TerrainTypes.cs`: `Loc` keys.
 - `KeybindMenu.cs`: one help bullet.
 
+Implemented: language-neutral numeric suffixes appended to the existing HUD
+state labels (no new `Loc` keys needed); shoelace area + chain length helpers;
+final numbers appended to ramp/line/rect/poly confirmation messages.
+
 **Acceptance**
-- [ ] Line/ramp marking shows live length, rise and angle updating with cursor
-- [ ] Rect shows W×D + area; poly shows perimeter + area + point count
-- [ ] Both languages
+- [x] Line/ramp marking shows live length, rise and angle updating with cursor
+- [x] Rect shows W×D + area; poly shows perimeter + area + point count
+- [x] Both languages (numbers only, no new strings)
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** S | **Risk:** low
 
