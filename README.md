@@ -102,7 +102,8 @@ operations apply over these footprints with undo support.
 
 ### In-game help
 
-Press **F5** (configurable) and open the **AYUDA** tab for an in-game description
+Press **F5** (configurable) — or the **TerrainForge** button in the `ESC` pause
+menu — and open the **AYUDA** tab for an in-game description
 of the tool and every operation. The **TECLAS** tab rebinds keys: click a binding,
 press the new key or mouse button, and it is saved to the config immediately.
 `Esc` cancels a capture.

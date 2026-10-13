@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Snow operation**: paint-only snow brush (same mask as the game's snow);
   hold `Shift` to erase it back to the original ground. Preview turns grey in
   erase mode, HUD shows the mode, works over every footprint with undo support.
+- **Pause menu button**: the `ESC` pause menu now has a `TerrainForge` entry
+  (cloned from the settings button, same styling) that opens the mod menu.
+  `F5` keeps working as before.
 
 ### Fixed
 

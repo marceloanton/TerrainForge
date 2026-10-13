@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TerrainForge
 {
@@ -233,6 +235,64 @@ namespace TerrainForge
                 if (smt) mod.m_smoothRadius = Mathf.Clamp(sm * scale, 0.5f, 200f);
                 if (pnt) mod.m_paintRadius = Mathf.Clamp(p * scale, 0.5f, 200f);
             }
+        }
+    }
+
+    /// <summary>
+    /// Adds a "TerrainForge" button to the ESC pause menu (cloned from the settings
+    /// button so it matches the game's styling) that opens the mod menu. Everything
+    /// is guarded: if the game's menu internals ever change, the pause menu keeps
+    /// working and we just log a warning.
+    /// </summary>
+    internal static class PauseMenuPatch
+    {
+        private const string ButtonName = "TerrainForgeButton";
+        private static MethodInfo s_updateNavigation;
+
+        [HarmonyPatch(typeof(Menu), "Start")]
+        [HarmonyPostfix]
+        private static void Postfix(Menu __instance)
+        {
+            try
+            {
+                AddButton(__instance);
+            }
+            catch (Exception e)
+            {
+                TerrainForgePlugin.Log?.LogWarning("TerrainForge pause menu button failed: " + e.Message);
+            }
+        }
+
+        private static void AddButton(Menu menu)
+        {
+            if (menu == null || menu.m_settingsButton == null || menu.menuEntriesParent == null)
+                return;
+
+            Transform parent = menu.menuEntriesParent;
+            if (parent.Find(ButtonName) != null)
+                return; // already added
+
+            Button clone = UnityEngine.Object.Instantiate(menu.m_settingsButton, parent);
+            if (clone == null)
+                return;
+            clone.name = ButtonName;
+            clone.transform.SetSiblingIndex(menu.m_settingsButton.transform.GetSiblingIndex() + 1);
+
+            // Drop the vanilla settings listener; wire ours instead.
+            clone.onClick = new Button.ButtonClickedEvent();
+            TMP_Text text = clone.GetComponentInChildren<TMP_Text>(true);
+            if (text != null)
+                text.text = "TerrainForge";
+            clone.onClick.AddListener(() => TerrainKeybinds.OpenMenu());
+
+            // Refresh gamepad navigation so the new entry is reachable.
+            try
+            {
+                if (s_updateNavigation == null)
+                    s_updateNavigation = AccessTools.Method(typeof(Menu), "UpdateNavigation");
+                s_updateNavigation?.Invoke(menu, null);
+            }
+            catch { /* mouse users unaffected */ }
         }
     }
 

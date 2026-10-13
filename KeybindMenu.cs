@@ -228,8 +228,17 @@ namespace TerrainForge
 
         public static bool MenuOpen { get; private set; }
 
+        private static TerrainKeybinds s_instance;
+
+        internal static void OpenMenu()
+        {
+            if (s_instance != null)
+                s_instance.Toggle(true);
+        }
+
         private void Start()
         {
+            s_instance = this;
             BuildEntries();
         }
 
