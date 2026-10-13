@@ -249,6 +249,7 @@ namespace TerrainForge
     {
         private const string ButtonName = "TerrainForgeButton";
         private static MethodInfo s_updateNavigation;
+        private static bool s_logged;
 
         [HarmonyPatch(typeof(Menu), "Show")]
         [HarmonyPostfix]
@@ -289,13 +290,15 @@ namespace TerrainForge
                 clone.name = ButtonName;
             }
             clone.transform.SetSiblingIndex(menu.m_settingsButton.transform.GetSiblingIndex() + 1);
+            clone.transform.localScale = Vector3.one;
             clone.gameObject.SetActive(true);
 
             // Drop the vanilla settings listener; wire ours instead.
             clone.onClick = new Button.ButtonClickedEvent();
-            TMP_Text text = clone.GetComponentInChildren<TMP_Text>(true);
-            if (text != null)
+            foreach (TMP_Text text in clone.GetComponentsInChildren<TMP_Text>(true))
                 text.text = "TerrainForge";
+            foreach (Text legacy in clone.GetComponentsInChildren<Text>(true))
+                legacy.text = "TerrainForge";
             clone.onClick.AddListener(() => TerrainKeybinds.OpenMenu());
 
             // Refresh gamepad navigation so the new entry is reachable.
@@ -307,7 +310,13 @@ namespace TerrainForge
             }
             catch { /* mouse users unaffected */ }
 
-            TerrainForgePlugin.Log?.LogInfo("TerrainForge pause menu button added.");
+            if (!s_logged)
+            {
+                s_logged = true;
+                TerrainForgePlugin.Log?.LogInfo("TerrainForge pause menu button added " +
+                    "(index " + clone.transform.GetSiblingIndex() +
+                    " of " + parent.childCount + " entries).");
+            }
         }
     }
 
