@@ -193,8 +193,8 @@ namespace TerrainForge
                     "• The solid line marks the real edge: where terrain is generated.\n• Faint guides around it (each operation's color): full-strength zone, maximum radius and maximum aim distance.\n• In Ramp, mark A and B to see the real corridor (both width lines).\n• The edge tints red where terrain gets steep (slope guide).\n• In Flatten/Shore you will see a ring at the target plane (level marker).\n• They can be disabled in the config (Preview > ShowGuides)." } },
                 { "help.mp.t", new[] { "Multijugador", "Multiplayer" } },
                 { "help.mp.b", new[] {
-                    "• El mod debe estar en el cliente Y en el servidor.\n• \"UnlockDeltaLimit\" debe estar activado tambien en el servidor; si no, el servidor recorta los cambios de mas de 8 m.\n• Radios muy grandes pueden desincronizar a clientes que no tengan el mod.\n• Autoridad del servidor: si el servidor tiene el mod, su seccion \"Server\" manda sobre los clientes (AllowTerrainEdits, AdminOnlyEdits). En servidores SIN el mod, tu config local sigue valiendo y la herramienta funciona para probar.",
-                    "• The mod must be on the client AND the server.\n• \"UnlockDeltaLimit\" must also be enabled on the server; otherwise the server clamps changes beyond 8 m.\n• Very large radii may desync clients without the mod.\n• Server authority: if the server runs the mod, its \"Server\" section rules over clients (AllowTerrainEdits, AdminOnlyEdits). On servers WITHOUT the mod, your local config still applies and the tool keeps working for testing." } },
+                    "• El mod debe estar en el cliente Y en el servidor.\n• \"UnlockDeltaLimit\" debe estar activado tambien en el servidor; si no, el servidor recorta los cambios de mas de 8 m.\n• Radios muy grandes pueden desincronizar a clientes que no tengan el mod.\n• Autoridad del servidor: si el servidor tiene el mod, su seccion \"Server\" manda sobre los clientes (AllowTerrainEdits, AdminOnlyEdits). En servidores SIN el mod, tu config local sigue valiendo y la herramienta funciona para probar.\n• Con RespectWards activado no se edita dentro de wards ajenos.\n• RadiusCap/DeltaCap dejan al servidor imponer radio y desnivel maximos (se ven recortados en HUD y preview).",
+                    "• The mod must be on the client AND the server.\n• \"UnlockDeltaLimit\" must also be enabled on the server; otherwise the server clamps changes beyond 8 m.\n• Very large radii may desync clients without the mod.\n• Server authority: if the server runs the mod, its \"Server\" section rules over clients (AllowTerrainEdits, AdminOnlyEdits). On servers WITHOUT the mod, your local config still applies and the tool keeps working for testing.\n• With RespectWards on, editing inside other players' wards is blocked.\n• RadiusCap/DeltaCap let the server enforce maximum radius and delta (seen clamped in HUD and preview)." } },
                 { "help.save.t", new[] { "Recargar / guardar", "Reload / save" } },
                 { "help.save.b", new[] {
                     "Las teclas se guardan solas al reasignarlas. La pestaña AJUSTES edita todo en vivo (operacion, forma, pintura, modos, tamaños e interruptores) y se guarda al cerrar el menu. Todo vive tambien en el archivo de configuracion del mod (BepInEx/config). Los snapshots de terreno (copias de seguridad) se guardan y cargan en AJUSTES.",
@@ -233,6 +233,11 @@ namespace TerrainForge
                 { "flash.angle", new[] { "Ángulo de rampa: {0}°", "Ramp angle: {0}°" } },
                 { "srv.adminonly", new[] { "Solo administradores pueden editar terreno en este servidor.", "Only admins may edit terrain on this server." } },
                 { "srv.blocked", new[] { "El servidor no permite editar terreno.", "This server does not allow terrain editing." } },
+                { "srv.ward", new[] { "Sin acceso en esta zona protegida (ward).", "No access in this protected zone (ward)." } },
+                { "set.respectwards", new[] { "RespectWards (wards ajenos)", "RespectWards (foreign wards)" } },
+                { "set.radiuscap", new[] { "Tope radio (server)", "Radius cap (server)" } },
+                { "set.deltacap", new[] { "Tope desnivel (server)", "Delta cap (server)" } },
+                { "hud.ward", new[] { "WARD: SIN ACCESO", "WARD: NO ACCESS" } },
                 { "hud.radius", new[] { "radio", "radius" } },
                 { "hud.undo", new[] { "deshacer", "undo" } },
                 { "hud.redo", new[] { "rehacer", "redo" } },

@@ -155,9 +155,14 @@ diff-write through the recorder (import is undoable), 12-file cap,
   visible before applying.
 - New `Loc` keys, help bullets, README server section.
 
+Implemented: `RespectWards` (`PrivateArea.CheckAccess`, no flash spam) gating
+apply/mark/undo; `EffectiveRadius/MaxUp/MaxDown` used by every spec builder,
+HUD and preview; `WARD: SIN ACCESO` tag; AJUSTES rows; synced = authoritative.
+
 **Acceptance**
-- [ ] Editing inside someone else's ward blocked with reason (when enabled)
-- [ ] Server-set radius/delta caps visibly clamp brush + preview on clients
+- [x] Editing inside someone else's ward blocked with reason (when enabled)
+- [x] Server-set radius/delta caps visibly clamp brush + preview on clients
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** S–M | **Risk:** low–medium
 

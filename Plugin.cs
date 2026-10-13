@@ -81,6 +81,9 @@ namespace TerrainForge
         // runs the mod; servers without the mod simply ignore these)
         public ConfigEntry<bool> AllowTerrainEdits;
         public ConfigEntry<bool> AdminOnlyEdits;
+        public ConfigEntry<bool> RespectWards;
+        public ConfigEntry<float> RadiusCap;
+        public ConfigEntry<float> DeltaCap;
 
         private Harmony _harmony;
 
@@ -206,6 +209,17 @@ namespace TerrainForge
             AdminOnlyEdits = Config.Bind("Server", "AdminOnlyEdits", false,
                 "When true, only admins / the host may edit terrain " +
                 "(server-enforced through config sync).");
+            RespectWards = Config.Bind("Server", "RespectWards", true,
+                "Block brush edits inside wards you have no access to, using the " +
+                "game's own ward check (server-enforced through config sync).");
+            RadiusCap = Config.Bind("Server", "RadiusCap", 0f,
+                new ConfigDescription("Maximum brush radius enforced by the server, " +
+                    "visible clamped in HUD and preview (0 = no cap).",
+                    new AcceptableValueRange<float>(0f, 100f)));
+            DeltaCap = Config.Bind("Server", "DeltaCap", 0f,
+                new ConfigDescription("Maximum terrain delta in meters enforced by " +
+                    "the server on top of MaxUpDelta/MaxDownDelta (0 = no cap).",
+                    new AcceptableValueRange<float>(0f, 64f)));
 
             TerrainEngine.Cache();
 

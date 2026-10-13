@@ -134,7 +134,9 @@ Config file: `BepInEx/config/com.terrainforge.valheim.cfg`
 - **Server** (authoritative when the server runs the mod — its values win through
   config sync): `AllowTerrainEdits` (default `true`; when `false`, clients cannot
   apply, undo or redo) and `AdminOnlyEdits` (default `false`; only admins / host
-  may edit). Servers *without* the mod ignore this section, so the client tool
+  may edit). `RespectWards` (default `true`) blocks edits inside foreign wards.
+  `RadiusCap` / `DeltaCap` (`0` = off) clamp brush radius and delta, visibly in
+  HUD and preview. Servers *without* the mod ignore this section, so the client tool
   keeps working there for testing.
 
 ## Building

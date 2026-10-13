@@ -64,6 +64,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   restore them later (`BepInEx/config/TerrainForge/snapshots/`, AJUSTES UI with
   save/load/delete, 12-file cap); importing resolves tiles, restores arrays
   with ownership and is itself undoable; missing tiles report cleanly.
+- **Wards + server caps**: `RespectWards` blocks edits inside foreign wards via
+  the game's own check; `RadiusCap`/`DeltaCap` let the server clamp radius and
+  delta, visibly (HUD + preview use the effective values). HUD `WARD` tag and
+  AJUSTES rows included.
 - **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
   When the server runs the mod, its values win through config sync and clients
   cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the

@@ -649,6 +649,9 @@ namespace TerrainForge
             BoolToggle(Loc.T("set.deltalimit"), p.UnlockDeltaLimit);
             BoolToggle(Loc.T("set.allow"), p.AllowTerrainEdits);
             BoolToggle(Loc.T("set.adminonly"), p.AdminOnlyEdits);
+            BoolToggle(Loc.T("set.respectwards"), p.RespectWards);
+            FloatSlider(Loc.T("set.radiuscap"), p.RadiusCap, 0f, 100f, "0.#");
+            FloatSlider(Loc.T("set.deltacap"), p.DeltaCap, 0f, 64f, "0.#");
 
             GUILayout.EndScrollView();
 

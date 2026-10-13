@@ -31,6 +31,8 @@ namespace TerrainForge
         private Vector3 _aimPoint;
         private bool _serverAllowed = true;
         private string _serverWhy;
+        private bool _wardOk = true;
+        private string _wardWhy;
         private bool _lineHasA;
         private Vector3 _lineA;
         private bool _rectHasA;
@@ -183,6 +185,9 @@ namespace TerrainForge
             // terrain. Servers without the mod leave the local values alone, so
             // the tool keeps working there for testing.
             _serverAllowed = !equipped || ServerAllows(p, out _serverWhy);
+            _wardOk = !equipped || WardAllows(p, groundCenter, EffectiveRadius(p), out _wardWhy);
+            bool canEdit = _serverAllowed && _wardOk;
+            string why = _serverAllowed ? _wardWhy : _serverWhy;
 
             if (!blocked && equipped && !Held(p.RadialKey.Value))
             {
@@ -190,10 +195,10 @@ namespace TerrainForge
                 {
                     if (p.ApplyKey.Value.IsDown())
                     {
-                        if (_serverAllowed)
+                        if (canEdit)
                             HandleRampMark(p, player, groundCenter, hasAim);
                         else
-                            Flash(_serverWhy);
+                            Flash(why);
                     }
                 }
                 else if (p.Shape.Value == TerrainShape.Line ||
@@ -202,18 +207,18 @@ namespace TerrainForge
                 {
                     if (p.ApplyKey.Value.IsDown())
                     {
-                        if (_serverAllowed)
+                        if (canEdit)
                             _applying = HandleShapeMark(p, player, groundCenter);
                         else
-                            Flash(_serverWhy);
+                            Flash(why);
                     }
                 }
                 else if (Held(p.ApplyKey.Value))
                 {
-                    if (_serverAllowed)
+                    if (canEdit)
                         _applying = TryApply(p, player, groundCenter);
                     else
-                        Flash(_serverWhy);
+                        Flash(why);
                 }
             }
 
@@ -243,7 +248,8 @@ namespace TerrainForge
             if (equipped && p.ShowPreview.Value)
             {
                 bool guides = p.ShowGuides.Value;
-                float fullRadius = p.Radius.Value * (1f - 0.5f * Mathf.Clamp01(p.Softness.Value / 100f));
+                float effRadius = EffectiveRadius(p);
+                float fullRadius = effRadius * (1f - 0.5f * Mathf.Clamp01(p.Softness.Value / 100f));
                 bool isRamp = p.DefaultOperation.Value == TerrainOperation.Ramp;
                 bool pathMarking = isRamp && p.RampMode.Value == RampMode.Path && _rampPath.Count > 0;
                 // The line footprint reuses the ramp corridor projection.
@@ -263,7 +269,7 @@ namespace TerrainForge
                 {
                     Center = groundCenter,
                     PlayerPos = player.transform.position,
-                    Radius = p.Radius.Value,
+                    Radius = effRadius,
                     FullRadius = guides ? fullRadius : 0f,
                     ReachRadius = guides ? p.RadiusMax.Value : 0f,
                     AimReach = guides ? MaxAimDistance : 0f,
@@ -336,10 +342,10 @@ namespace TerrainForge
             {
                 Operation = TerrainOperation.Ramp,
                 Shape = p.Shape.Value,
-                Radius = p.Radius.Value,
+                Radius = EffectiveRadius(p),
                 Softness = p.Softness.Value,
-                MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
-                MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f,
+                MaxUp = EffectiveMaxUp(p),
+                MaxDown = EffectiveMaxDown(p),
                 HasRampLine = true,
                 RampA = a,
                 RampB = ground
@@ -388,10 +394,10 @@ namespace TerrainForge
                 BrushSpec spec = new BrushSpec
                 {
                     Operation = TerrainOperation.Ramp,
-                    Radius = p.Radius.Value,
+                    Radius = EffectiveRadius(p),
                     Softness = p.Softness.Value,
-                    MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
-                    MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f,
+                    MaxUp = EffectiveMaxUp(p),
+                    MaxDown = EffectiveMaxDown(p),
                     HasRampPath = true,
                     RampPath = _rampPath.ToArray(),
                     RampPathH = _rampPathH.ToArray()
@@ -457,14 +463,14 @@ namespace TerrainForge
                 Operation = p.DefaultOperation.Value,
                 Shape = p.Shape.Value,
                 Paint = p.Paint.Value,
-                Radius = p.Radius.Value,
+                Radius = EffectiveRadius(p),
                 Softness = p.Softness.Value,
                 Power = p.FalloffPower.Value,
                 RaiseDelta = p.RaiseDelta.Value,
                 TargetWorld = p.UseFixedHeight.Value ? p.FixedHeight.Value : (ownHeight ? playerGround : center.y),
                 PaintStrength = p.PaintStrength.Value,
-                MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
-                MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f,
+                MaxUp = EffectiveMaxUp(p),
+                MaxDown = EffectiveMaxDown(p),
                 SmoothMode = p.SmoothMode.Value,
                 ShoreTarget = TerrainEngine.WaterLevel() + p.ShoreOffset.Value
             };
@@ -652,6 +658,39 @@ namespace TerrainForge
             p.Shape.Value = (TerrainShape)(((int)p.Shape.Value + 1) % 5);
         }
 
+        private static float EffectiveRadius(TerrainForgePlugin p)
+        {
+            float cap = p.RadiusCap != null ? p.RadiusCap.Value : 0f;
+            return cap > 0.01f ? Mathf.Min(p.Radius.Value, cap) : p.Radius.Value;
+        }
+
+        private static float EffectiveMaxUp(TerrainForgePlugin p)
+        {
+            float v = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f;
+            float cap = p.DeltaCap != null ? p.DeltaCap.Value : 0f;
+            return cap > 0.01f ? Mathf.Min(v, cap) : v;
+        }
+
+        private static float EffectiveMaxDown(TerrainForgePlugin p)
+        {
+            float v = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f;
+            float cap = p.DeltaCap != null ? p.DeltaCap.Value : 0f;
+            return cap > 0.01f ? Mathf.Min(v, cap) : v;
+        }
+
+        private static bool WardAllows(TerrainForgePlugin p, Vector3 center, float radius, out string reason)
+        {
+            reason = null;
+            if (p.RespectWards == null || !p.RespectWards.Value)
+                return true;
+            bool ok = true;
+            try { ok = PrivateArea.CheckAccess(center, radius, false); }
+            catch { ok = true; }
+            if (!ok)
+                reason = Loc.T("srv.ward");
+            return ok;
+        }
+
         private static bool ServerAllows(TerrainForgePlugin p, out string reason)
         {
             reason = null;
@@ -676,9 +715,9 @@ namespace TerrainForge
 
         private void DoUndo()
         {
-            if (!_serverAllowed)
+            if (!_serverAllowed || !_wardOk)
             {
-                Flash(_serverWhy);
+                Flash(!_serverAllowed ? _serverWhy : _wardWhy);
                 return;
             }
             if (TerrainEngine.Undo(out string label))
@@ -691,9 +730,9 @@ namespace TerrainForge
 
         private void DoRedo()
         {
-            if (!_serverAllowed)
+            if (!_serverAllowed || !_wardOk)
             {
-                Flash(_serverWhy);
+                Flash(!_serverAllowed ? _serverWhy : _wardWhy);
                 return;
             }
             if (TerrainEngine.Redo(out string label))
@@ -1089,7 +1128,7 @@ namespace TerrainForge
             EnsureHudStyle();
 
             string status = string.Format("TerrainForge   {0}   |   {1} {2:0.#} m   |   {3}   |   {4}",
-                p.DefaultOperation.Value, Loc.T("hud.radius"), p.Radius.Value, p.Shape.Value, p.Paint.Value);
+                p.DefaultOperation.Value, Loc.T("hud.radius"), EffectiveRadius(p), p.Shape.Value, p.Paint.Value);
             if (p.DefaultOperation.Value == TerrainOperation.Ramp)
             {
                 if (p.RampMode.Value == RampMode.Path)
@@ -1142,6 +1181,8 @@ namespace TerrainForge
                 Loc.T("hud.undo"), TerrainEngine.UndoCount, Loc.T("hud.redo"), TerrainEngine.RedoCount);
             if (!_serverAllowed)
                 status += "   |   " + Loc.T("hud.blocked");
+            if (!_wardOk)
+                status += "   |   " + Loc.T("hud.ward");
             if (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil)
                 status += "   |   " + _flashMsg;
 
