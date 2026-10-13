@@ -203,6 +203,7 @@ namespace TerrainForge
         private Vector2 _settingsScroll;
         private string _presetName = "";
         private ModLanguage _langBuilt;
+        private string _fixedHeightText;
 
         private GUIStyle _winStyle;
         private GUIStyle _headerStyle;
@@ -337,6 +338,8 @@ namespace TerrainForge
                         BuildEntries();
                     if (p.UndoDepth != null)
                         _undoDepthText = p.UndoDepth.Value.ToString();
+                    if (p.FixedHeight != null)
+                        _fixedHeightText = p.FixedHeight.Value.ToString("0.0");
                 }
             }
             else
@@ -425,6 +428,39 @@ namespace TerrainForge
             GUILayout.Space(6f);
             if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
                 Toggle(false);
+        }
+
+        private static bool TryParseLenient(string t, out float v)
+        {
+            if (float.TryParse(t, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out v))
+                return true;
+            return float.TryParse(t, out v);
+        }
+
+        private void DrawFixedHeight(TerrainForgePlugin p)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("set.fixedheight"), _rowStyle, GUILayout.Width(140f), GUILayout.Height(26f));
+            string t = GUILayout.TextField(_fixedHeightText ?? p.FixedHeight.Value.ToString("0.0"),
+                GUILayout.Width(90f), GUILayout.Height(26f));
+            if (t != _fixedHeightText)
+            {
+                _fixedHeightText = t;
+                if (TryParseLenient(t, out float v))
+                    p.FixedHeight.Value = Mathf.Clamp(v, -10f, 150f);
+            }
+            if (GUILayout.Button(Loc.T("set.fix"), _btnStyle, GUILayout.Width(85f), GUILayout.Height(26f)))
+            {
+                if (TryParseLenient(_fixedHeightText ?? "", out float v))
+                    p.FixedHeight.Value = Mathf.Clamp(v, -10f, 150f);
+                p.UseFixedHeight.Value = true;
+                _fixedHeightText = p.FixedHeight.Value.ToString("0.0");
+            }
+            if (GUILayout.Button(Loc.T("set.release"), _btnStyle, GUILayout.Width(85f), GUILayout.Height(26f)))
+                p.UseFixedHeight.Value = false;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
         }
 
         private void DrawPresets(TerrainForgePlugin p)
@@ -548,6 +584,8 @@ namespace TerrainForge
             FloatSlider(Loc.T("set.paintstrength"), p.PaintStrength, 0f, 1f, "0.00");
             FloatSlider(Loc.T("set.falloff"), p.FalloffPower, 1f, 5f, "0.#");
             FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
+
+            DrawFixedHeight(p);
 
             SettingHeader(Loc.T("set.profiles"));
             DrawPresets(p);

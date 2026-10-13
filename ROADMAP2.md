@@ -63,13 +63,22 @@ Type an exact Flatten height instead of only capturing it with `G`.
   read the configs (same `fija X m` HUD). State persists by design (it's config).
 - Migration: delete the two fields; behaviour identical otherwise.
 
+Implemented: `G` writes the same configs; AJUSTES textbox parses leniently
+(dot/comma) + Fix/Release buttons; state clears on world exit; HUD, level ring
+and spec read the configs.
+
 **Files to edit**
 - `Plugin.cs`: 2 configs. `TerrainBrush.cs`: spec/text/level/eyedrop.
 - `KeybindMenu.cs`: AJUSTES row + help line. `TerrainTypes.cs`: `Loc` keys.
 
+Implemented: `G` writes the same configs; AJUSTES textbox parses leniently
+(dot/comma) + Fix/Release buttons; state clears on world exit; HUD, level ring
+and spec read the configs.
+
 **Acceptance**
-- [ ] Typing 32.5 levels Flatten to 32.5 m; `G` still captures/releases
-- [ ] HUD + level ring follow the typed value; survives menu reopen
+- [x] Typing 32.5 levels Flatten to 32.5 m; `G` still captures/releases
+- [x] HUD + level ring follow the typed value; survives menu reopen
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** S | **Risk:** low
 

@@ -35,6 +35,8 @@ namespace TerrainForge
         public ConfigEntry<TerrainPaint> Paint;
         public ConfigEntry<RampMode> RampMode;
         public ConfigEntry<float> SlopeAngle;
+        public ConfigEntry<bool> UseFixedHeight;
+        public ConfigEntry<float> FixedHeight;
         public ConfigEntry<SmoothMode> SmoothMode;
         public ConfigEntry<float> ShoreOffset;
 
@@ -122,6 +124,11 @@ namespace TerrainForge
                 new ConfigDescription("Slope used by fixed-angle ramps (degrees). " +
                     "Adjust in-game with Alt + radius keys/wheel while Ramp is selected.",
                     new AcceptableValueRange<float>(5f, 60f)));
+            UseFixedHeight = Config.Bind("Brush", "UseFixedHeight", false,
+                "When true, Flatten levels to FixedHeight instead of the aimed / feet height (eyedropper state).");
+            FixedHeight = Config.Bind("Brush", "FixedHeight", 30f,
+                new ConfigDescription("Exact Flatten target height in meters (used when UseFixedHeight is true).",
+                    new AcceptableValueRange<float>(-10f, 150f)));
             SmoothMode = Config.Bind("Brush", "SmoothMode", global::TerrainForge.SmoothMode.Full,
                 "Smooth behavior: Full blurs both ways, Bumps only lowers bumps, Dips only fills dips.");
             ShoreOffset = Config.Bind("Brush", "ShoreOffset", 0.5f,

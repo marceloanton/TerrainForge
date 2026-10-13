@@ -31,8 +31,6 @@ namespace TerrainForge
         private Vector3 _aimPoint;
         private bool _serverAllowed = true;
         private string _serverWhy;
-        private bool _hasPicked;
-        private float _pickedHeight;
         private bool _lineHasA;
         private Vector3 _lineA;
         private bool _rectHasA;
@@ -68,7 +66,7 @@ namespace TerrainForge
                 _preview.Hide();
                 TerrainEngine.ClearHistory();
                 _rampHasA = false;
-                _hasPicked = false;
+                p.UseFixedHeight.Value = false;
                 ClearShapeMarks();
                 return;
             }
@@ -215,9 +213,9 @@ namespace TerrainForge
                 {
                     if (p.DefaultOperation.Value == TerrainOperation.Shore)
                         _levelY = TerrainEngine.WaterLevel() + p.ShoreOffset.Value;
-                    else if (p.DefaultOperation.Value == TerrainOperation.Flatten || _hasPicked)
-                        _levelY = _hasPicked
-                            ? _pickedHeight
+                    else if (p.DefaultOperation.Value == TerrainOperation.Flatten || p.UseFixedHeight.Value)
+                        _levelY = p.UseFixedHeight.Value
+                            ? p.FixedHeight.Value
                             : (Held(p.AimHeightModifierKey.Value)
                                 ? GroundHeight(player.transform.position)
                                 : groundCenter.y);
@@ -374,7 +372,7 @@ namespace TerrainForge
                 Softness = p.Softness.Value,
                 Power = p.FalloffPower.Value,
                 RaiseDelta = p.RaiseDelta.Value,
-                TargetWorld = _hasPicked ? _pickedHeight : (ownHeight ? playerGround : center.y),
+                TargetWorld = p.UseFixedHeight.Value ? p.FixedHeight.Value : (ownHeight ? playerGround : center.y),
                 PaintStrength = p.PaintStrength.Value,
                 MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
                 MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f,
@@ -625,16 +623,19 @@ namespace TerrainForge
 
         private void ToggleEyedrop(Vector3 center)
         {
-            if (_hasPicked)
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+            if (p.UseFixedHeight.Value)
             {
-                _hasPicked = false;
+                p.UseFixedHeight.Value = false;
                 Flash(Loc.T("flash.released"));
             }
             else
             {
-                _hasPicked = true;
-                _pickedHeight = center.y;
-                Flash(Loc.F("flash.picked", _pickedHeight.ToString("0.0")));
+                p.FixedHeight.Value = Mathf.Clamp(center.y, -10f, 150f);
+                p.UseFixedHeight.Value = true;
+                Flash(Loc.F("flash.picked", p.FixedHeight.Value.ToString("0.0")));
             }
         }
 
@@ -644,8 +645,8 @@ namespace TerrainForge
             {
                 case TerrainOperation.Flatten:
                 {
-                    if (_hasPicked)
-                        return string.Format("{0} {1:0.0} m", Loc.T("hud.fixed"), _pickedHeight);
+                    if (p.UseFixedHeight.Value)
+                        return string.Format("{0} {1:0.0} m", Loc.T("hud.fixed"), p.FixedHeight.Value);
                     bool own = Held(p.AimHeightModifierKey.Value);
                     float t = own ? GroundHeight(player.transform.position) : center.y;
                     return string.Format("{0} {1:0.0} m", Loc.T("hud.target"), t);

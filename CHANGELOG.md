@@ -54,6 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Live measurements**: while marking, the HUD shows line/ramp length, rise and
   angle, rectangle W×D + area, polygon perimeter + area; final numbers are also
   appended to the confirmation messages.
+- **Typed target height**: the eyedropper is now config-backed (`Brush >
+  UseFixedHeight` / `FixedHeight`) with a textbox + Fix/Release row in AJUSTES;
+  `G` captures into the same state, which persists and drives HUD + level ring.
 - **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
   When the server runs the mod, its values win through config sync and clients
   cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the
