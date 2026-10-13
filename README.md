@@ -68,7 +68,9 @@ target and the local slope in degrees. Guides can be turned off with
 | Open the key binding + help menu | `F5` |
 
 Operations cycle through: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`,
-`Restore`, `Shore` (flattens toward water level + offset, for beaches).
+`Restore`, `Shore` (flattens toward water level + offset, for beaches) and
+`Snow` (paints snow like Paint but snow-only; hold `Shift` to remove it and
+restore the original ground).
 
 Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab):
 operation / shape / paint / ramp-mode / smooth-mode, all sizes via sliders,

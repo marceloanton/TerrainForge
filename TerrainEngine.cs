@@ -678,20 +678,25 @@ namespace TerrainForge
                         }
                         else
                         {
-                            float k = Mathf.Clamp01(spec.PaintStrength) * w;
-                            if (k > 0.0001f)
+                            PaintToward(PaintTarget, spec.Paint != TerrainPaint.ClearVegetation, idx, w);
+                        }
+                        break;
+                    }
+                    case TerrainOperation.Snow:
+                    {
+                        if (spec.SnowClear)
+                        {
+                            if (ModP[idx])
                             {
-                                Color c = Paint[idx];
-                                float a = c.a;
-                                c = Color.Lerp(c, PaintTarget, k);
-                                if (spec.Paint != TerrainPaint.ClearVegetation)
-                                    c.a = a;
                                 if (Rec != null)
                                     Rec.Add(idx);
-                                Paint[idx] = c;
-                                ModP[idx] = true;
+                                ModP[idx] = false;
                                 Any = true;
                             }
+                        }
+                        else
+                        {
+                            PaintToward(PaintColor(TerrainPaint.DeepSnow), true, idx, w);
                         }
                         break;
                     }
@@ -710,6 +715,23 @@ namespace TerrainForge
                         break;
                     }
                 }
+            }
+
+            private void PaintToward(Color target, bool preserveAlpha, int idx, float w)
+            {
+                float k = Mathf.Clamp01(Spec.PaintStrength) * w;
+                if (k <= 0.0001f)
+                    return;
+                Color c = Paint[idx];
+                float a = c.a;
+                c = Color.Lerp(c, target, k);
+                if (preserveAlpha)
+                    c.a = a;
+                if (Rec != null)
+                    Rec.Add(idx);
+                Paint[idx] = c;
+                ModP[idx] = true;
+                Any = true;
             }
         }
 
@@ -1197,6 +1219,7 @@ namespace TerrainForge
             switch (spec.Operation)
             {
                 case TerrainOperation.Paint:
+                case TerrainOperation.Snow:
                 {
                     float t = 1f - Mathf.Clamp01(d / radiusIdx);
                     return Mathf.Clamp01(Mathf.Pow(t, 0.1f));

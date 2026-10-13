@@ -595,7 +595,7 @@ namespace TerrainForge
             SettingHeader(Loc.T("set.brush"));
             CycleRow(Loc.T("set.operation"), p.DefaultOperation.Value.ToString(), () =>
             {
-                p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 8);
+                p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 9);
                 TerrainBrush.RequestClearMarks();
             });
             CycleRow(Loc.T("set.shape"), ShapeText(p.Shape.Value), () =>

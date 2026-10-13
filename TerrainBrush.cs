@@ -485,6 +485,7 @@ namespace TerrainForge
                 Power = p.FalloffPower.Value,
                 RaiseDelta = p.RaiseDelta.Value,
                 TargetWorld = p.UseFixedHeight.Value ? p.FixedHeight.Value : (ownHeight ? playerGround : center.y),
+                SnowClear = p.DefaultOperation.Value == TerrainOperation.Snow && Held(p.AimHeightModifierKey.Value),
                 PaintStrength = p.PaintStrength.Value,
                 MaxUp = EffectiveMaxUp(p),
                 MaxDown = EffectiveMaxDown(p),
@@ -667,7 +668,7 @@ namespace TerrainForge
 
         private static void CycleOperation(TerrainForgePlugin p)
         {
-            p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 8);
+            p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 9);
         }
 
         private static void CycleShape(TerrainForgePlugin p)
@@ -810,6 +811,8 @@ namespace TerrainForge
                 case TerrainOperation.Shore:
                     return string.Format("{0} {1:0.0} m", Loc.T("hud.shore"),
                         TerrainEngine.WaterLevel() + p.ShoreOffset.Value);
+                case TerrainOperation.Snow:
+                    return Loc.T(Held(p.AimHeightModifierKey.Value) ? "hud.snow.clear" : "hud.snow.put");
                 case TerrainOperation.Paint:
                     return p.Paint.Value + " " + (p.PaintStrength.Value * 100f).ToString("0") + "%";
                 case TerrainOperation.Restore:
@@ -1096,10 +1099,12 @@ namespace TerrainForge
 
         internal static Color BrushColor(TerrainForgePlugin p)
         {
-            return OpColor(p.DefaultOperation.Value, p.Paint.Value);
+            bool snowClear = p.DefaultOperation.Value == TerrainOperation.Snow &&
+                             Held(p.AimHeightModifierKey.Value);
+            return OpColor(p.DefaultOperation.Value, p.Paint.Value, snowClear);
         }
 
-        internal static Color OpColor(TerrainOperation op, TerrainPaint paint)
+        internal static Color OpColor(TerrainOperation op, TerrainPaint paint, bool snowClear)
         {
             switch (op)
             {
@@ -1109,6 +1114,8 @@ namespace TerrainForge
                 case TerrainOperation.Restore: return new Color(0.90f, 0.45f, 0.95f);
                 case TerrainOperation.Ramp: return new Color(0.98f, 0.78f, 0.40f);
                 case TerrainOperation.Shore: return new Color(0.93f, 0.87f, 0.66f);
+                case TerrainOperation.Snow: return snowClear
+                    ? new Color(0.55f, 0.55f, 0.60f) : new Color(0.90f, 0.95f, 1.00f);
                 case TerrainOperation.Paint: return PaintColor(paint);
                 default: return new Color(0.45f, 0.92f, 0.50f);
             }
@@ -1427,7 +1434,7 @@ namespace TerrainForge
                 float ang = (-90f + i * 45f) * Mathf.Deg2Rad;
                 float bx = cx + Mathf.Cos(ang) * 104f - 58f;
                 float by = cy - Mathf.Sin(ang) * 104f - 16f;
-                Color c = TerrainBrush.OpColor(s_ops[i], paint);
+                Color c = TerrainBrush.OpColor(s_ops[i], paint, false);
                 if (i == _sel)
                     GUI.backgroundColor = new Color(Mathf.Min(1f, c.r + 0.3f), Mathf.Min(1f, c.g + 0.3f), Mathf.Min(1f, c.b + 0.3f), 0.97f);
                 else

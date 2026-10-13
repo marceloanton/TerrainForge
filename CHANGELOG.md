@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Snow operation**: paint-only snow brush (same mask as the game's snow);
+  hold `Shift` to erase it back to the original ground. Preview turns grey in
+  erase mode, HUD shows the mode, works over every footprint with undo support.
+
 ### Fixed
 
 - Guides much more visible (thicker lines, stronger alphas) plus a startup log
