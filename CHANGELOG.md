@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Live HUD data**: a second status line shows the aimed ground height, the
   current target (Flatten height / Raise-Lower step / paint / ramp A→B heights)
   and the local slope in degrees, updated every frame while aiming.
+- **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
+  When the server runs the mod, its values win through config sync and clients
+  cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the
+  reason). Servers without the mod ignore these, so the client tool keeps working
+  there for testing.
 
 ## [0.1.0] - 2026-10-12
 

@@ -105,6 +105,12 @@ Config file: `BepInEx/config/com.terrainforge.valheim.cfg`
   - `NoBuildCost` – remove material / workstation requirements.
   - `AllowInProtectedZones` – ignore no-build and ward zones (bypasses protection).
 - **Preview**: `ShowPreview`.
+- **History**: `UndoDepth` (0-500, default 50; 0 disables undo history).
+- **Server** (authoritative when the server runs the mod — its values win through
+  config sync): `AllowTerrainEdits` (default `true`; when `false`, clients cannot
+  apply, undo or redo) and `AdminOnlyEdits` (default `false`; only admins / host
+  may edit). Servers *without* the mod ignore this section, so the client tool
+  keeps working there for testing.
 
 ## Building
 

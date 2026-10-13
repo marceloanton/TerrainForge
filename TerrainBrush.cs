@@ -26,6 +26,8 @@ namespace TerrainForge
         private float _aimY;
         private string _targetTxt = "";
         private float _slopeDeg;
+        private bool _serverAllowed = true;
+        private string _serverWhy;
 
         private void OnDestroy()
         {
@@ -115,16 +117,30 @@ namespace TerrainForge
             if (op != TerrainOperation.Ramp)
                 _rampHasA = false;
 
+            // Server authority: when the server runs the mod, its Server-section
+            // values (synced to clients) decide whether this client may write
+            // terrain. Servers without the mod leave the local values alone, so
+            // the tool keeps working there for testing.
+            _serverAllowed = !equipped || ServerAllows(p, out _serverWhy);
+
             if (!blocked && equipped)
             {
                 if (op == TerrainOperation.Ramp)
                 {
                     if (p.ApplyKey.Value.IsDown())
-                        HandleRampMark(p, player, groundCenter, hasAim);
+                    {
+                        if (_serverAllowed)
+                            HandleRampMark(p, player, groundCenter, hasAim);
+                        else
+                            Flash(_serverWhy);
+                    }
                 }
                 else if (Held(p.ApplyKey.Value))
                 {
-                    _applying = TryApply(p, player, groundCenter);
+                    if (_serverAllowed)
+                        _applying = TryApply(p, player, groundCenter);
+                    else
+                        Flash(_serverWhy);
                 }
             }
 
@@ -275,8 +291,35 @@ namespace TerrainForge
             p.Shape.Value = p.Shape.Value == TerrainShape.Circle ? TerrainShape.Square : TerrainShape.Circle;
         }
 
+        private static bool ServerAllows(TerrainForgePlugin p, out string reason)
+        {
+            reason = null;
+            if (p.AllowTerrainEdits == null || p.AllowTerrainEdits.Value)
+            {
+                if (p.AdminOnlyEdits != null && p.AdminOnlyEdits.Value)
+                {
+                    bool admin = false;
+                    try { admin = ZNet.instance != null && ZNet.instance.LocalPlayerIsAdminOrHost(); }
+                    catch { admin = false; }
+                    if (!admin)
+                    {
+                        reason = "Solo administradores pueden editar terreno en este servidor.";
+                        return false;
+                    }
+                }
+                return true;
+            }
+            reason = "El servidor no permite editar terreno.";
+            return false;
+        }
+
         private void DoUndo()
         {
+            if (!_serverAllowed)
+            {
+                Flash(_serverWhy);
+                return;
+            }
             if (TerrainEngine.Undo(out string label))
                 Flash("Deshecho" + (string.IsNullOrEmpty(label) ? "" : ": " + label) +
                       "  (quedan " + TerrainEngine.UndoCount + ")");
@@ -286,6 +329,11 @@ namespace TerrainForge
 
         private void DoRedo()
         {
+            if (!_serverAllowed)
+            {
+                Flash(_serverWhy);
+                return;
+            }
             if (TerrainEngine.Redo(out string label))
                 Flash("Rehecho" + (string.IsNullOrEmpty(label) ? "" : ": " + label) +
                       "  (quedan " + TerrainEngine.RedoCount + ")");
@@ -575,6 +623,8 @@ namespace TerrainForge
                 status += "   |   RAMPA: punto A fijado, apunta a B";
             status += string.Format("   |   deshacer {0} / rehacer {1}",
                 TerrainEngine.UndoCount, TerrainEngine.RedoCount);
+            if (!_serverAllowed)
+                status += "   |   SERVER: BLOQUEADO";
             if (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil)
                 status += "   |   " + _flashMsg;
 

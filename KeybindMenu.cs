@@ -333,7 +333,11 @@ namespace TerrainForge
             Body("\u2022 El mod debe estar en el cliente Y en el servidor.\n" +
                  "\u2022 \"UnlockDeltaLimit\" debe estar activado tambien en el servidor; si no, " +
                  "el servidor recorta los cambios de mas de 8 m.\n" +
-                 "\u2022 Radios muy grandes pueden desincronizar a clientes que no tengan el mod.");
+                 "\u2022 Radios muy grandes pueden desincronizar a clientes que no tengan el mod.\n" +
+                 "\u2022 Autoridad del servidor: si el servidor tiene el mod, su seccion " +
+                 "\"Server\" manda sobre los clientes (AllowTerrainEdits, AdminOnlyEdits). " +
+                 "En servidores SIN el mod, tu config local sigue valiendo y la " +
+                 "herramienta funciona para probar.");
 
             Topic("Recargar / guardar");
             Body("Las teclas se guardan solas al reasignarlas. La herramienta y el resto de " +

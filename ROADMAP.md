@@ -71,19 +71,26 @@ Raise/Lower step, Smooth, paint + strength, Restore, ramp A→B heights).
 
 **Effort:** S | **Risk:** low
 
-## Phase 3 – Server permissions
-Block editing unless allowed: by player role? Check for admin (`ZNet.instance.IsServer() || ZNet.instance.GetPlayerList().Find(p=>p.m_characterID==ZDOID)?` better `Player.m_localPlayer.IsAdmin()` or ward owner). Also `PrivateArea`/`Ward` checks?
+## Phase 3 – Server permissions — DONE (server authority)
+The server decides: when it runs the mod, its `Server`-section values win through
+config sync; servers without the mod leave the client's local values alone, so the
+tool keeps working there for testing.
 
-Ideas:
-- `Plugin.cs`: `RequireAdmin`, `AllowInWards` (already exists concept), `AllowOutsideWardsOnly`, `BypassIfCreator` etc
-- `TerrainBrush.cs`: before `TryApply` → permission check: if not admin and in ward and not owner → block + message
-- Can reuse `PrivateArea.CheckAccess`? Or `Ward.IsInside` checks.
+Implemented (`Plugin.cs` `Server` section + `TerrainBrush.ServerAllows` gate):
+- `AllowTerrainEdits` (default true): master switch; when the server sets it false,
+  clients cannot apply, undo or redo.
+- `AdminOnlyEdits` (default false): only admins / host may edit, checked with
+  `ZNet.instance.LocalPlayerIsAdminOrHost()` (works on clients via synced admin list).
+- Gate covers brush apply, ramp marking and undo/redo; blocked attempts show the
+  reason as a HUD flash and the HUD carries a `SERVER: BLOQUEADO` tag.
 
 **Acceptance**
-- [ ] Admin can edit anywhere
-- [ ] Non-admin blocked in wards unless configured
-- [ ] Message shown on blocked attempt
-- [ ] Config sync friendly via ConditionalConfigSync if desired
+- [x] Server with `AllowTerrainEdits=false` blocks client edits with reason
+- [x] Server with `AdminOnlyEdits=true` blocks non-admins, allows admins/host
+- [x] Server without the mod: client keeps working (local config applies)
+- [x] Message shown on blocked attempt (HUD flash + tag)
+- [ ] Verify in-game incl. dedicated server (player test + `LogOutput.log` check)
+- [ ] Optional follow-up: ward-owner checks via `PrivateArea.CheckAccess`
 
 **Effort:** M | **Risk:** low–medium
 

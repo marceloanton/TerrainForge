@@ -65,6 +65,11 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> UndoKey;
         public ConfigEntry<KeyboardShortcut> RedoKey;
 
+        // Server authority (the server's values win through config sync when it
+        // runs the mod; servers without the mod simply ignore these)
+        public ConfigEntry<bool> AllowTerrainEdits;
+        public ConfigEntry<bool> AdminOnlyEdits;
+
         private Harmony _harmony;
 
         private void Awake()
@@ -151,6 +156,14 @@ namespace TerrainForge
                 "Undo the last brush application.");
             RedoKey = Config.Bind("Input", "RedoKey", new KeyboardShortcut(KeyCode.Y, KeyCode.LeftControl),
                 "Redo an undone brush application.");
+
+            AllowTerrainEdits = Config.Bind("Server", "AllowTerrainEdits", true,
+                "Master switch enforced by the SERVER (its value wins through config sync). " +
+                "When false, clients cannot apply, undo or redo terrain edits. " +
+                "Servers without the mod ignore this, so the client keeps working for testing.");
+            AdminOnlyEdits = Config.Bind("Server", "AdminOnlyEdits", false,
+                "When true, only admins / the host may edit terrain " +
+                "(server-enforced through config sync).");
 
             TerrainEngine.Cache();
 
