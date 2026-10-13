@@ -251,6 +251,7 @@ namespace TerrainForge
         private static MethodInfo s_updateNavigation;
         private static bool s_logged;
 
+        [HarmonyPatch(typeof(Menu), "Start")]
         [HarmonyPatch(typeof(Menu), "Show")]
         [HarmonyPostfix]
         private static void Postfix(Menu __instance)
