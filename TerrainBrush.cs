@@ -29,6 +29,7 @@ namespace TerrainForge
         private float _slopeDeg;
         private float _levelY = float.NaN;
         private Vector3 _aimPoint;
+        private bool _previewLogged;
         private bool _serverAllowed = true;
         private string _serverWhy;
         private bool _wardOk = true;
@@ -258,6 +259,11 @@ namespace TerrainForge
 
             if (equipped && p.ShowPreview.Value)
             {
+                if (!_previewLogged)
+                {
+                    _previewLogged = true;
+                    TerrainForgePlugin.Log?.LogInfo("TerrainPreview: drawing (first call).");
+                }
                 bool guides = p.ShowGuides.Value;
                 float effRadius = EffectiveRadius(p);
                 float fullRadius = effRadius * (1f - 0.5f * Mathf.Clamp01(p.Softness.Value / 100f));
