@@ -126,16 +126,26 @@ preview reused (shows path + width).
 
 **Effort:** M | **Risk:** low
 
-## Phase 7 – Forms: line, rect (drag), polygon
-Biggest UX jump.
+## Phase 7 – Forms: line, rect (drag), polygon — DONE
+Shapes define WHERE, operations define WHAT (`TerrainShape` grew to
+`Circle, Square, Line, Rect, Poly`, cycled with `.`).
 
-- New op `Line`, `Rect`, `Poly`? Or general `Shape` enum grows: `Circle,Square,Line,Rect,Poly`.
-- For `Line`: click A, drag to B, apply (like ramp but you pick width). Or two-point apply.
-- For `Rect`: drag from corner1 to corner2, axis-aligned or rotated? Start simple axis-aligned in world.
-- For `Poly`: click points, close on double-click/apply.
-- Preview: draw edges, fill? Use `LineRenderer`s.
+- `Line`: two-press capsule, half-width = brush radius, ramp-style flat-core +
+  side-fade profile; reuses the corridor preview.
+- `Rect`: two opposite corners (1×1 m minimum), axis-aligned in world XZ, soft
+  edges from radius + softness; rectangle outline preview.
+- `Poly`: one vertex per press (0.5 m min spacing), double-press with 3+ points
+  closes and applies; closed-loop outline preview.
+- Engine: `ApplyToComp` dispatches to `ApplyFootprint`; the per-vertex op switch
+  was extracted into shared `VertexWriter` (no behavior change for Circle/Square);
+  bbox-based search radius, frozen Smooth snapshot, sparse undo recording.
+- Marks clear on shape/operation change and world exit; Ramp ignores Shape.
 
-**Touch:** `TerrainTypes.cs`, `TerrainBrush.cs` (drag state: `_dragStart`, `_dragging`), `TerrainPreview.cs`, `TerrainEngine.cs` (point-in-shape tests + falloff per shape).
+**Acceptance**
+- [x] Line/Rect/Poly apply every area op with soft edges
+- [x] Preview outlines + circular-guide suppression while marking
+- [x] HUD marking state, undo support
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** L | **Risk:** medium–high (stateful)
 

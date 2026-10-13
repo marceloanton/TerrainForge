@@ -18,6 +18,11 @@ namespace TerrainForge
         public bool IsRamp;
         public bool HasRampA;
         public Vector3 RampA;
+        public bool SuppressCircles;
+        public bool HasRect;
+        public Vector3 RectA;
+        public Vector3 RectB;
+        public Vector3[] PolyPreview;
     }
 
     /// <summary>
@@ -43,6 +48,8 @@ namespace TerrainForge
         private LineRenderer _rampLine;  // A -> cursor centre line (world)
         private LineRenderer _rampL;     // ramp corridor left edge (world)
         private LineRenderer _rampR;     // ramp corridor right edge (world)
+        private LineRenderer _rect;      // rectangle footprint outline (world)
+        private LineRenderer _poly;      // polygon footprint outline (world)
 
         private Vector3[] _unitRing;
 
@@ -77,6 +84,8 @@ namespace TerrainForge
             _rampLine = MakeLine("ramp", 0, true);
             _rampL = MakeLine("rampL", 0, true);
             _rampR = MakeLine("rampR", 0, true);
+            _rect = MakeLine("rect", 0, true);
+            _poly = MakeLine("poly", 0, true);
 
             BuildRing();
             _root.SetActive(false);
@@ -166,9 +175,9 @@ namespace TerrainForge
             SetColor(_reach, Col(c, 0.20f));
             SetColor(_aim, Col(c, 0.15f));
 
-            // Once the ramp corridor projection exists it replaces the round
+            // Once a corridor / footprint projection exists it replaces the round
             // footprint, so hide the circular guides to avoid clutter.
-            bool suppress = s.IsRamp && s.HasRampA;
+            bool suppress = s.SuppressCircles || (s.IsRamp && s.HasRampA);
 
             SetActive(_edge, !suppress);
             SetActive(_full, !suppress && s.FullRadius < s.Radius - 0.05f && fullR > 0.05f);
@@ -239,6 +248,48 @@ namespace TerrainForge
                 SetActive(_rampR, false);
             }
 
+            // Rectangle footprint outline (corner A -> cursor corner B).
+            if (s.HasRect)
+            {
+                float x0 = Mathf.Min(s.RectA.x, s.RectB.x);
+                float x1 = Mathf.Max(s.RectA.x, s.RectB.x);
+                float z0 = Mathf.Min(s.RectA.z, s.RectB.z);
+                float z1 = Mathf.Max(s.RectA.z, s.RectB.z);
+                _rect.positionCount = 5;
+                _rect.SetPosition(0, new Vector3(x0, GroundHeight(x0, z0) + 0.15f, z0));
+                _rect.SetPosition(1, new Vector3(x0, GroundHeight(x0, z1) + 0.15f, z1));
+                _rect.SetPosition(2, new Vector3(x1, GroundHeight(x1, z1) + 0.15f, z1));
+                _rect.SetPosition(3, new Vector3(x1, GroundHeight(x1, z0) + 0.15f, z0));
+                _rect.SetPosition(4, new Vector3(x0, GroundHeight(x0, z0) + 0.15f, z0));
+                SetWidth(_rect, w * 0.6f);
+                SetColor(_rect, c);
+                SetActive(_rect, true);
+            }
+            else
+            {
+                SetActive(_rect, false);
+            }
+
+            // Polygon footprint outline (fixed points + cursor, closed loop).
+            if (s.PolyPreview != null && s.PolyPreview.Length >= 2)
+            {
+                int n = s.PolyPreview.Length;
+                _poly.positionCount = n + 1;
+                for (int k = 0; k < n; k++)
+                {
+                    Vector3 pt = s.PolyPreview[k];
+                    _poly.SetPosition(k, new Vector3(pt.x, GroundHeight(pt.x, pt.z) + 0.15f, pt.z));
+                }
+                _poly.SetPosition(n, _poly.GetPosition(0));
+                SetWidth(_poly, w * 0.6f);
+                SetColor(_poly, c);
+                SetActive(_poly, true);
+            }
+            else
+            {
+                SetActive(_poly, false);
+            }
+
             if (!_root.activeSelf)
                 _root.SetActive(true);
         }
@@ -307,6 +358,8 @@ namespace TerrainForge
                 _rampLine = null;
                 _rampL = null;
                 _rampR = null;
+                _rect = null;
+                _poly = null;
             }
         }
 

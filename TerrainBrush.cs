@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BepInEx.Configuration;
 using UnityEngine;
 
@@ -30,6 +31,12 @@ namespace TerrainForge
         private string _serverWhy;
         private bool _hasPicked;
         private float _pickedHeight;
+        private bool _lineHasA;
+        private Vector3 _lineA;
+        private bool _rectHasA;
+        private Vector3 _rectA;
+        private readonly List<Vector3> _polyPoints = new List<Vector3>();
+        private float _polyLastClick = -999f;
 
         private void OnDestroy()
         {
@@ -57,6 +64,7 @@ namespace TerrainForge
                 TerrainEngine.ClearHistory();
                 _rampHasA = false;
                 _hasPicked = false;
+                ClearShapeMarks();
                 return;
             }
 
@@ -106,9 +114,13 @@ namespace TerrainForge
                 {
                     CycleOperation(p);
                     _rampHasA = false;
+                    ClearShapeMarks();
                 }
                 if (p.CycleShapeKey.Value.IsDown())
+                {
                     CycleShape(p);
+                    ClearShapeMarks();
+                }
                 if (p.CyclePaintKey.Value.IsDown())
                     CyclePaint(p);
                 if (p.UndoKey.Value.IsDown())
@@ -150,6 +162,18 @@ namespace TerrainForge
                             Flash(_serverWhy);
                     }
                 }
+                else if (p.Shape.Value == TerrainShape.Line ||
+                         p.Shape.Value == TerrainShape.Rect ||
+                         p.Shape.Value == TerrainShape.Poly)
+                {
+                    if (p.ApplyKey.Value.IsDown())
+                    {
+                        if (_serverAllowed)
+                            _applying = HandleShapeMark(p, player, groundCenter);
+                        else
+                            Flash(_serverWhy);
+                    }
+                }
                 else if (Held(p.ApplyKey.Value))
                 {
                     if (_serverAllowed)
@@ -170,6 +194,19 @@ namespace TerrainForge
             {
                 bool guides = p.ShowGuides.Value;
                 float fullRadius = p.Radius.Value * (1f - 0.5f * Mathf.Clamp01(p.Softness.Value / 100f));
+                bool isRamp = p.DefaultOperation.Value == TerrainOperation.Ramp;
+                // The line footprint reuses the ramp corridor projection.
+                bool lineMarking = !isRamp && p.Shape.Value == TerrainShape.Line && _lineHasA;
+                bool rectMarking = !isRamp && p.Shape.Value == TerrainShape.Rect && _rectHasA;
+                bool polyMarking = !isRamp && p.Shape.Value == TerrainShape.Poly && _polyPoints.Count > 0;
+                Vector3[] polyPreview = null;
+                if (polyMarking)
+                {
+                    polyPreview = new Vector3[_polyPoints.Count + 1];
+                    for (int k = 0; k < _polyPoints.Count; k++)
+                        polyPreview[k] = _polyPoints[k];
+                    polyPreview[_polyPoints.Count] = groundCenter;
+                }
                 _preview.Update(new PreviewState
                 {
                     Center = groundCenter,
@@ -180,9 +217,14 @@ namespace TerrainForge
                     AimReach = guides ? MaxAimDistance : 0f,
                     Shape = p.Shape.Value,
                     Color = BrushColor(p).WithAlpha(0.95f),
-                    IsRamp = p.DefaultOperation.Value == TerrainOperation.Ramp,
-                    HasRampA = _rampHasA,
-                    RampA = _rampA,
+                    IsRamp = isRamp,
+                    HasRampA = isRamp ? _rampHasA : _lineHasA,
+                    RampA = isRamp ? _rampA : _lineA,
+                    SuppressCircles = lineMarking || rectMarking || polyMarking,
+                    HasRect = rectMarking,
+                    RectA = _rectA,
+                    RectB = groundCenter,
+                    PolyPreview = polyPreview,
                 });
             }
             else
@@ -265,11 +307,15 @@ namespace TerrainForge
                 TerrainForgePlugin.Message("Rampa: no se pudo crear (puntos muy cortos o sin terreno).");
         }
 
-        private bool TryApply(TerrainForgePlugin p, Player player, Vector3 center)
+        private void ClearShapeMarks()
         {
-            if (Time.time - _lastApply < ApplyInterval)
-                return _applying;
+            _lineHasA = false;
+            _rectHasA = false;
+            _polyPoints.Clear();
+        }
 
+        private BrushSpec BaseSpec(TerrainForgePlugin p, Player player, Vector3 center)
+        {
             float playerGround = GroundHeight(player.transform.position);
 
             // Flatten follows the height under the crosshair by default so it
@@ -277,7 +323,7 @@ namespace TerrainForge
             // level to your own feet instead; a fixed eyedrop height wins over both.
             bool ownHeight = Held(p.AimHeightModifierKey.Value);
 
-            var spec = new BrushSpec
+            return new BrushSpec
             {
                 Operation = p.DefaultOperation.Value,
                 Shape = p.Shape.Value,
@@ -291,9 +337,112 @@ namespace TerrainForge
                 MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
                 MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f
             };
+        }
+
+        private bool TryApply(TerrainForgePlugin p, Player player, Vector3 center)
+        {
+            if (Time.time - _lastApply < ApplyInterval)
+                return _applying;
+
+            BrushSpec spec = BaseSpec(p, player, center);
 
             _lastApply = Time.time;
             return TerrainEngine.Apply(center, spec);
+        }
+
+        /// <summary>
+        /// Two-press marking for Line / Rect / Poly shapes: the first press fixes
+        /// the start (or adds a polygon vertex), the second applies the operation
+        /// over the footprint. Polygons close on a double-press with 3+ points.
+        /// </summary>
+        private bool HandleShapeMark(TerrainForgePlugin p, Player player, Vector3 point)
+        {
+            switch (p.Shape.Value)
+            {
+                case TerrainShape.Line:
+                {
+                    if (!_lineHasA)
+                    {
+                        _lineA = point;
+                        _lineHasA = true;
+                        TerrainForgePlugin.Message("Línea: punto A marcado. Apunta a B y volve a pulsar aplicar.");
+                        return false;
+                    }
+                    Vector3 a = _lineA;
+                    _lineHasA = false;
+                    if ((point - a).sqrMagnitude < 1f)
+                    {
+                        TerrainForgePlugin.Message("Línea: A y B estan demasiado cerca.");
+                        return false;
+                    }
+                    BrushSpec spec = BaseSpec(p, player, point);
+                    spec.HasLine = true;
+                    spec.LineA = a;
+                    spec.LineB = point;
+                    Vector3 mid = (a + point) * 0.5f;
+                    bool ok = TerrainEngine.Apply(mid, spec);
+                    TerrainForgePlugin.Message(ok ? "Línea aplicada." : "Línea: sin terreno en la zona.");
+                    return ok;
+                }
+                case TerrainShape.Rect:
+                {
+                    if (!_rectHasA)
+                    {
+                        _rectA = point;
+                        _rectHasA = true;
+                        TerrainForgePlugin.Message("Rectángulo: esquina A marcada. Apunta a la esquina B y volve a pulsar.");
+                        return false;
+                    }
+                    Vector3 ra = _rectA;
+                    _rectHasA = false;
+                    float dx = Mathf.Abs(point.x - ra.x);
+                    float dz = Mathf.Abs(point.z - ra.z);
+                    if (dx < 1f || dz < 1f)
+                    {
+                        TerrainForgePlugin.Message("Rectángulo: demasiado chico (mínimo 1×1 m).");
+                        return false;
+                    }
+                    BrushSpec spec = BaseSpec(p, player, point);
+                    spec.HasRect = true;
+                    spec.RectA = ra;
+                    spec.RectB = point;
+                    Vector3 mid = (ra + point) * 0.5f;
+                    bool ok = TerrainEngine.Apply(mid, spec);
+                    TerrainForgePlugin.Message(ok ? "Rectángulo aplicado." : "Rectángulo: sin terreno en la zona.");
+                    return ok;
+                }
+                case TerrainShape.Poly:
+                {
+                    if (_polyPoints.Count >= 3 && Time.time - _polyLastClick < 0.5f)
+                    {
+                        BrushSpec spec = BaseSpec(p, player, point);
+                        spec.HasPoly = true;
+                        spec.PolyPoints = _polyPoints.ToArray();
+                        Vector3 c = Vector3.zero;
+                        for (int k = 0; k < _polyPoints.Count; k++)
+                            c += _polyPoints[k];
+                        c /= _polyPoints.Count;
+                        int n = _polyPoints.Count;
+                        _polyPoints.Clear();
+                        bool ok = TerrainEngine.Apply(c, spec);
+                        TerrainForgePlugin.Message(ok
+                            ? "Polígono aplicado (" + n + " puntos)."
+                            : "Polígono: sin terreno en la zona.");
+                        return ok;
+                    }
+                    if (_polyPoints.Count == 0 ||
+                        (_polyPoints[_polyPoints.Count - 1] - point).sqrMagnitude > 0.25f)
+                    {
+                        _polyPoints.Add(point);
+                        TerrainForgePlugin.Message("Polígono: punto " + _polyPoints.Count +
+                            ". Doble pulso para cerrar y aplicar.");
+                    }
+                    _polyLastClick = Time.time;
+                    return false;
+                }
+                default:
+                    return false;
+            }
         }
 
         private void HandleRadius(TerrainForgePlugin p)
@@ -352,7 +501,7 @@ namespace TerrainForge
 
         private static void CycleShape(TerrainForgePlugin p)
         {
-            p.Shape.Value = p.Shape.Value == TerrainShape.Circle ? TerrainShape.Square : TerrainShape.Circle;
+            p.Shape.Value = (TerrainShape)(((int)p.Shape.Value + 1) % 5);
         }
 
         private static bool ServerAllows(TerrainForgePlugin p, out string reason)
@@ -706,6 +855,27 @@ namespace TerrainForge
                 p.DefaultOperation.Value, p.Radius.Value, p.Shape.Value, p.Paint.Value);
             if (p.DefaultOperation.Value == TerrainOperation.Ramp && _rampHasA)
                 status += "   |   RAMPA: punto A fijado, apunta a B";
+            if (p.DefaultOperation.Value != TerrainOperation.Ramp)
+            {
+                switch (p.Shape.Value)
+                {
+                    case TerrainShape.Line:
+                        status += _lineHasA
+                            ? "   |   LÍNEA: A fijado, apunta a B"
+                            : "   |   LÍNEA: marca A y B";
+                        break;
+                    case TerrainShape.Rect:
+                        status += _rectHasA
+                            ? "   |   RECT: esquina A fijada, apunta a B"
+                            : "   |   RECT: marca dos esquinas";
+                        break;
+                    case TerrainShape.Poly:
+                        status += _polyPoints.Count > 0
+                            ? string.Format("   |   POLI: {0} puntos (doble pulso cierra)", _polyPoints.Count)
+                            : "   |   POLI: marca puntos";
+                        break;
+                }
+            }
             status += string.Format("   |   deshacer {0} / rehacer {1}",
                 TerrainEngine.UndoCount, TerrainEngine.RedoCount);
             if (!_serverAllowed)

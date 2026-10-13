@@ -314,8 +314,11 @@ namespace TerrainForge
             Body("\u2022 Mantener \"Aplicar\" para esculpir (en Ramp: cada pulsacion marca " +
                  "un punto A o B).\n" +
                  "\u2022 \"Subir/Bajar radio\" o Ctrl + rueda del raton: tamano de la brocha " +
-                 "(en Ramp es el ancho de la rampa).\n" +
-                 "\u2022 \"Cambiar forma\": circulo o cuadrado.\n" +
+                 "(en Ramp y Linea es el ancho).\n" +
+                 "\u2022 \"Cambiar forma\": circulo, cuadrado, linea, rectangulo o poligono. " +
+                 "Linea/Rectangulo se marcan con dos pulsos de Aplicar (A y B); el " +
+                 "poligono suma un punto por pulso y se cierra con doble pulso (3+ puntos). " +
+                 "Los bordes se suavizan segun Softness.\n" +
                  "\u2022 \"Cambiar pintura\": tipo de pintura.\n" +
                  "\u2022 \"Nivelar a tus pies\" (Shift): Flatten toma esa altura en " +
                  "vez de la apuntada.\n" +

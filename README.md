@@ -67,6 +67,12 @@ target and the local slope in degrees. Guides can be turned off with
 Operations cycle through: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`,
 `Restore`.
 
+Shapes cycle through: `Circle`, `Square`, `Line`, `Rect`, `Poly` (`.` key).
+`Line`/`Rect` are marked with two `Apply` presses (A then B; line half-width =
+brush radius, rect corners define the area with soft edges). `Poly` adds one
+vertex per press and closes on a double-press with 3+ vertices. All area
+operations apply over these footprints with undo support.
+
 - **Flatten** follows the ground **under the crosshair** by default, so it conforms
   to whatever you aim at (e.g. a ramp). Hold the modifier (`Left Shift`) to level to
   your own feet instead.

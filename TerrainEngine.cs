@@ -70,11 +70,38 @@ namespace TerrainForge
                 return false;
 
             s_hmaps.Clear();
+            Vector3 searchCenter = center;
             float searchRadius = spec.Radius + 4f;
             if (spec.Operation == TerrainOperation.Ramp && spec.HasRampLine)
+            {
                 searchRadius = Mathf.Max(spec.Radius, Vector3.Distance(spec.RampA, spec.RampB) * 0.5f + spec.Radius) + 4f;
+            }
+            else if (spec.HasLine)
+            {
+                searchCenter = (spec.LineA + spec.LineB) * 0.5f;
+                searchRadius = Vector3.Distance(spec.LineA, spec.LineB) * 0.5f + spec.Radius + 4f;
+            }
+            else if (spec.HasRect)
+            {
+                searchCenter = (spec.RectA + spec.RectB) * 0.5f;
+                float dx = Mathf.Abs(spec.RectB.x - spec.RectA.x);
+                float dz = Mathf.Abs(spec.RectB.z - spec.RectA.z);
+                searchRadius = Mathf.Sqrt(dx * dx + dz * dz) * 0.5f + EdgeBlendMeters(spec) + 4f;
+            }
+            else if (spec.HasPoly && spec.PolyPoints != null && spec.PolyPoints.Length >= 3)
+            {
+                Vector3 c = Vector3.zero;
+                float maxD = 0f;
+                for (int k = 0; k < spec.PolyPoints.Length; k++)
+                    c += spec.PolyPoints[k];
+                c /= spec.PolyPoints.Length;
+                for (int k = 0; k < spec.PolyPoints.Length; k++)
+                    maxD = Mathf.Max(maxD, Vector3.Distance(c, spec.PolyPoints[k]));
+                searchCenter = c;
+                searchRadius = maxD + EdgeBlendMeters(spec) + 4f;
+            }
 
-            Heightmap.FindHeightmap(center, searchRadius, s_hmaps);
+            Heightmap.FindHeightmap(searchCenter, searchRadius, s_hmaps);
             if (s_hmaps.Count == 0)
                 return false;
 
@@ -108,14 +135,14 @@ namespace TerrainForge
             }
 
             if (changed && ClutterSystem.instance != null)
-                ClutterSystem.instance.ResetGrass(center, searchRadius + 1f);
+                ClutterSystem.instance.ResetGrass(searchCenter, searchRadius + 1f);
 
             if (changed && frame != null && frame.Count > 0)
             {
                 PushUndo(new UndoFrame
                 {
                     Label = spec.Operation.ToString(),
-                    Center = center,
+                    Center = searchCenter,
                     Radius = searchRadius,
                     Entries = frame
                 });
@@ -348,6 +375,8 @@ namespace TerrainForge
         {
             if (spec.Operation == TerrainOperation.Ramp && spec.HasRampLine)
                 return ApplyRampLine(comp, hm, spec, frame);
+            if (spec.HasLine || spec.HasRect || spec.HasPoly)
+                return ApplyFootprint(comp, hm, spec, frame);
 
             int width = hm.m_width;
             int pitch = width + 1;
@@ -372,7 +401,6 @@ namespace TerrainForge
                 return false;
 
             Color paintTarget = PaintColor(spec.Paint);
-            bool any = false;
 
             Recorder rec = frame != null
                 ? new Recorder(level, smooth, modHeight, paint, modPaint)
@@ -402,6 +430,23 @@ namespace TerrainForge
                         src[(i - sy0) * sw + (j - sx0)] = hm.GetHeight(j, i);
             }
 
+            var writer = new VertexWriter
+            {
+                Spec = spec,
+                PaintTarget = paintTarget,
+                Level = level,
+                Smooth = smooth,
+                ModH = modHeight,
+                ModP = modPaint,
+                Paint = paint,
+                Snap = src,
+                Sx0 = sx0,
+                Sy0 = sy0,
+                Sw = sw,
+                Sh = sh,
+                Rec = rec
+            };
+
             for (int i = y0; i <= y1; i++)
             {
                 for (int j = x0; j <= x1; j++)
@@ -418,119 +463,11 @@ namespace TerrainForge
                     int idx = i * pitch + j;
                     float curWorld = hm.GetHeight(j, i);
                     float w = Falloff(d, radiusIdx, blendIdx, spec);
-
-                    switch (spec.Operation)
-                    {
-                        case TerrainOperation.Flatten:
-                        {
-                            float newWorld = Mathf.Lerp(curWorld, spec.TargetWorld, w);
-                            if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !modHeight[idx])
-                            {
-                                if (rec != null)
-                                    rec.Add(idx);
-                                level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
-                                modHeight[idx] = true;
-                                any = true;
-                            }
-                            break;
-                        }
-                        case TerrainOperation.Raise:
-                        case TerrainOperation.Lower:
-                        {
-                            float sign = spec.Operation == TerrainOperation.Lower ? -1f : 1f;
-                            float delta = spec.RaiseDelta * w * sign;
-                            if (Mathf.Abs(delta) > 0.0001f || !modHeight[idx])
-                            {
-                                if (rec != null)
-                                    rec.Add(idx);
-                                level[idx] = ClampDelta(level[idx] + delta, spec);
-                                modHeight[idx] = true;
-                                any = true;
-                            }
-                            break;
-                        }
-                        case TerrainOperation.Smooth:
-                        {
-                            float sum = 0f;
-                            int n = 0;
-                            int gi = i - sy0;
-                            int gj = j - sx0;
-                            for (int oy = -1; oy <= 1; oy++)
-                            {
-                                int ni = gi + oy;
-                                if (ni < 0 || ni >= sh)
-                                    continue;
-                                for (int ox = -1; ox <= 1; ox++)
-                                {
-                                    int nj = gj + ox;
-                                    if (nj < 0 || nj >= sw)
-                                        continue;
-                                    sum += src[ni * sw + nj];
-                                    n++;
-                                }
-                            }
-
-                            float avg = n > 0 ? sum / n : curWorld;
-                            float newWorld = Mathf.Lerp(curWorld, avg, w);
-                            if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !modHeight[idx])
-                            {
-                                if (rec != null)
-                                    rec.Add(idx);
-                                level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
-                                modHeight[idx] = true;
-                                any = true;
-                            }
-                            break;
-                        }
-                        case TerrainOperation.Paint:
-                        {
-                            if (spec.Paint == TerrainPaint.Reset)
-                            {
-                                if (modPaint[idx])
-                                {
-                                    if (rec != null)
-                                        rec.Add(idx);
-                                    modPaint[idx] = false;
-                                    any = true;
-                                }
-                            }
-                            else
-                            {
-                                float k = Mathf.Clamp01(spec.PaintStrength) * w;
-                                if (k > 0.0001f)
-                                {
-                                    Color c = paint[idx];
-                                    float a = c.a;
-                                    c = Color.Lerp(c, paintTarget, k);
-                                    if (spec.Paint != TerrainPaint.ClearVegetation)
-                                        c.a = a;
-                                    if (rec != null)
-                                        rec.Add(idx);
-                                    paint[idx] = c;
-                                    modPaint[idx] = true;
-                                    any = true;
-                                }
-                            }
-                            break;
-                        }
-                        case TerrainOperation.Restore:
-                        {
-                            if (level[idx] != 0f || smooth[idx] != 0f || modHeight[idx] || modPaint[idx])
-                            {
-                                if (rec != null)
-                                    rec.Add(idx);
-                                level[idx] = 0f;
-                                smooth[idx] = 0f;
-                                modHeight[idx] = false;
-                                modPaint[idx] = false;
-                                any = true;
-                            }
-                            break;
-                        }
-                    }
+                    writer.Write(idx, j, i, curWorld, w);
                 }
             }
 
+            bool any = writer.Any;
             if (any && frame != null && rec != null && rec.Cells.Count > 0)
             {
                 frame.Add(new UndoEntry
@@ -544,6 +481,140 @@ namespace TerrainForge
             }
 
             return any;
+        }
+
+        /// <summary>
+        /// Writes one vertex for area ops (Flatten / Raise / Lower / Smooth /
+        /// Paint / Restore). Shared by the circular brush and the Line / Rect /
+        /// Poly footprints; only the caller-provided falloff weight differs.
+        /// </summary>
+        private sealed class VertexWriter
+        {
+            public BrushSpec Spec;
+            public Color PaintTarget;
+            public float[] Level;
+            public float[] Smooth;
+            public bool[] ModH;
+            public bool[] ModP;
+            public Color[] Paint;
+            public float[] Snap;
+            public int Sx0, Sy0, Sw, Sh;
+            public Recorder Rec;
+            public bool Any;
+
+            public void Write(int idx, int j, int i, float curWorld, float w)
+            {
+                BrushSpec spec = Spec;
+                switch (spec.Operation)
+                {
+                    case TerrainOperation.Flatten:
+                    {
+                        float newWorld = Mathf.Lerp(curWorld, spec.TargetWorld, w);
+                        if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !ModH[idx])
+                        {
+                            if (Rec != null)
+                                Rec.Add(idx);
+                            Level[idx] = ClampDelta(Level[idx] + (newWorld - curWorld), spec);
+                            ModH[idx] = true;
+                            Any = true;
+                        }
+                        break;
+                    }
+                    case TerrainOperation.Raise:
+                    case TerrainOperation.Lower:
+                    {
+                        float sign = spec.Operation == TerrainOperation.Lower ? -1f : 1f;
+                        float delta = spec.RaiseDelta * w * sign;
+                        if (Mathf.Abs(delta) > 0.0001f || !ModH[idx])
+                        {
+                            if (Rec != null)
+                                Rec.Add(idx);
+                            Level[idx] = ClampDelta(Level[idx] + delta, spec);
+                            ModH[idx] = true;
+                            Any = true;
+                        }
+                        break;
+                    }
+                    case TerrainOperation.Smooth:
+                    {
+                        float sum = 0f;
+                        int n = 0;
+                        int gi = i - Sy0;
+                        int gj = j - Sx0;
+                        for (int oy = -1; oy <= 1; oy++)
+                        {
+                            int ni = gi + oy;
+                            if (ni < 0 || ni >= Sh)
+                                continue;
+                            for (int ox = -1; ox <= 1; ox++)
+                            {
+                                int nj = gj + ox;
+                                if (nj < 0 || nj >= Sw)
+                                    continue;
+                                sum += Snap[ni * Sw + nj];
+                                n++;
+                            }
+                        }
+
+                        float avg = n > 0 ? sum / n : curWorld;
+                        float newWorld = Mathf.Lerp(curWorld, avg, w);
+                        if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !ModH[idx])
+                        {
+                            if (Rec != null)
+                                Rec.Add(idx);
+                            Level[idx] = ClampDelta(Level[idx] + (newWorld - curWorld), spec);
+                            ModH[idx] = true;
+                            Any = true;
+                        }
+                        break;
+                    }
+                    case TerrainOperation.Paint:
+                    {
+                        if (spec.Paint == TerrainPaint.Reset)
+                        {
+                            if (ModP[idx])
+                            {
+                                if (Rec != null)
+                                    Rec.Add(idx);
+                                ModP[idx] = false;
+                                Any = true;
+                            }
+                        }
+                        else
+                        {
+                            float k = Mathf.Clamp01(spec.PaintStrength) * w;
+                            if (k > 0.0001f)
+                            {
+                                Color c = Paint[idx];
+                                float a = c.a;
+                                c = Color.Lerp(c, PaintTarget, k);
+                                if (spec.Paint != TerrainPaint.ClearVegetation)
+                                    c.a = a;
+                                if (Rec != null)
+                                    Rec.Add(idx);
+                                Paint[idx] = c;
+                                ModP[idx] = true;
+                                Any = true;
+                            }
+                        }
+                        break;
+                    }
+                    case TerrainOperation.Restore:
+                    {
+                        if (Level[idx] != 0f || Smooth[idx] != 0f || ModH[idx] || ModP[idx])
+                        {
+                            if (Rec != null)
+                                Rec.Add(idx);
+                            Level[idx] = 0f;
+                            Smooth[idx] = 0f;
+                            ModH[idx] = false;
+                            ModP[idx] = false;
+                            Any = true;
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -649,6 +720,234 @@ namespace TerrainForge
             }
 
             return any;
+        }
+
+        /// <summary>
+        /// Applies an area op inside a Line (capsule), Rect or Poly footprint.
+        /// Points are converted to vertex space (like the ramp) so every distance
+        /// stays in meters; Rect/Poly use an edge blend, Line reuses the ramp's
+        /// flat-core + side-fade profile with the brush radius as half-width.
+        /// </summary>
+        private static bool ApplyFootprint(TerrainComp comp, Heightmap hm, BrushSpec spec, List<UndoEntry> frame)
+        {
+            int width = hm.m_width;
+            int pitch = width + 1;
+            float scale = hm.m_scale;
+            if (scale <= 0f)
+                return false;
+
+            float[] level = LevelDelta(comp);
+            float[] smooth = SmoothDelta(comp);
+            bool[] modHeight = (bool[])f_modifiedHeight.GetValue(comp);
+            Color[] paint = PaintMask(comp);
+            bool[] modPaint = ModifiedPaint(comp);
+            if (level == null || smooth == null || modHeight == null || paint == null || modPaint == null)
+                return false;
+
+            int x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+            float blendMeters = EdgeBlendMeters(spec);
+
+            // Per-shape data in vertex*scale (meter) space.
+            float axw = 0f, ayw = 0f, bxw = 0f, byw = 0f; // line
+            float halfWidth = Mathf.Max(0.5f, spec.Radius);
+            float sideFade = halfWidth * 0.5f * Mathf.Clamp01(spec.Softness / 100f);
+            float rx0 = 0f, rx1 = 0f, rz0 = 0f, rz1 = 0f; // rect (vertex units)
+            float[] px = null, pz = null;                 // poly (vertex units)
+
+            if (spec.HasLine)
+            {
+                hm.WorldToVertex(spec.LineA, out int ax, out int ay);
+                hm.WorldToVertex(spec.LineB, out int bx, out int by);
+                if (ax == bx && ay == by)
+                    return false;
+                axw = ax * scale; ayw = ay * scale;
+                bxw = bx * scale; byw = by * scale;
+                int pad = Mathf.CeilToInt(halfWidth / scale) + 1;
+                x0 = Mathf.Max(0, Mathf.Min(ax, bx) - pad);
+                x1 = Mathf.Min(width, Mathf.Max(ax, bx) + pad);
+                y0 = Mathf.Max(0, Mathf.Min(ay, by) - pad);
+                y1 = Mathf.Min(width, Mathf.Max(ay, by) + pad);
+            }
+            else if (spec.HasRect)
+            {
+                hm.WorldToVertex(spec.RectA, out int ax, out int ay);
+                hm.WorldToVertex(spec.RectB, out int bx, out int by);
+                if (ax == bx || ay == by)
+                    return false;
+                rx0 = Mathf.Min(ax, bx); rx1 = Mathf.Max(ax, bx);
+                rz0 = Mathf.Min(ay, by); rz1 = Mathf.Max(ay, by);
+                int pad = Mathf.CeilToInt(blendMeters / scale) + 1;
+                x0 = Mathf.Max(0, (int)rx0 - pad);
+                x1 = Mathf.Min(width, (int)rx1 + pad);
+                y0 = Mathf.Max(0, (int)rz0 - pad);
+                y1 = Mathf.Min(width, (int)rz1 + pad);
+            }
+            else if (spec.HasPoly && spec.PolyPoints != null && spec.PolyPoints.Length >= 3)
+            {
+                int n = spec.PolyPoints.Length;
+                px = new float[n];
+                pz = new float[n];
+                float minx = float.MaxValue, maxx = float.MinValue;
+                float minz = float.MaxValue, maxz = float.MinValue;
+                for (int k = 0; k < n; k++)
+                {
+                    hm.WorldToVertex(spec.PolyPoints[k], out int vx, out int vy);
+                    px[k] = vx; pz[k] = vy;
+                    if (vx < minx) minx = vx;
+                    if (vx > maxx) maxx = vx;
+                    if (vy < minz) minz = vy;
+                    if (vy > maxz) maxz = vy;
+                }
+                if (maxx - minx < 1f && maxz - minz < 1f)
+                    return false;
+                int pad = Mathf.CeilToInt(blendMeters / scale) + 1;
+                x0 = Mathf.Max(0, (int)minx - pad);
+                x1 = Mathf.Min(width, (int)maxx + pad);
+                y0 = Mathf.Max(0, (int)minz - pad);
+                y1 = Mathf.Min(width, (int)maxz + pad);
+            }
+            else
+            {
+                return false;
+            }
+
+            // Frozen snapshot for Smooth, over the bbox expanded by one vertex.
+            float[] src = null;
+            int sx0 = 0, sy0 = 0, sw = 0, sh = 0;
+            if (spec.Operation == TerrainOperation.Smooth)
+            {
+                sx0 = Mathf.Max(0, x0 - 1);
+                sy0 = Mathf.Max(0, y0 - 1);
+                int sx1 = Mathf.Min(width, x1 + 1);
+                int sy1 = Mathf.Min(width, y1 + 1);
+                sw = sx1 - sx0 + 1;
+                sh = sy1 - sy0 + 1;
+                src = new float[sw * sh];
+                for (int i = sy0; i <= sy1; i++)
+                    for (int j = sx0; j <= sx1; j++)
+                        src[(i - sy0) * sw + (j - sx0)] = hm.GetHeight(j, i);
+            }
+
+            Recorder rec = frame != null
+                ? new Recorder(level, smooth, modHeight, paint, modPaint)
+                : null;
+
+            var writer = new VertexWriter
+            {
+                Spec = spec,
+                PaintTarget = PaintColor(spec.Paint),
+                Level = level,
+                Smooth = smooth,
+                ModH = modHeight,
+                ModP = modPaint,
+                Paint = paint,
+                Snap = src,
+                Sx0 = sx0,
+                Sy0 = sy0,
+                Sw = sw,
+                Sh = sh,
+                Rec = rec
+            };
+
+            for (int i = y0; i <= y1; i++)
+            {
+                for (int j = x0; j <= x1; j++)
+                {
+                    float w = -1f;
+                    if (spec.HasLine)
+                    {
+                        float dSeg = DistToSegment(j * scale, i * scale, axw, ayw, bxw, byw);
+                        if (dSeg > halfWidth)
+                            continue;
+                        float lat = 1f;
+                        if (sideFade > 0.001f)
+                            lat = Mathf.Clamp01((halfWidth - dSeg) / sideFade);
+                        w = lat * lat * (3f - 2f * lat);
+                    }
+                    else if (spec.HasRect)
+                    {
+                        if (j < rx0 || j > rx1 || i < rz0 || i > rz1)
+                            continue;
+                        float dEdge = Mathf.Min(Mathf.Min(j - rx0, rx1 - j), Mathf.Min(i - rz0, rz1 - i)) * scale;
+                        w = EdgeWeight(dEdge, blendMeters);
+                    }
+                    else
+                    {
+                        if (!PointInPoly(j, i, px, pz))
+                            continue;
+                        w = EdgeWeight(DistToPoly(j, i, px, pz) * scale, blendMeters);
+                    }
+
+                    int idx = i * pitch + j;
+                    writer.Write(idx, j, i, hm.GetHeight(j, i), w);
+                }
+            }
+
+            bool any = writer.Any;
+            if (any && frame != null && rec != null && rec.Cells.Count > 0)
+            {
+                frame.Add(new UndoEntry
+                {
+                    Comp = comp,
+                    Hm = hm,
+                    WithSmooth = true,
+                    WithPaint = true,
+                    Before = rec.Cells
+                });
+            }
+
+            return any;
+        }
+
+        private static float EdgeBlendMeters(BrushSpec spec)
+        {
+            return Mathf.Max(0.05f, spec.Radius * 0.5f * Mathf.Clamp01(spec.Softness / 100f));
+        }
+
+        private static float EdgeWeight(float distMeters, float blendMeters)
+        {
+            if (blendMeters <= 0.001f)
+                return 1f;
+            float t = Mathf.Clamp01(distMeters / blendMeters);
+            return t * t * (3f - 2f * t);
+        }
+
+        private static float DistToSegment(float px, float pz, float ax, float az, float bx, float bz)
+        {
+            float dx = bx - ax, dz = bz - az;
+            float len2 = dx * dx + dz * dz;
+            if (len2 < 0.000001f)
+                return Mathf.Sqrt((px - ax) * (px - ax) + (pz - az) * (pz - az));
+            float t = ((px - ax) * dx + (pz - az) * dz) / len2;
+            t = Mathf.Clamp01(t);
+            float nx = ax + t * dx, nz = az + t * dz;
+            return Mathf.Sqrt((px - nx) * (px - nx) + (pz - nz) * (pz - nz));
+        }
+
+        private static bool PointInPoly(float x, float z, float[] px, float[] pz)
+        {
+            bool inside = false;
+            int n = px.Length;
+            for (int a = 0, b = n - 1; a < n; b = a++)
+            {
+                float ax = px[a], az = pz[a], bx = px[b], bz = pz[b];
+                if (((az > z) != (bz > z)) && (x < (bx - ax) * (z - az) / (bz - az) + ax))
+                    inside = !inside;
+            }
+            return inside;
+        }
+
+        private static float DistToPoly(float x, float z, float[] px, float[] pz)
+        {
+            float m = float.MaxValue;
+            int n = px.Length;
+            for (int a = 0, b = n - 1; a < n; b = a++)
+            {
+                float d = DistToSegment(x, z, px[a], pz[a], px[b], pz[b]);
+                if (d < m)
+                    m = d;
+            }
+            return m;
         }
 
         private static float Falloff(float d, float radiusIdx, float blendIdx, BrushSpec spec)

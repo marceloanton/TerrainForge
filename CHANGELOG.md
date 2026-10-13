@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `RampModeKey`, default `H`). In fixed-angle mode B only sets direction and
   length while heights follow `SlopeAngle` (up or down depending on the aim);
   adjust the angle in-game with `Alt` + radius keys/wheel.
+- **New brush shapes**: `Line` (two-press capsule with the brush radius as
+  half-width, reuses the corridor preview), `Rect` (two opposite corners, soft
+  edges from radius + softness) and `Poly` (one point per press, double-press
+  with 3+ points closes and applies). All area operations work over them, with
+  undo support and HUD + preview state.
 - **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
   When the server runs the mod, its values win through config sync and clients
   cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the

@@ -16,7 +16,10 @@ namespace TerrainForge
     public enum TerrainShape
     {
         Circle,
-        Square
+        Square,
+        Line,
+        Rect,
+        Poly
     }
 
     public enum RampMode
@@ -75,6 +78,17 @@ namespace TerrainForge
         public bool UseFixedHeights;
         public float FixedHA;
         public float FixedHB;
+
+        // Area footprints (Line / Rect / Poly shapes): the operation applies
+        // inside these instead of the circular brush. Y is ignored for Rect/Poly.
+        public bool HasLine;
+        public Vector3 LineA;
+        public Vector3 LineB;
+        public bool HasRect;
+        public Vector3 RectA;
+        public Vector3 RectB;
+        public bool HasPoly;
+        public Vector3[] PolyPoints;
 
         public TerrainPaint PaintType => Paint;
     }
