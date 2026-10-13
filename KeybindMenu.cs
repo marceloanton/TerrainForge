@@ -520,12 +520,12 @@ namespace TerrainForge
             _snapshotName = GUILayout.TextField(_snapshotName ?? "", GUILayout.Height(26f));
             if (GUILayout.Button(Loc.T("set.profilesave"), _btnStyle, GUILayout.Width(130f), GUILayout.Height(26f)))
             {
-                if (!string.IsNullOrEmpty((_snapshotName ?? "").Trim()))
-                {
-                    if (TerrainEngine.ExportSnapshot(_snapshotName.Trim(), out string msg))
-                        _snapshotName = "";
-                    TerrainForgePlugin.Message(msg);
-                }
+                string nm = (_snapshotName ?? "").Trim();
+                if (nm.Length == 0)
+                    nm = "Snapshot-" + System.DateTime.Now.ToString("yyyyMMdd-HHmm");
+                if (TerrainEngine.ExportSnapshot(nm, out string msg))
+                    _snapshotName = "";
+                TerrainForgePlugin.Message(msg);
             }
             GUILayout.EndHorizontal();
             GUILayout.Space(3f);

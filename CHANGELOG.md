@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   denies editing, so it reads before trying.
 - **First-time tutorial**: two short messages on first equip
   (`General > SeenTutorial`), then never again.
+- **Capped radius tag**: the HUD shows `20 (tope/capped)` when the server cap
+  clamps your radius.
+- **Snapshot auto-naming**: saving without a name uses date and time.
+- **Fine radius adjust**: `Shift` + wheel / radius keys move in 0.1 m steps.
 
 ### Fixed
 

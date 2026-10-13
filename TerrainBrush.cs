@@ -663,6 +663,7 @@ namespace TerrainForge
                              p.RampMode.Value == RampMode.FixedAngle;
 
             bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+            bool fine = Held(p.AimHeightModifierKey.Value);
             float scroll = Input.mouseScrollDelta.y;
             if (Mathf.Abs(scroll) > 0.01f)
             {
@@ -670,6 +671,8 @@ namespace TerrainForge
                     AdjustRadius(p, Mathf.Sign(scroll) * p.RadiusStep.Value);
                 else if (angleMode)
                     AdjustAngle(p, Mathf.Sign(scroll) * 2.5f);
+                else if (fine)
+                    AdjustRadius(p, Mathf.Sign(scroll) * 0.1f);
                 else if (ctrl)
                     AdjustRadius(p, Mathf.Sign(scroll) * p.RadiusStep.Value);
             }
@@ -678,6 +681,8 @@ namespace TerrainForge
             {
                 if (angleMode)
                     AdjustAngle(p, 2.5f);
+                else if (fine)
+                    AdjustRadius(p, 0.1f);
                 else
                     AdjustRadius(p, p.RadiusStep.Value);
             }
@@ -685,6 +690,8 @@ namespace TerrainForge
             {
                 if (angleMode)
                     AdjustAngle(p, -2.5f);
+                else if (fine)
+                    AdjustRadius(p, -0.1f);
                 else
                     AdjustRadius(p, -p.RadiusStep.Value);
             }
@@ -1190,8 +1197,11 @@ namespace TerrainForge
 
             EnsureHudStyle();
 
-            string status = string.Format("TerrainForge   {0}   |   {1} {2:0.#} m   |   {3}   |   {4}",
-                p.DefaultOperation.Value, Loc.T("hud.radius"), EffectiveRadius(p), p.Shape.Value, p.Paint.Value);
+            float er = EffectiveRadius(p);
+            string rtxt = er.ToString("0.#") + " m" +
+                (er < p.Radius.Value - 0.001f ? " (" + Loc.T("hud.capped") + ")" : "");
+            string status = string.Format("TerrainForge   {0}   |   {1} {2}   |   {3}   |   {4}",
+                p.DefaultOperation.Value, Loc.T("hud.radius"), rtxt, p.Shape.Value, p.Paint.Value);
             if (p.DefaultOperation.Value == TerrainOperation.Ramp)
             {
                 if (p.RampMode.Value == RampMode.Path)

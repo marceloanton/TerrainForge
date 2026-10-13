@@ -65,6 +65,7 @@ target and the local slope in degrees. Guides can be turned off with
 | Adjust fixed ramp angle (Ramp selected) | Hold `Alt` + radius keys / wheel |
 | Operation radial menu (hold, release to confirm) | `Q` |
 | Toggle adjust mode (wheel = radius, camera zoom frozen) | `V` |
+| Fine radius adjust (0.1 m steps) | Hold `Shift` + wheel / radius keys |
 | Give yourself the TerrainForge Rod | `F8` |
 | Open the key binding + help menu | `F5` |
 
