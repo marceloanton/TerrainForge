@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Seamless Smooth**: border vertices now sample the neighbouring tile across
+  the edge (exact vertex mapping), so smoothing blends both sides instead of
+  opening a visible seam/crack in the mesh between tiles. Applies to every
+  footprint; other operations were already continuous by construction.
+
 ### Added
 
 - **Snow operation**: paint-only snow brush (same mask as the game's snow);

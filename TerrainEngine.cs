@@ -493,21 +493,24 @@ namespace TerrainForge
 
             // Smooth needs a frozen snapshot of the surrounding heights so every
             // vertex averages its ORIGINAL neighbours; without it the blur would
-            // compound within a single pass and create artifacts.
+            // compound within a single pass and create artifacts. The 1-vertex
+            // margin is intentionally UNCLAMPED: border vertices sample across
+            // the tile edge (see ExtendedHeight) so smoothing never opens a
+            // seam between neighbouring tiles.
             float[] src = null;
             int sx0 = 0, sy0 = 0, sw = 0, sh = 0;
             if (spec.Operation == TerrainOperation.Smooth)
             {
-                sx0 = Mathf.Max(0, x0 - 1);
-                sy0 = Mathf.Max(0, y0 - 1);
-                int sx1 = Mathf.Min(width, x1 + 1);
-                int sy1 = Mathf.Min(width, y1 + 1);
+                sx0 = x0 - 1;
+                sy0 = y0 - 1;
+                int sx1 = x1 + 1;
+                int sy1 = y1 + 1;
                 sw = sx1 - sx0 + 1;
                 sh = sy1 - sy0 + 1;
                 src = new float[sw * sh];
                 for (int i = sy0; i <= sy1; i++)
                     for (int j = sx0; j <= sx1; j++)
-                        src[(i - sy0) * sw + (j - sx0)] = hm.GetHeight(j, i);
+                        src[(i - sy0) * sw + (j - sx0)] = ExtendedHeight(hm, width, scale, j, i);
             }
 
             var writer = new VertexWriter
@@ -1075,21 +1078,23 @@ namespace TerrainForge
                 return false;
             }
 
-            // Frozen snapshot for Smooth, over the bbox expanded by one vertex.
+            // Frozen snapshot for Smooth, over the bbox expanded by one vertex
+            // (unclamped: border vertices sample across the tile edge, so the
+            // blur stays seamless between neighbouring tiles).
             float[] src = null;
             int sx0 = 0, sy0 = 0, sw = 0, sh = 0;
             if (spec.Operation == TerrainOperation.Smooth)
             {
-                sx0 = Mathf.Max(0, x0 - 1);
-                sy0 = Mathf.Max(0, y0 - 1);
-                int sx1 = Mathf.Min(width, x1 + 1);
-                int sy1 = Mathf.Min(width, y1 + 1);
+                sx0 = x0 - 1;
+                sy0 = y0 - 1;
+                int sx1 = x1 + 1;
+                int sy1 = y1 + 1;
                 sw = sx1 - sx0 + 1;
                 sh = sy1 - sy0 + 1;
                 src = new float[sw * sh];
                 for (int i = sy0; i <= sy1; i++)
                     for (int j = sx0; j <= sx1; j++)
-                        src[(i - sy0) * sw + (j - sx0)] = hm.GetHeight(j, i);
+                        src[(i - sy0) * sw + (j - sx0)] = ExtendedHeight(hm, width, scale, j, i);
             }
 
             Recorder rec = frame != null
@@ -1254,6 +1259,42 @@ namespace TerrainForge
             if (ZoneSystem.instance != null)
                 return ZoneSystem.instance.GetGroundHeight(pos);
             return pos.y;
+        }
+
+        private static readonly List<Heightmap> s_borderHmaps = new List<Heightmap>();
+
+        /// <summary>
+        /// Height of vertex (j,i), sampling the neighbouring tile when it falls
+        /// outside this one. Vertex positions invert the game's own WorldToVertex
+        /// mapping exactly, so the cross-border sample lands on the true neighbour
+        /// vertex (with its own deltas). Falls back to the clamped local height.
+        /// </summary>
+        private static float ExtendedHeight(Heightmap hm, int width, float scale, int j, int i)
+        {
+            if (j >= 0 && j <= width && i >= 0 && i <= width)
+                return hm.GetHeight(j, i);
+            try
+            {
+                Vector3 origin = hm.transform.position;
+                Vector3 wpos = new Vector3(
+                    origin.x + (j - width * 0.5f) * scale, 0f,
+                    origin.z + (i - width * 0.5f) * scale);
+                s_borderHmaps.Clear();
+                Heightmap.FindHeightmap(wpos, 2f, s_borderHmaps);
+                for (int k = 0; k < s_borderHmaps.Count; k++)
+                {
+                    Heightmap nhm = s_borderHmaps[k];
+                    if (nhm == null || nhm == hm || nhm.m_scale <= 0f)
+                        continue;
+                    nhm.WorldToVertex(wpos, out int nj, out int ni);
+                    int nw = nhm.m_width;
+                    if (nj < 0 || ni < 0 || nj > nw || ni > nw)
+                        continue;
+                    return nhm.GetHeight(nj, ni);
+                }
+            }
+            catch { /* fall through to clamped local height */ }
+            return hm.GetHeight(Mathf.Clamp(j, 0, width), Mathf.Clamp(i, 0, width));
         }
 
         internal static float WaterLevel()
