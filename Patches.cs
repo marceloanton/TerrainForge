@@ -240,16 +240,17 @@ namespace TerrainForge
 
     /// <summary>
     /// Adds a "TerrainForge" button to the ESC pause menu (cloned from the settings
-    /// button so it matches the game's styling) that opens the mod menu. Everything
-    /// is guarded: if the game's menu internals ever change, the pause menu keeps
-    /// working and we just log a warning.
+    /// button so it matches the game's styling) that opens the mod menu. Hooked on
+    /// every open (not just Start) so the entry survives other menu mods and is
+    /// always re-seated right below Settings. Everything is guarded: if the game's
+    /// menu internals ever change, the pause menu keeps working and we log.
     /// </summary>
     internal static class PauseMenuPatch
     {
         private const string ButtonName = "TerrainForgeButton";
         private static MethodInfo s_updateNavigation;
 
-        [HarmonyPatch(typeof(Menu), "Start")]
+        [HarmonyPatch(typeof(Menu), "Show")]
         [HarmonyPostfix]
         private static void Postfix(Menu __instance)
         {
@@ -272,14 +273,23 @@ namespace TerrainForge
             }
 
             Transform parent = menu.menuEntriesParent;
-            if (parent.Find(ButtonName) != null)
-                return; // already added
-
-            Button clone = UnityEngine.Object.Instantiate(menu.m_settingsButton, parent);
-            if (clone == null)
-                return;
-            clone.name = ButtonName;
+            Transform existing = parent.Find(ButtonName);
+            Button clone;
+            if (existing != null)
+            {
+                clone = existing.GetComponent<Button>();
+                if (clone == null)
+                    return;
+            }
+            else
+            {
+                clone = UnityEngine.Object.Instantiate(menu.m_settingsButton, parent);
+                if (clone == null)
+                    return;
+                clone.name = ButtonName;
+            }
             clone.transform.SetSiblingIndex(menu.m_settingsButton.transform.GetSiblingIndex() + 1);
+            clone.gameObject.SetActive(true);
 
             // Drop the vanilla settings listener; wire ours instead.
             clone.onClick = new Button.ButtonClickedEvent();
