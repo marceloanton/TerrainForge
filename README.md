@@ -61,6 +61,11 @@ target and the local slope in degrees. Guides can be turned off with
 | Fix / release Flatten height at aim (eyedropper) | `G` |
 | Toggle ramp mode (two-point / fixed angle) | `H` |
 | Adjust fixed ramp angle (Ramp selected) | Hold `Alt` + radius keys / wheel |
+| Operation radial menu (hold, release to confirm) | `Q` |
+
+Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab,
+including menu/HUD language `Español`/`English` and named brush **presets** to
+save and reload the whole brush setup).
 | Give yourself the TerrainForge Rod | `F8` |
 | Open the key binding + help menu | `F5` |
 

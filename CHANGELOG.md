@@ -44,6 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Feedback effects**: the tool's own terrain-hit effect (dust + thud) plays on
   every application (throttled while holding, always on ramps/shapes); toggle
   with `General > PlayEffects`.
+- **EN/ES localization**: `General > Language` switches the whole menu, HUD,
+  messages and help between Español and English (key labels rebuild on open).
+- **Radial menu**: hold `RadialKey` (default `Q`) to pick any of the 8 operations
+  with the mouse; release confirms, `Esc` cancels. Suppresses brush application
+  while open.
+- **Named presets**: save / load / delete up to 12 full brush setups from the
+  AJUSTES tab (stored in `Presets > Slots`, culture-invariant format).
 - **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
   When the server runs the mod, its values win through config sync and clients
   cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the

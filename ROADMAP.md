@@ -174,10 +174,22 @@ Need to mirror Jotunn's clone carefully (instantiate, copy components, don't tou
 
 **Effort:** M–L | **Risk:** medium (networking/prefab lifecycle)
 
-## Phase 9 – Localisation + radial + profiles — PENDING (final technical batch)
-- Localisation: simple CSV/JSON or `LocalizationManager`? But if removing Jotunn maybe own. Or use BepInEx config text + translate keys in `KeybindMenu`.
-- Radial: IMGUI radial or Unity UI? Keep IMGUI to avoid extra assets. Draw pie, highlight sector, click to select.
-- Profiles: save `Radius`, `Softness`, `Operation`, `Shape`, `Paint`, `FalloffPower` as named sets in config or separate file.
+## Phase 9 – Localisation + radial + profiles — DONE
+- **Localisation**: own `Loc` dictionary (`TerrainTypes.cs`), `General > Language`
+  (`Español`/`English`); every menu label, HUD string, flash/message and help body
+  goes through it; key labels rebuild when the menu opens in another language.
+- **Radial**: `TerrainRadial` (IMGUI, no assets), hold `RadialKey` (default `Q`),
+  8 color-coded wedges, dead-zone center, release/click confirms, `Esc` cancels;
+  brush application is suppressed while open; cursor state saved/restored.
+- **Profiles**: `TerrainPresets` (max 12, `Presets > Slots` string, invariant
+  culture) storing radius/softness/op/shape/paint/rampMode/slope/smooth/
+  raiseDelta/paintStrength/falloff/shoreOffset; save/load/delete UI in AJUSTES.
+
+**Acceptance**
+- [x] Full menu/HUD/help in both languages
+- [x] Radial picks all 8 operations, cancels cleanly
+- [x] Presets round-trip (save → load identical, delete works)
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** M | **Risk:** low
 

@@ -6,6 +6,175 @@ using UnityEngine;
 namespace TerrainForge
 {
     /// <summary>
+    /// Named brush presets stored in a single config string:
+    /// name|radius|softness|op|shape|paint|rampMode|slope|smooth|raiseDelta|paintStrength|falloff|shoreOffset; ...
+    /// </summary>
+    internal static class TerrainPresets
+    {
+        private const int MaxSlots = 12;
+
+        internal sealed class Preset
+        {
+            public string Name = "";
+            public float Radius = 8f;
+            public float Softness = 50f;
+            public TerrainOperation Operation = TerrainOperation.Flatten;
+            public TerrainShape Shape = TerrainShape.Circle;
+            public TerrainPaint Paint = TerrainPaint.Dirt;
+            public RampMode RampMode = RampMode.TwoPoint;
+            public float SlopeAngle = 30f;
+            public SmoothMode SmoothMode = SmoothMode.Full;
+            public float RaiseDelta = 2f;
+            public float PaintStrength = 1f;
+            public float FalloffPower = 3f;
+            public float ShoreOffset = 0.5f;
+        }
+
+        public static List<Preset> Load()
+        {
+            var list = new List<Preset>();
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || p.PresetSlots == null)
+                return list;
+            string raw = p.PresetSlots.Value;
+            if (string.IsNullOrEmpty(raw))
+                return list;
+            string[] entries = raw.Split(';');
+            for (int i = 0; i < entries.Length && list.Count < MaxSlots; i++)
+            {
+                Preset pr = Parse(entries[i]);
+                if (pr != null)
+                    list.Add(pr);
+            }
+            return list;
+        }
+
+        public static void SaveCurrent(string name)
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+            name = (name ?? "").Trim().Replace("|", " ").Replace(";", " ");
+            if (name.Length == 0)
+                return;
+
+            var list = Load();
+            list.RemoveAll(x => x.Name == name);
+            list.Add(Capture(p, name));
+            while (list.Count > MaxSlots)
+                list.RemoveAt(0);
+            Write(list);
+        }
+
+        public static void Delete(string name)
+        {
+            var list = Load();
+            list.RemoveAll(x => x.Name == name);
+            Write(list);
+        }
+
+        public static void ApplyPreset(Preset s)
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || s == null)
+                return;
+            p.Radius.Value = Mathf.Clamp(s.Radius, 1f, 100f);
+            p.Softness.Value = Mathf.Clamp(s.Softness, 0f, 100f);
+            p.DefaultOperation.Value = s.Operation;
+            p.Shape.Value = s.Shape;
+            p.Paint.Value = s.Paint;
+            p.RampMode.Value = s.RampMode;
+            p.SlopeAngle.Value = Mathf.Clamp(s.SlopeAngle, 5f, 60f);
+            p.SmoothMode.Value = s.SmoothMode;
+            p.RaiseDelta.Value = Mathf.Clamp(s.RaiseDelta, 0.5f, 10f);
+            p.PaintStrength.Value = Mathf.Clamp(s.PaintStrength, 0f, 1f);
+            p.FalloffPower.Value = Mathf.Clamp(s.FalloffPower, 1f, 5f);
+            p.ShoreOffset.Value = Mathf.Clamp(s.ShoreOffset, -2f, 5f);
+        }
+
+        private static Preset Capture(TerrainForgePlugin p, string name)
+        {
+            return new Preset
+            {
+                Name = name,
+                Radius = p.Radius.Value,
+                Softness = p.Softness.Value,
+                Operation = p.DefaultOperation.Value,
+                Shape = p.Shape.Value,
+                Paint = p.Paint.Value,
+                RampMode = p.RampMode.Value,
+                SlopeAngle = p.SlopeAngle.Value,
+                SmoothMode = p.SmoothMode.Value,
+                RaiseDelta = p.RaiseDelta.Value,
+                PaintStrength = p.PaintStrength.Value,
+                FalloffPower = p.FalloffPower.Value,
+                ShoreOffset = p.ShoreOffset.Value
+            };
+        }
+
+        private static void Write(List<Preset> list)
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || p.PresetSlots == null)
+                return;
+            System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
+            var parts = new List<string>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                Preset s = list[i];
+                parts.Add(string.Join("|", new string[]
+                {
+                    s.Name,
+                    s.Radius.ToString("0.##", inv), s.Softness.ToString("0.##", inv),
+                    ((int)s.Operation).ToString(inv), ((int)s.Shape).ToString(inv), ((int)s.Paint).ToString(inv),
+                    ((int)s.RampMode).ToString(inv), s.SlopeAngle.ToString("0.##", inv), ((int)s.SmoothMode).ToString(inv),
+                    s.RaiseDelta.ToString("0.##", inv), s.PaintStrength.ToString("0.##", inv),
+                    s.FalloffPower.ToString("0.##", inv), s.ShoreOffset.ToString("0.##", inv)
+                }));
+            }
+            p.PresetSlots.Value = string.Join(";", parts.ToArray());
+        }
+
+        private static Preset Parse(string entry)
+        {
+            if (string.IsNullOrEmpty(entry))
+                return null;
+            string[] f = entry.Split('|');
+            if (f.Length != 13)
+                return null;
+            try
+            {
+                System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
+                var s = new Preset { Name = f[0].Trim() };
+                if (s.Name.Length == 0)
+                    return null;
+                s.Radius = float.Parse(f[1], inv);
+                s.Softness = float.Parse(f[2], inv);
+                s.Operation = (TerrainOperation)int.Parse(f[3], inv);
+                s.Shape = (TerrainShape)int.Parse(f[4], inv);
+                s.Paint = (TerrainPaint)int.Parse(f[5], inv);
+                s.RampMode = (RampMode)int.Parse(f[6], inv);
+                s.SlopeAngle = float.Parse(f[7], inv);
+                s.SmoothMode = (SmoothMode)int.Parse(f[8], inv);
+                s.RaiseDelta = float.Parse(f[9], inv);
+                s.PaintStrength = float.Parse(f[10], inv);
+                s.FalloffPower = float.Parse(f[11], inv);
+                s.ShoreOffset = float.Parse(f[12], inv);
+                if (!System.Enum.IsDefined(typeof(TerrainOperation), s.Operation)) return null;
+                if (!System.Enum.IsDefined(typeof(TerrainShape), s.Shape)) return null;
+                if (!System.Enum.IsDefined(typeof(TerrainPaint), s.Paint)) return null;
+                if (!System.Enum.IsDefined(typeof(RampMode), s.RampMode)) return null;
+                if (!System.Enum.IsDefined(typeof(SmoothMode), s.SmoothMode)) return null;
+                return s;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
     /// In-mod key rebinding UI with a custom skin. Toggle with the configured menu
     /// key (default F5); click a binding then press a key / mouse button. Saved to config.
     /// </summary>
@@ -32,6 +201,8 @@ namespace TerrainForge
         private CursorLockMode _cursorLock;
         private string _undoDepthText;
         private Vector2 _settingsScroll;
+        private string _presetName = "";
+        private ModLanguage _langBuilt;
 
         private GUIStyle _winStyle;
         private GUIStyle _headerStyle;
@@ -57,23 +228,31 @@ namespace TerrainForge
 
         private void Start()
         {
+            BuildEntries();
+        }
+
+        private void BuildEntries()
+        {
             TerrainForgePlugin p = TerrainForgePlugin.Instance;
             if (p == null)
                 return;
 
-            _entries.Add(new Entry { Label = "Aplicar (mantener)", Bind = p.ApplyKey });
-            _entries.Add(new Entry { Label = "Subir radio", Bind = p.RadiusUpKey });
-            _entries.Add(new Entry { Label = "Bajar radio", Bind = p.RadiusDownKey });
-            _entries.Add(new Entry { Label = "Cambiar operacion", Bind = p.CycleOperationKey });
-            _entries.Add(new Entry { Label = "Cambiar forma", Bind = p.CycleShapeKey });
-            _entries.Add(new Entry { Label = "Cambiar pintura", Bind = p.CyclePaintKey });
-            _entries.Add(new Entry { Label = "Nivelar a tus pies (mod.)", Bind = p.AimHeightModifierKey });
-            _entries.Add(new Entry { Label = "Deshacer", Bind = p.UndoKey });
-            _entries.Add(new Entry { Label = "Rehacer", Bind = p.RedoKey });
-            _entries.Add(new Entry { Label = "Fijar altura (eyedrop)", Bind = p.EyedropKey });
-            _entries.Add(new Entry { Label = "Modo de rampa", Bind = p.RampModeKey });
-            _entries.Add(new Entry { Label = "Obtener herramienta", Bind = p.GiveToolKey });
-            _entries.Add(new Entry { Label = "Abrir este menu", Bind = p.RebindMenuKey });
+            _entries.Clear();
+            _entries.Add(new Entry { Label = Loc.T("key.apply"), Bind = p.ApplyKey });
+            _entries.Add(new Entry { Label = Loc.T("key.radiusUp"), Bind = p.RadiusUpKey });
+            _entries.Add(new Entry { Label = Loc.T("key.radiusDown"), Bind = p.RadiusDownKey });
+            _entries.Add(new Entry { Label = Loc.T("key.cycleOp"), Bind = p.CycleOperationKey });
+            _entries.Add(new Entry { Label = Loc.T("key.cycleShape"), Bind = p.CycleShapeKey });
+            _entries.Add(new Entry { Label = Loc.T("key.cyclePaint"), Bind = p.CyclePaintKey });
+            _entries.Add(new Entry { Label = Loc.T("key.aimMod"), Bind = p.AimHeightModifierKey });
+            _entries.Add(new Entry { Label = Loc.T("key.undo"), Bind = p.UndoKey });
+            _entries.Add(new Entry { Label = Loc.T("key.redo"), Bind = p.RedoKey });
+            _entries.Add(new Entry { Label = Loc.T("key.eyedrop"), Bind = p.EyedropKey });
+            _entries.Add(new Entry { Label = Loc.T("key.rampMode"), Bind = p.RampModeKey });
+            _entries.Add(new Entry { Label = Loc.T("key.radial"), Bind = p.RadialKey });
+            _entries.Add(new Entry { Label = Loc.T("key.give"), Bind = p.GiveToolKey });
+            _entries.Add(new Entry { Label = Loc.T("key.menu"), Bind = p.RebindMenuKey });
+            _langBuilt = p.Language != null ? p.Language.Value : ModLanguage.Español;
         }
 
         private void Update()
@@ -151,8 +330,14 @@ namespace TerrainForge
                 Cursor.lockState = CursorLockMode.None;
 
                 TerrainForgePlugin p = TerrainForgePlugin.Instance;
-                if (p != null && p.UndoDepth != null)
-                    _undoDepthText = p.UndoDepth.Value.ToString();
+                if (p != null)
+                {
+                    ModLanguage lang = p.Language != null ? p.Language.Value : ModLanguage.Español;
+                    if (_entries.Count == 0 || lang != _langBuilt)
+                        BuildEntries();
+                    if (p.UndoDepth != null)
+                        _undoDepthText = p.UndoDepth.Value.ToString();
+                }
             }
             else
             {
@@ -186,11 +371,11 @@ namespace TerrainForge
             GUILayout.Space(8f);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_tab == 0, "TECLAS", _tabStyle, GUILayout.Height(28f)))
+            if (GUILayout.Toggle(_tab == 0, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(28f)))
                 _tab = 0;
-            if (GUILayout.Toggle(_tab == 1, "AYUDA", _tabStyle, GUILayout.Height(28f)))
+            if (GUILayout.Toggle(_tab == 1, Loc.T("tab.help"), _tabStyle, GUILayout.Height(28f)))
                 _tab = 1;
-            if (GUILayout.Toggle(_tab == 2, "AJUSTES", _tabStyle, GUILayout.Height(28f)))
+            if (GUILayout.Toggle(_tab == 2, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(28f)))
                 _tab = 2;
             GUILayout.EndHorizontal();
 
@@ -209,9 +394,8 @@ namespace TerrainForge
 
         private void DrawKeysTab()
         {
-            GUILayout.Label(_capturing >= 0
-                ? "Pulsa una tecla o boton del raton...   (Esc cancela)"
-                : "Haz click en una tecla y luego pulsa la nueva.", _capturing >= 0 ? _capturingStyle : _hintStyle);
+            GUILayout.Label(_capturing >= 0 ? Loc.T("keys.hint.capture") : Loc.T("keys.hint.idle"),
+                _capturing >= 0 ? _capturingStyle : _hintStyle);
             GUILayout.Space(8f);
 
             for (int i = 0; i < _entries.Count; i++)
@@ -223,7 +407,7 @@ namespace TerrainForge
                 GUILayout.Label(_entries[i].Label, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
                 GUI.color = prev;
 
-                string text = _capturing == i ? "< pulsa una tecla... >" : _entries[i].Bind.Value.ToString();
+                string text = _capturing == i ? Loc.T("keys.press") : _entries[i].Bind.Value.ToString();
                 if (GUILayout.Button(text, _capturing == i ? _capturingStyle : _btnStyle, GUILayout.Width(205f), GUILayout.Height(26f)))
                     _capturing = i;
 
@@ -235,12 +419,51 @@ namespace TerrainForge
             DrawHistorySection();
 
             GUILayout.Space(6f);
-            if (GUILayout.Button("Obtener la herramienta ahora", _btnStyle, GUILayout.Height(28f)))
+            if (GUILayout.Button(Loc.T("btn.get"), _btnStyle, GUILayout.Height(28f)))
                 TerrainTool.Give(Player.m_localPlayer);
 
             GUILayout.Space(6f);
-            if (GUILayout.Button("Cerrar", _btnStyle, GUILayout.Height(28f)))
+            if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
                 Toggle(false);
+        }
+
+        private void DrawPresets(TerrainForgePlugin p)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("set.profilename"), _rowStyle, GUILayout.Width(90f), GUILayout.Height(26f));
+            _presetName = GUILayout.TextField(_presetName ?? "", GUILayout.Height(26f));
+            if (GUILayout.Button(Loc.T("set.profilesave"), _btnStyle, GUILayout.Width(130f), GUILayout.Height(26f)))
+            {
+                if (!string.IsNullOrEmpty((_presetName ?? "").Trim()))
+                {
+                    TerrainPresets.SaveCurrent(_presetName.Trim());
+                    _presetName = "";
+                }
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            List<TerrainPresets.Preset> presets = TerrainPresets.Load();
+            if (presets.Count == 0)
+            {
+                GUILayout.Label(Loc.T("set.profileempty"), _hintStyle);
+                return;
+            }
+            for (int i = 0; i < presets.Count; i++)
+            {
+                TerrainPresets.Preset pr = presets[i];
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(pr.Name, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+                if (GUILayout.Button(Loc.T("set.profileload"), _btnStyle, GUILayout.Width(120f), GUILayout.Height(26f)))
+                {
+                    TerrainPresets.ApplyPreset(pr);
+                    TerrainBrush.RequestClearMarks();
+                }
+                if (GUILayout.Button("X", _btnStyle, GUILayout.Width(60f), GUILayout.Height(26f)))
+                    TerrainPresets.Delete(pr.Name);
+                GUILayout.EndHorizontal();
+                GUILayout.Space(3f);
+            }
         }
 
         private void DrawHistorySection()
@@ -249,7 +472,7 @@ namespace TerrainForge
             if (p == null || p.UndoDepth == null)
                 return;
 
-            GUILayout.Label("Historial de deshacer (pasos guardados)", _hintStyle);
+            GUILayout.Label(Loc.T("hist.title"), _hintStyle);
 
             int depth = Mathf.Clamp(p.UndoDepth.Value, 0, 500);
             float f = GUILayout.HorizontalSlider(depth, 0f, 200f);
@@ -263,7 +486,7 @@ namespace TerrainForge
             }
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Exacto (0-500):", _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+            GUILayout.Label(Loc.T("hist.exact"), _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
             string t = GUILayout.TextField(_undoDepthText ?? depth.ToString(), GUILayout.Width(205f), GUILayout.Height(26f));
             if (t != _undoDepthText)
             {
@@ -281,8 +504,7 @@ namespace TerrainForge
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.Label("Guardados: deshacer " + TerrainEngine.UndoCount +
-                            "  ·  rehacer " + TerrainEngine.RedoCount, _hintStyle);
+            GUILayout.Label(Loc.F("hist.saved", TerrainEngine.UndoCount, TerrainEngine.RedoCount), _hintStyle);
         }
 
         private void DrawSettingsTab()
@@ -293,55 +515,63 @@ namespace TerrainForge
 
             _settingsScroll = GUILayout.BeginScrollView(_settingsScroll, _boxStyle, GUILayout.Height(400f));
 
-            SettingHeader("Brocha (click para cambiar)");
-            CycleRow("Operación", p.DefaultOperation.Value.ToString(), () =>
+            SettingHeader(Loc.T("set.brush"));
+            CycleRow(Loc.T("set.operation"), p.DefaultOperation.Value.ToString(), () =>
             {
                 p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 8);
                 TerrainBrush.RequestClearMarks();
             });
-            CycleRow("Forma", ShapeText(p.Shape.Value), () =>
+            CycleRow(Loc.T("set.shape"), ShapeText(p.Shape.Value), () =>
             {
                 p.Shape.Value = (TerrainShape)(((int)p.Shape.Value + 1) % 5);
                 TerrainBrush.RequestClearMarks();
             });
-            CycleRow("Pintura", p.Paint.Value.ToString(), () =>
+            CycleRow(Loc.T("set.paint"), p.Paint.Value.ToString(), () =>
             {
                 p.Paint.Value = (TerrainPaint)(((int)p.Paint.Value + 1) % 6);
             });
-            CycleRow("Modo rampa", p.RampMode.Value == RampMode.FixedAngle ? "Ángulo fijo" : "Dos puntos", () =>
+            CycleRow(Loc.T("set.rampmode"), p.RampMode.Value == RampMode.FixedAngle ? Loc.T("rampmode.fixed") : Loc.T("rampmode.two"), () =>
             {
                 p.RampMode.Value = p.RampMode.Value == RampMode.FixedAngle ? RampMode.TwoPoint : RampMode.FixedAngle;
                 TerrainBrush.RequestClearMarks();
             });
-            CycleRow("Modo smooth", SmoothModeText(p.SmoothMode.Value), () =>
+            CycleRow(Loc.T("set.smoothmode"), SmoothModeText(p.SmoothMode.Value), () =>
             {
                 p.SmoothMode.Value = (SmoothMode)(((int)p.SmoothMode.Value + 1) % 3);
             });
 
-            SettingHeader("Tamaños (arrastrar)");
-            FloatSlider("Radio", p.Radius, 1f, 100f, "0.#");
-            FloatSlider("Suavidad", p.Softness, 0f, 100f, "0");
-            FloatSlider("Ángulo rampa", p.SlopeAngle, 5f, 60f, "0");
-            FloatSlider("Subir/bajar (m)", p.RaiseDelta, 0.5f, 10f, "0.#");
-            FloatSlider("Fuerza pintura", p.PaintStrength, 0f, 1f, "0.00");
-            FloatSlider("Caída Raise/Lower", p.FalloffPower, 1f, 5f, "0.#");
-            FloatSlider("Costa sobre agua (m)", p.ShoreOffset, -2f, 5f, "0.#");
+            SettingHeader(Loc.T("set.sizes"));
+            FloatSlider(Loc.T("set.radius"), p.Radius, 1f, 100f, "0.#");
+            FloatSlider(Loc.T("set.softness"), p.Softness, 0f, 100f, "0");
+            FloatSlider(Loc.T("set.angle"), p.SlopeAngle, 5f, 60f, "0");
+            FloatSlider(Loc.T("set.raisedelta"), p.RaiseDelta, 0.5f, 10f, "0.#");
+            FloatSlider(Loc.T("set.paintstrength"), p.PaintStrength, 0f, 1f, "0.00");
+            FloatSlider(Loc.T("set.falloff"), p.FalloffPower, 1f, 5f, "0.#");
+            FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
 
-            SettingHeader("Interruptores (valores del servidor mandan)");
-            BoolToggle("Vista previa", p.ShowPreview);
-            BoolToggle("Guías", p.ShowGuides);
-            BoolToggle("Efectos (polvo+sonido)", p.PlayEffects);
-            BoolToggle("Dar herramienta al entrar", p.AutoGiveTool);
-            BoolToggle("Sin costo de construcción", p.NoBuildCost);
-            BoolToggle("Ignorar zonas protegidas", p.AllowInProtectedZones);
-            BoolToggle("Pasar el límite +-8 m", p.UnlockDeltaLimit);
-            BoolToggle("Server: permitir edición", p.AllowTerrainEdits);
-            BoolToggle("Server: solo admins", p.AdminOnlyEdits);
+            SettingHeader(Loc.T("set.profiles"));
+            DrawPresets(p);
+
+            CycleRow(Loc.T("set.language"), p.Language.Value.ToString(), () =>
+            {
+                p.Language.Value = p.Language.Value == ModLanguage.English ? ModLanguage.Español : ModLanguage.English;
+            });
+
+            SettingHeader(Loc.T("set.switches"));
+            BoolToggle(Loc.T("set.preview"), p.ShowPreview);
+            BoolToggle(Loc.T("set.guides"), p.ShowGuides);
+            BoolToggle(Loc.T("set.effects"), p.PlayEffects);
+            BoolToggle(Loc.T("set.autogive"), p.AutoGiveTool);
+            BoolToggle(Loc.T("set.nocost"), p.NoBuildCost);
+            BoolToggle(Loc.T("set.protected"), p.AllowInProtectedZones);
+            BoolToggle(Loc.T("set.deltalimit"), p.UnlockDeltaLimit);
+            BoolToggle(Loc.T("set.allow"), p.AllowTerrainEdits);
+            BoolToggle(Loc.T("set.adminonly"), p.AdminOnlyEdits);
 
             GUILayout.EndScrollView();
 
             GUILayout.Space(8f);
-            if (GUILayout.Button("Cerrar", _btnStyle, GUILayout.Height(28f)))
+            if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
                 Toggle(false);
         }
 
@@ -384,11 +614,11 @@ namespace TerrainForge
         {
             switch (s)
             {
-                case TerrainShape.Square: return "Cuadrado";
-                case TerrainShape.Line: return "Línea";
-                case TerrainShape.Rect: return "Rectángulo";
-                case TerrainShape.Poly: return "Polígono";
-                default: return "Círculo";
+                case TerrainShape.Square: return Loc.T("shape.square");
+                case TerrainShape.Line: return Loc.T("shape.line");
+                case TerrainShape.Rect: return Loc.T("shape.rect");
+                case TerrainShape.Poly: return Loc.T("shape.poly");
+                default: return Loc.T("shape.circle");
             }
         }
 
@@ -396,9 +626,9 @@ namespace TerrainForge
         {
             switch (m)
             {
-                case SmoothMode.Bumps: return "Solo lomos";
-                case SmoothMode.Dips: return "Solo hoyos";
-                default: return "Completo";
+                case SmoothMode.Bumps: return Loc.T("smooth.bumps");
+                case SmoothMode.Dips: return Loc.T("smooth.dips");
+                default: return Loc.T("smooth.full");
             }
         }
 
@@ -406,84 +636,26 @@ namespace TerrainForge
         {
             _helpScroll = GUILayout.BeginScrollView(_helpScroll, _boxStyle, GUILayout.Height(400f));
 
-            Topic("Que hace");
-            Body("TerrainForge esculpe el terreno libremente: sube/baja mas de 8 m, " +
-                 "suaviza, crea rampas, pinta y restaura, sin las ataduras del pico o la " +
-                 "azada vanilla. Los cambios se guardan en el mundo y se replican a los " +
-                 "demas jugadores.");
+            Topic(Loc.T("help.what.t"));
+            Body(Loc.T("help.what.b"));
 
-            Topic("Herramienta");
-            Body("\u2022 'TerrainForge Rod': la varita del mod (clon del martillo). Se te " +
-                 "entrega automaticamente al entrar al mundo y se equipa sola; tambien " +
-                 "podes obtenerla con la tecla \"Obtener herramienta\" o desde esta ventana.\n" +
-                 "\u2022 Debe estar EQUIPADA para que la brocha funcione. Si el registro del " +
-                 "objeto fallara, la brocha queda usable igual.");
+            Topic(Loc.T("help.tool.t"));
+            Body(Loc.T("help.tool.b"));
 
-            Topic("Operaciones  (cambiar con \"Cambiar operacion\")");
-            Body("\u2022 Flatten: aplana a la altura apuntada (mantene Shift para nivelar a tus pies).\n" +
-                 "\u2022 Raise: sube el terreno.\n" +
-                 "\u2022 Lower: baja el terreno.\n" +
-                 "\u2022 Smooth: promedia cada punto con sus vecinos y suaviza el terreno " +
-                 "de verdad (bordes, escalones y ruido). Mantenelo para suavizar mas. " +
-                 "En AJUSTES elegis Completo, Solo lomos o Solo hoyos. Con forma Linea " +
-                 "suavizas a lo largo de un camino.\n" +
-                 "\u2022 Shore: aplana hacia el nivel del agua + un margen (playa). Ideal " +
-                 "para costas; el margen se ajusta en AJUSTES.\n" +
-                 "\u2022 Ramp: marca un punto A y luego un punto B con la tecla Aplicar; se " +
-                 "crea una rampa recta entre ambos que une las dos alturas. El ancho es " +
-                 "el radio de la brocha y \"Softness\" suaviza solo los bordes laterales. " +
-                 "Con \"Modo de rampa\" en angulo fijo, B solo da direccion y largo: la " +
-                 "altura sigue el angulo (sube o baja segun donde apuntes).\n" +
-                 "\u2022 Paint: pinta el terreno (Dirt, Cultivated, Paved, hierba/vegetacion...).\n" +
-                 "\u2022 Restore: devuelve el terreno a su estado original.");
+            Topic(Loc.T("help.ops.t"));
+            Body(Loc.T("help.ops.b"));
 
-            Topic("Controles");
-            Body("\u2022 Mantener \"Aplicar\" para esculpir (en Ramp: cada pulsacion marca " +
-                 "un punto A o B).\n" +
-                 "\u2022 \"Subir/Bajar radio\" o Ctrl + rueda del raton: tamano de la brocha " +
-                 "(en Ramp y Linea es el ancho).\n" +
-                 "\u2022 \"Cambiar forma\": circulo, cuadrado, linea, rectangulo o poligono. " +
-                 "Linea/Rectangulo se marcan con dos pulsos de Aplicar (A y B); el " +
-                 "poligono suma un punto por pulso y se cierra con doble pulso (3+ puntos). " +
-                 "Los bordes se suavizan segun Softness.\n" +
-                 "\u2022 \"Cambiar pintura\": tipo de pintura.\n" +
-                 "\u2022 \"Nivelar a tus pies\" (Shift): Flatten toma esa altura en " +
-                 "vez de la apuntada.\n" +
-                 "\u2022 \"Fijar altura\": copia la altura apuntada y Flatten la usa " +
-                 "siempre hasta liberarla (gana a Shift).\n" +
-                 "\u2022 \"Modo de rampa\": dos puntos o angulo fijo. Con angulo fijo, " +
-                 "Alt + teclas de radio (o rueda) ajusta los grados.\n" +
-                 "\u2022 El HUD (arriba a la izquierda) muestra operacion, radio, forma y " +
-                 "pintura actuales, mas una segunda linea con altura apuntada, objetivo " +
-                 "y pendiente en grados.\n" +
-                 "\u2022 \"Deshacer\" (Ctrl+Z) revierte la ultima aplicacion y \"Rehacer\" " +
-                 "(Ctrl+Y) la recupera. La profundidad del historial se ajusta en la " +
-                 "pesta\u00F1a TECLAS (0 lo desactiva y borra lo guardado).");
+            Topic(Loc.T("help.controls.t"));
+            Body(Loc.T("help.controls.b"));
 
-            Topic("Vista previa");
-            Body("\u2022 La linea solida marca el borde real: donde se genera terreno.\n" +
-                 "\u2022 Guias tenues alrededor (mismo color de cada operacion): zona de fuerza " +
-                 "plena, radio maximo y distancia maxima de apuntado.\n" +
-                 "\u2022 En Ramp, marca A y B y veras el corredor real (las dos lineas del ancho).\n" +
-                 "\u2022 El borde se ti\u00F1e de rojo donde el terreno empina (guia de pendiente).\n" +
-                 "\u2022 En Flatten/Shore veras un anillo al plano objetivo (marca de nivel).\n" +
-                 "\u2022 Se pueden desactivar en la config (Preview > ShowGuides).");
+            Topic(Loc.T("help.preview.t"));
+            Body(Loc.T("help.preview.b"));
 
-            Topic("Multijugador");
-            Body("\u2022 El mod debe estar en el cliente Y en el servidor.\n" +
-                 "\u2022 \"UnlockDeltaLimit\" debe estar activado tambien en el servidor; si no, " +
-                 "el servidor recorta los cambios de mas de 8 m.\n" +
-                 "\u2022 Radios muy grandes pueden desincronizar a clientes que no tengan el mod.\n" +
-                 "\u2022 Autoridad del servidor: si el servidor tiene el mod, su seccion " +
-                 "\"Server\" manda sobre los clientes (AllowTerrainEdits, AdminOnlyEdits). " +
-                 "En servidores SIN el mod, tu config local sigue valiendo y la " +
-                 "herramienta funciona para probar.");
+            Topic(Loc.T("help.mp.t"));
+            Body(Loc.T("help.mp.b"));
 
-             Topic("Recargar / guardar");
-             Body("Las teclas se guardan solas al reasignarlas. La pesta\u00F1a AJUSTES " +
-                  "edita todo en vivo (operacion, forma, pintura, modos, tama\u00F1os e " +
-                  "interruptores) y se guarda al cerrar el menu. Todo vive tambien en " +
-                  "el archivo de configuracion del mod (BepInEx/config).");
+             Topic(Loc.T("help.save.t"));
+             Body(Loc.T("help.save.b"));
 
             GUILayout.EndScrollView();
 

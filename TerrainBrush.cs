@@ -78,6 +78,12 @@ namespace TerrainForge
                 return;
             }
 
+            if (TerrainRadial.Open)
+            {
+                _preview.Hide();
+                return;
+            }
+
             if (s_clearMarks)
             {
                 s_clearMarks = false;
@@ -145,9 +151,9 @@ namespace TerrainForge
                     p.RampMode.Value = p.RampMode.Value == RampMode.TwoPoint
                         ? RampMode.FixedAngle : RampMode.TwoPoint;
                     _rampHasA = false;
-                    Flash("Modo de rampa: " + (p.RampMode.Value == RampMode.FixedAngle
-                        ? "ángulo fijo " + p.SlopeAngle.Value.ToString("0") + "°"
-                        : "dos puntos"));
+                    Flash(p.RampMode.Value == RampMode.FixedAngle
+                        ? Loc.F("flash.rampmode.fixed", p.SlopeAngle.Value.ToString("0"))
+                        : Loc.T("flash.rampmode.two"));
                 }
             }
 
@@ -161,7 +167,7 @@ namespace TerrainForge
             // the tool keeps working there for testing.
             _serverAllowed = !equipped || ServerAllows(p, out _serverWhy);
 
-            if (!blocked && equipped)
+            if (!blocked && equipped && !Held(p.RadialKey.Value))
             {
                 if (op == TerrainOperation.Ramp)
                 {
@@ -282,9 +288,8 @@ namespace TerrainForge
                 _rampA = ground;
                 _rampHasA = true;
                 TerrainForgePlugin.Message(fixedAngle
-                    ? "Rampa ángulo " + p.SlopeAngle.Value.ToString("0") +
-                      "°: punto A marcado. Apunta la dirección y volve a pulsar aplicar."
-                    : "Rampa: punto A marcado. Apunta al punto B y volve a pulsar aplicar.");
+                    ? Loc.F("msg.ramp.fixmark", p.SlopeAngle.Value.ToString("0"))
+                    : Loc.T("msg.ramp.markA"));
                 return;
             }
 
@@ -293,7 +298,7 @@ namespace TerrainForge
 
             if ((ground - a).sqrMagnitude < 1f)
             {
-                TerrainForgePlugin.Message("Rampa: los puntos A y B estan demasiado cerca.");
+                TerrainForgePlugin.Message(Loc.T("msg.ramp.close"));
                 return;
             }
 
@@ -310,7 +315,7 @@ namespace TerrainForge
                 RampB = ground
             };
 
-            string doneMsg = "Rampa creada de A a B.";
+            string doneMsg = Loc.T("msg.ramp.doneAB");
             if (fixedAngle)
             {
                 // B sets direction + length; the height follows the fixed angle,
@@ -324,8 +329,8 @@ namespace TerrainForge
                 spec.UseFixedHeights = true;
                 spec.FixedHA = hA;
                 spec.FixedHB = hB;
-                doneMsg = string.Format("Rampa {0:0}° creada ({1} {2:0.0} m en {3:0.0} m).",
-                    p.SlopeAngle.Value, sign >= 0f ? "sube" : "baja",
+                doneMsg = Loc.F("msg.ramp.fixdone",
+                    p.SlopeAngle.Value, sign >= 0f ? Loc.T("msg.ramp.up") : Loc.T("msg.ramp.down"),
                     Mathf.Abs(hB - hA), dist);
             }
 
@@ -336,7 +341,7 @@ namespace TerrainForge
                 TerrainFx.Play(mid, true);
             }
             else
-                TerrainForgePlugin.Message("Rampa: no se pudo crear (puntos muy cortos o sin terreno).");
+                TerrainForgePlugin.Message(Loc.T("msg.ramp.fail"));
         }
 
         private void ClearShapeMarks()
@@ -402,14 +407,14 @@ namespace TerrainForge
                     {
                         _lineA = point;
                         _lineHasA = true;
-                        TerrainForgePlugin.Message("Línea: punto A marcado. Apunta a B y volve a pulsar aplicar.");
+                        TerrainForgePlugin.Message(Loc.T("msg.line.markA"));
                         return false;
                     }
                     Vector3 a = _lineA;
                     _lineHasA = false;
                     if ((point - a).sqrMagnitude < 1f)
                     {
-                        TerrainForgePlugin.Message("Línea: A y B estan demasiado cerca.");
+                        TerrainForgePlugin.Message(Loc.T("msg.line.close"));
                         return false;
                     }
                     BrushSpec spec = BaseSpec(p, player, point);
@@ -418,7 +423,7 @@ namespace TerrainForge
                     spec.LineB = point;
                     Vector3 mid = (a + point) * 0.5f;
                     bool ok = TerrainEngine.Apply(mid, spec);
-                    TerrainForgePlugin.Message(ok ? "Línea aplicada." : "Línea: sin terreno en la zona.");
+                    TerrainForgePlugin.Message(ok ? Loc.T("msg.line.done") : Loc.T("msg.line.fail"));
                     if (ok)
                         TerrainFx.Play(mid, true);
                     return ok;
@@ -429,7 +434,7 @@ namespace TerrainForge
                     {
                         _rectA = point;
                         _rectHasA = true;
-                        TerrainForgePlugin.Message("Rectángulo: esquina A marcada. Apunta a la esquina B y volve a pulsar.");
+                        TerrainForgePlugin.Message(Loc.T("msg.rect.markA"));
                         return false;
                     }
                     Vector3 ra = _rectA;
@@ -438,7 +443,7 @@ namespace TerrainForge
                     float dz = Mathf.Abs(point.z - ra.z);
                     if (dx < 1f || dz < 1f)
                     {
-                        TerrainForgePlugin.Message("Rectángulo: demasiado chico (mínimo 1×1 m).");
+                        TerrainForgePlugin.Message(Loc.T("msg.rect.small"));
                         return false;
                     }
                     BrushSpec spec = BaseSpec(p, player, point);
@@ -447,7 +452,7 @@ namespace TerrainForge
                     spec.RectB = point;
                     Vector3 mid = (ra + point) * 0.5f;
                     bool ok = TerrainEngine.Apply(mid, spec);
-                    TerrainForgePlugin.Message(ok ? "Rectángulo aplicado." : "Rectángulo: sin terreno en la zona.");
+                    TerrainForgePlugin.Message(ok ? Loc.T("msg.rect.done") : Loc.T("msg.rect.fail"));
                     if (ok)
                         TerrainFx.Play(mid, true);
                     return ok;
@@ -467,8 +472,8 @@ namespace TerrainForge
                         _polyPoints.Clear();
                         bool ok = TerrainEngine.Apply(c, spec);
                         TerrainForgePlugin.Message(ok
-                            ? "Polígono aplicado (" + n + " puntos)."
-                            : "Polígono: sin terreno en la zona.");
+                            ? Loc.F("msg.poly.done", n)
+                            : Loc.T("msg.poly.fail"));
                         if (ok)
                             TerrainFx.Play(c, true);
                         return ok;
@@ -477,8 +482,7 @@ namespace TerrainForge
                         (_polyPoints[_polyPoints.Count - 1] - point).sqrMagnitude > 0.25f)
                     {
                         _polyPoints.Add(point);
-                        TerrainForgePlugin.Message("Polígono: punto " + _polyPoints.Count +
-                            ". Doble pulso para cerrar y aplicar.");
+                        TerrainForgePlugin.Message(Loc.F("msg.poly.point", _polyPoints.Count));
                     }
                     _polyLastClick = Time.time;
                     return false;
@@ -526,7 +530,7 @@ namespace TerrainForge
         {
             float v = Mathf.Clamp(p.SlopeAngle.Value + delta, 5f, 60f);
             p.SlopeAngle.Value = v;
-            Flash("Ángulo de rampa: " + v.ToString("0") + "°");
+            Flash(Loc.F("flash.angle", v.ToString("0")));
         }
 
         private static void AdjustRadius(TerrainForgePlugin p, float delta)
@@ -559,13 +563,13 @@ namespace TerrainForge
                     catch { admin = false; }
                     if (!admin)
                     {
-                        reason = "Solo administradores pueden editar terreno en este servidor.";
+                        reason = Loc.T("srv.adminonly");
                         return false;
                     }
                 }
                 return true;
             }
-            reason = "El servidor no permite editar terreno.";
+            reason = Loc.T("srv.blocked");
             return false;
         }
 
@@ -577,10 +581,11 @@ namespace TerrainForge
                 return;
             }
             if (TerrainEngine.Undo(out string label))
-                Flash("Deshecho" + (string.IsNullOrEmpty(label) ? "" : ": " + label) +
-                      "  (quedan " + TerrainEngine.UndoCount + ")");
+                Flash(string.IsNullOrEmpty(label)
+                    ? Loc.F("flash.undo", TerrainEngine.UndoCount)
+                    : Loc.F("flash.undo.op", label, TerrainEngine.UndoCount));
             else
-                Flash("Nada que deshacer");
+                Flash(Loc.T("flash.nothing.undo"));
         }
 
         private void DoRedo()
@@ -591,10 +596,11 @@ namespace TerrainForge
                 return;
             }
             if (TerrainEngine.Redo(out string label))
-                Flash("Rehecho" + (string.IsNullOrEmpty(label) ? "" : ": " + label) +
-                      "  (quedan " + TerrainEngine.RedoCount + ")");
+                Flash(string.IsNullOrEmpty(label)
+                    ? Loc.F("flash.redo", TerrainEngine.RedoCount)
+                    : Loc.F("flash.redo.op", label, TerrainEngine.RedoCount));
             else
-                Flash("Nada que rehacer");
+                Flash(Loc.T("flash.nothing.redo"));
         }
 
         private void Flash(string msg)
@@ -608,13 +614,13 @@ namespace TerrainForge
             if (_hasPicked)
             {
                 _hasPicked = false;
-                Flash("Altura liberada (Flatten vuelve a la apuntada)");
+                Flash(Loc.T("flash.released"));
             }
             else
             {
                 _hasPicked = true;
                 _pickedHeight = center.y;
-                Flash("Altura fijada: " + _pickedHeight.ToString("0.0") + " m (Flatten la usará)");
+                Flash(Loc.F("flash.picked", _pickedHeight.ToString("0.0")));
             }
         }
 
@@ -625,38 +631,38 @@ namespace TerrainForge
                 case TerrainOperation.Flatten:
                 {
                     if (_hasPicked)
-                        return string.Format("fija {0:0.0} m", _pickedHeight);
+                        return string.Format("{0} {1:0.0} m", Loc.T("hud.fixed"), _pickedHeight);
                     bool own = Held(p.AimHeightModifierKey.Value);
                     float t = own ? GroundHeight(player.transform.position) : center.y;
-                    return string.Format("objetivo {0:0.0} m", t);
+                    return string.Format("{0} {1:0.0} m", Loc.T("hud.target"), t);
                 }
                 case TerrainOperation.Raise:
-                    return "+" + p.RaiseDelta.Value.ToString("0.#") + " m/aplic.";
+                    return "+" + p.RaiseDelta.Value.ToString("0.#") + " " + Loc.T("hud.perapp");
                 case TerrainOperation.Lower:
-                    return "-" + p.RaiseDelta.Value.ToString("0.#") + " m/aplic.";
+                    return "-" + p.RaiseDelta.Value.ToString("0.#") + " " + Loc.T("hud.perapp");
                 case TerrainOperation.Smooth:
                     switch (p.SmoothMode.Value)
                     {
-                        case SmoothMode.Bumps: return "solo lomos";
-                        case SmoothMode.Dips: return "solo hoyos";
-                        default: return "promedio vecinos";
+                        case SmoothMode.Bumps: return Loc.T("hud.bumps");
+                        case SmoothMode.Dips: return Loc.T("hud.dips");
+                        default: return Loc.T("hud.avg");
                     }
                 case TerrainOperation.Shore:
-                    return string.Format("costa {0:0.0} m",
+                    return string.Format("{0} {1:0.0} m", Loc.T("hud.shore"),
                         TerrainEngine.WaterLevel() + p.ShoreOffset.Value);
                 case TerrainOperation.Paint:
                     return p.Paint.Value + " " + (p.PaintStrength.Value * 100f).ToString("0") + "%";
                 case TerrainOperation.Restore:
-                    return "original";
+                    return Loc.T("hud.original");
                 case TerrainOperation.Ramp:
                     if (p.RampMode.Value == RampMode.FixedAngle)
                         return _rampHasA
-                            ? string.Format("{0:0}°: A \u2192 B", p.SlopeAngle.Value)
-                            : string.Format("rampa {0:0}°: marca A", p.SlopeAngle.Value);
+                            ? Loc.F("hud.ramp.fixed.mark", p.SlopeAngle.Value)
+                            : Loc.F("hud.ramp.fixed.idle", p.SlopeAngle.Value);
                     if (_rampHasA)
                         return string.Format("A {0:0.0} \u2192 B {1:0.0} m",
                             GroundHeight(_rampA), center.y);
-                    return "marca A y B";
+                    return Loc.T("hud.markAB");
                 default:
                     return "";
             }
@@ -686,7 +692,7 @@ namespace TerrainForge
         // GetCurrentWeapon() only returns actual weapons (IsWeapon()); a Tool-type
         // item such as our rod or the vanilla Hammer lives in the hand slots but is
         // NOT a weapon, so it must be read from RightItem/LeftItem directly.
-        private static ItemDrop.ItemData GetHeldItem(Player player)
+        internal static ItemDrop.ItemData GetHeldItem(Player player)
         {
             if (player == null)
                 return null;
@@ -791,7 +797,7 @@ namespace TerrainForge
             return false;
         }
 
-        private static bool IsToolEquipped(TerrainForgePlugin p, ItemDrop.ItemData weapon)
+        internal static bool IsToolEquipped(TerrainForgePlugin p, ItemDrop.ItemData weapon)
         {
             switch (p.RequiredTool.Value)
             {
@@ -830,7 +836,7 @@ namespace TerrainForge
             }
         }
 
-        private static bool Held(KeyboardShortcut shortcut)
+        internal static bool Held(KeyboardShortcut shortcut)
         {
             KeyCode main = shortcut.MainKey;
             if (main == KeyCode.None)
@@ -860,7 +866,12 @@ namespace TerrainForge
 
         internal static Color BrushColor(TerrainForgePlugin p)
         {
-            switch (p.DefaultOperation.Value)
+            return OpColor(p.DefaultOperation.Value, p.Paint.Value);
+        }
+
+        internal static Color OpColor(TerrainOperation op, TerrainPaint paint)
+        {
+            switch (op)
             {
                 case TerrainOperation.Raise: return new Color(0.50f, 0.82f, 1.00f);
                 case TerrainOperation.Lower: return new Color(1.00f, 0.60f, 0.30f);
@@ -868,7 +879,7 @@ namespace TerrainForge
                 case TerrainOperation.Restore: return new Color(0.90f, 0.45f, 0.95f);
                 case TerrainOperation.Ramp: return new Color(0.98f, 0.78f, 0.40f);
                 case TerrainOperation.Shore: return new Color(0.93f, 0.87f, 0.66f);
-                case TerrainOperation.Paint: return PaintColor(p.Paint.Value);
+                case TerrainOperation.Paint: return PaintColor(paint);
                 default: return new Color(0.45f, 0.92f, 0.50f);
             }
         }
@@ -903,35 +914,31 @@ namespace TerrainForge
 
             EnsureHudStyle();
 
-            string status = string.Format("TerrainForge   {0}   |   radio {1:0.#} m   |   {2}   |   {3}",
-                p.DefaultOperation.Value, p.Radius.Value, p.Shape.Value, p.Paint.Value);
+            string status = string.Format("TerrainForge   {0}   |   {1} {2:0.#} m   |   {3}   |   {4}",
+                p.DefaultOperation.Value, Loc.T("hud.radius"), p.Radius.Value, p.Shape.Value, p.Paint.Value);
             if (p.DefaultOperation.Value == TerrainOperation.Ramp && _rampHasA)
-                status += "   |   RAMPA: punto A fijado, apunta a B";
+                status += "   |   " + Loc.T("hud.rampA");
             if (p.DefaultOperation.Value != TerrainOperation.Ramp)
             {
                 switch (p.Shape.Value)
                 {
                     case TerrainShape.Line:
-                        status += _lineHasA
-                            ? "   |   LÍNEA: A fijado, apunta a B"
-                            : "   |   LÍNEA: marca A y B";
+                        status += "   |   " + Loc.T(_lineHasA ? "hud.line.mark" : "hud.line.idle");
                         break;
                     case TerrainShape.Rect:
-                        status += _rectHasA
-                            ? "   |   RECT: esquina A fijada, apunta a B"
-                            : "   |   RECT: marca dos esquinas";
+                        status += "   |   " + Loc.T(_rectHasA ? "hud.rect.mark" : "hud.rect.idle");
                         break;
                     case TerrainShape.Poly:
-                        status += _polyPoints.Count > 0
-                            ? string.Format("   |   POLI: {0} puntos (doble pulso cierra)", _polyPoints.Count)
-                            : "   |   POLI: marca puntos";
+                        status += "   |   " + (_polyPoints.Count > 0
+                            ? Loc.F("hud.poly.mark", _polyPoints.Count)
+                            : Loc.T("hud.poly.idle"));
                         break;
                 }
             }
-            status += string.Format("   |   deshacer {0} / rehacer {1}",
-                TerrainEngine.UndoCount, TerrainEngine.RedoCount);
+            status += string.Format("   |   {0} {1} / {2} {3}",
+                Loc.T("hud.undo"), TerrainEngine.UndoCount, Loc.T("hud.redo"), TerrainEngine.RedoCount);
             if (!_serverAllowed)
-                status += "   |   SERVER: BLOQUEADO";
+                status += "   |   " + Loc.T("hud.blocked");
             if (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil)
                 status += "   |   " + _flashMsg;
 
@@ -953,8 +960,8 @@ namespace TerrainForge
 
             GUI.Label(new Rect(rect.x + 12f, rect.y, rect.width - 20f, rect.height), full, _hud);
 
-            string line2 = string.Format("apuntado {0:0.0} m   |   {1}   |   pendiente {2:0}\u00B0",
-                _aimY, _targetTxt, _slopeDeg);
+            string line2 = string.Format("{0} {1:0.0} m   |   {2}   |   {3} {4:0}\u00B0",
+                Loc.T("hud.aimed"), _aimY, _targetTxt, Loc.T("hud.slope"), _slopeDeg);
             Vector2 size2 = _hud.CalcSize(new GUIContent(line2));
             float w2 = Mathf.Max(320f, size2.x + 28f);
             w2 = Mathf.Min(w2, Mathf.Max(200f, Screen.width - 24f));
@@ -1012,6 +1019,171 @@ namespace TerrainForge
         {
             c.a = a;
             return c;
+        }
+    }
+
+    /// <summary>
+    /// Hold-to-open radial menu for picking the brush operation with the mouse.
+    /// Release confirms the hovered wedge, Esc cancels. IMGUI only, no assets.
+    /// </summary>
+    internal sealed class TerrainRadial : MonoBehaviour
+    {
+        public static bool Open { get; private set; }
+
+        private static readonly TerrainOperation[] s_ops =
+            (TerrainOperation[])System.Enum.GetValues(typeof(TerrainOperation));
+
+        private int _sel = -1;
+        private bool _cancel;
+        private GUIStyle _style;
+        private bool _cursorWasVisible;
+        private CursorLockMode _cursorLock;
+
+        private void Update()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || !p.Enabled.Value || TerrainKeybinds.MenuOpen)
+            {
+                if (Open)
+                    Close();
+                return;
+            }
+
+            Player player = Player.m_localPlayer;
+            if (player == null)
+            {
+                if (Open)
+                    Close();
+                return;
+            }
+
+            bool blocked = Console.IsVisible() || InventoryGui.IsVisible() || TextInput.IsVisible();
+            if (blocked)
+            {
+                if (Open)
+                    Close();
+                return;
+            }
+
+            if (!TerrainBrush.IsToolEquipped(p, TerrainBrush.GetHeldItem(player)))
+            {
+                if (Open)
+                    Close();
+                return;
+            }
+
+            if (!Open)
+            {
+                if (TerrainBrush.Held(p.RadialKey.Value))
+                {
+                    Open = true;
+                    _sel = (int)p.DefaultOperation.Value;
+                    _cancel = false;
+                    EnsureStyle();
+                    _cursorWasVisible = Cursor.visible;
+                    _cursorLock = Cursor.lockState;
+                    Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
+                }
+                return;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+                _cancel = true;
+
+            _sel = HoverFromMouse();
+
+            if (Input.GetMouseButtonDown(0) && !_cancel && _sel >= 0)
+            {
+                ApplySel(p);
+                Close();
+                return;
+            }
+
+            if (!TerrainBrush.Held(p.RadialKey.Value))
+            {
+                if (!_cancel && _sel >= 0)
+                    ApplySel(p);
+                Close();
+            }
+        }
+
+        private void ApplySel(TerrainForgePlugin p)
+        {
+            if (_sel < 0 || _sel >= s_ops.Length)
+                return;
+            if (p.DefaultOperation.Value != s_ops[_sel])
+            {
+                p.DefaultOperation.Value = s_ops[_sel];
+                TerrainBrush.RequestClearMarks();
+            }
+        }
+
+        private void Close()
+        {
+            Open = false;
+            Cursor.visible = _cursorWasVisible;
+            Cursor.lockState = _cursorLock;
+        }
+
+        private static int HoverFromMouse()
+        {
+            Vector2 m = Input.mousePosition;
+            float dx = m.x - Screen.width * 0.5f;
+            float dy = m.y - Screen.height * 0.5f;
+            if (dx * dx + dy * dy < 34f * 34f)
+                return -1;
+            float deg = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
+            float cw = (90f - deg + 360f) % 360f;
+            int idx = (int)((cw + 22.5f) / 45f) % 8;
+            if (idx < 0 || idx >= s_ops.Length)
+                return -1;
+            return idx;
+        }
+
+        private void OnGUI()
+        {
+            if (!Open)
+                return;
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+            EnsureStyle();
+
+            TerrainPaint paint = p.Paint.Value;
+
+            float cx = Screen.width * 0.5f;
+            float cy = Screen.height * 0.5f;
+
+            Color prevBg = GUI.backgroundColor;
+            for (int i = 0; i < s_ops.Length; i++)
+            {
+                float ang = (-90f + i * 45f) * Mathf.Deg2Rad;
+                float bx = cx + Mathf.Cos(ang) * 104f - 58f;
+                float by = cy - Mathf.Sin(ang) * 104f - 16f;
+                Color c = TerrainBrush.OpColor(s_ops[i], paint);
+                if (i == _sel)
+                    GUI.backgroundColor = new Color(Mathf.Min(1f, c.r + 0.3f), Mathf.Min(1f, c.g + 0.3f), Mathf.Min(1f, c.b + 0.3f), 0.97f);
+                else
+                    GUI.backgroundColor = new Color(c.r * 0.35f, c.g * 0.35f, c.b * 0.35f, 0.92f);
+                GUI.Button(new Rect(bx, by, 116f, 32f), Loc.OpName(s_ops[i]), _style);
+            }
+            GUI.backgroundColor = prevBg;
+
+            string center = _sel >= 0 ? Loc.OpName(s_ops[_sel]) : Loc.OpName(p.DefaultOperation.Value);
+            GUI.Box(new Rect(cx - 70f, cy - 16f, 140f, 32f), center, _style);
+        }
+
+        private void EnsureStyle()
+        {
+            if (_style != null)
+                return;
+            _style = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 14,
+                alignment = TextAnchor.MiddleCenter,
+                font = TerrainBrush.GameFont()
+            };
         }
     }
 

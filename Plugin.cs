@@ -19,6 +19,7 @@ namespace TerrainForge
         // General
         public ConfigEntry<bool> Enabled;
         public ConfigEntry<bool> PlayEffects;
+        public ConfigEntry<ModLanguage> Language;
 
         // Brush
         public ConfigEntry<float> Radius;
@@ -54,6 +55,8 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> GiveToolKey;
         public ConfigEntry<KeyboardShortcut> EyedropKey;
         public ConfigEntry<KeyboardShortcut> RampModeKey;
+        public ConfigEntry<KeyboardShortcut> RadialKey;
+        public ConfigEntry<string> PresetSlots;
         public ConfigEntry<ToolRequirement> RequiredTool;
         public ConfigEntry<bool> AutoGiveTool;
 
@@ -88,6 +91,8 @@ namespace TerrainForge
                 "Master switch for TerrainForge.");
             PlayEffects = Config.Bind("General", "PlayEffects", true,
                 "Play the tool's terrain-hit effect (dust + thud) when the brush applies.");
+            Language = Config.Bind("General", "Language", ModLanguage.Español,
+                "Menu / HUD language: Español or English.");
 
             Radius = Config.Bind("Brush", "Radius", 8f,
                 new ConfigDescription("Brush radius in meters.", new AcceptableValueRange<float>(1f, 100f)));
@@ -153,6 +158,11 @@ namespace TerrainForge
                 "Fix the Flatten target height at the aimed point (press again to release).");
             RampModeKey = Config.Bind("Input", "RampModeKey", new KeyboardShortcut(KeyCode.H),
                 "Toggle ramp mode: two-point / fixed angle.");
+            RadialKey = Config.Bind("Input", "RadialKey", new KeyboardShortcut(KeyCode.Q),
+                "Hold to open the operation radial menu (release to confirm, Esc cancels).");
+            PresetSlots = Config.Bind("Presets", "Slots", "",
+                "Named brush presets, managed from the in-game SETTINGS tab. " +
+                "Format per preset: name|radius|softness|op|shape|paint|rampMode|slope|smooth|raiseDelta|paintStrength|falloff|shoreOffset; ...");
             RequiredTool = Config.Bind("Input", "RequiredTool", ToolRequirement.TerrainForgeTool,
                 "Which equipped item enables the brush: Any (no requirement), Pickaxe, or the mod's TerrainForgeTool.");
             AutoGiveTool = Config.Bind("Input", "AutoGiveTool", true,
@@ -199,6 +209,7 @@ namespace TerrainForge
 
             gameObject.AddComponent<TerrainBrush>();
             gameObject.AddComponent<TerrainKeybinds>();
+            gameObject.AddComponent<TerrainRadial>();
 
             Log.LogInfo("TerrainForge loaded. Radius=" + Radius.Value +
                         " Operation=" + DefaultOperation.Value + " UnlockDeltaLimit=" + UnlockDeltaLimit.Value +
