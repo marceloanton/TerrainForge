@@ -58,6 +58,8 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> EyedropKey;
         public ConfigEntry<KeyboardShortcut> RampModeKey;
         public ConfigEntry<KeyboardShortcut> RadialKey;
+        public ConfigEntry<KeyboardShortcut> AdjustModeKey;
+        public ConfigEntry<bool> SeenTutorial;
         public ConfigEntry<string> PresetSlots;
         public ConfigEntry<ToolRequirement> RequiredTool;
         public ConfigEntry<bool> AutoGiveTool;
@@ -171,6 +173,11 @@ namespace TerrainForge
                 "Toggle ramp mode: two-point / fixed angle.");
             RadialKey = Config.Bind("Input", "RadialKey", new KeyboardShortcut(KeyCode.Q),
                 "Hold to open the operation radial menu (release to confirm, Esc cancels).");
+            AdjustModeKey = Config.Bind("Input", "AdjustModeKey", new KeyboardShortcut(KeyCode.V),
+                "Toggle adjust mode: the mouse wheel changes the brush radius and vanilla " +
+                "scroll uses (camera zoom, hotbar, map) are frozen while active.");
+            SeenTutorial = Config.Bind("General", "SeenTutorial", false,
+                "Set once the first-time tutorial messages have been shown.");
             PresetSlots = Config.Bind("Presets", "Slots", "",
                 "Named brush presets, managed from the in-game SETTINGS tab. " +
                 "Format per preset: name|radius|softness|op|shape|paint|rampMode|slope|smooth|raiseDelta|paintStrength|falloff|shoreOffset; ...");
@@ -232,6 +239,26 @@ namespace TerrainForge
 
             _harmony = new Harmony(Guid);
             _harmony.PatchAll();
+
+            try
+            {
+                System.Reflection.MethodInfo scroll = HarmonyLib.AccessTools.Method(
+                    typeof(ZInput), "GetMouseScrollWheel", new System.Type[0]);
+                if (scroll != null && scroll.ReturnType == typeof(float) && scroll.GetParameters().Length == 0)
+                {
+                    _harmony.Patch(scroll, prefix: new HarmonyMethod(
+                        typeof(ScrollSuppressPatch), nameof(ScrollSuppressPatch.Prefix)));
+                }
+                else
+                {
+                    Log.LogWarning("TerrainForge: ZInput.GetMouseScrollWheel not found; " +
+                        "adjust mode will change radius but not freeze zoom.");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Log.LogWarning("TerrainForge scroll patch failed: " + e.Message);
+            }
 
             gameObject.AddComponent<TerrainBrush>();
             gameObject.AddComponent<TerrainKeybinds>();

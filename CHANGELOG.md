@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Adjust mode** (`V`, rebindable): the mouse wheel changes the brush radius
+  without moving the camera — vanilla scroll uses (camera zoom, hotbar, map,
+  piece rotation) are frozen while active, with a HUD tag. Patched defensively:
+  if the input API ever changes, only the freeze is lost (logged).
+- **Held undo/redo**: keeping `Ctrl+Z` / `Ctrl+Y` held steps back/forward
+  continuously (throttled), no need to re-press.
+- **Blocked guides**: the whole preview renders grey when the server or a ward
+  denies editing, so it reads before trying.
+- **First-time tutorial**: two short messages on first equip
+  (`General > SeenTutorial`), then never again.
+
 ### Fixed
 
 - Line/Rect/Poly shapes never show the round guides (edge, full-strength, max

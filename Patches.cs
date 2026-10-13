@@ -311,6 +311,25 @@ namespace TerrainForge
         }
     }
 
+    /// <summary>
+    /// Freezes vanilla mouse-wheel uses (camera zoom, hotbar scroll, map zoom,
+    /// piece rotation) while adjust mode is on, so the wheel belongs to the
+    /// brush radius. Patched manually and guarded: if the game's input API ever
+    /// changes, adjust mode simply stops freezing zoom and we log a warning.
+    /// </summary>
+    internal static class ScrollSuppressPatch
+    {
+        internal static bool Prefix(ref float __result)
+        {
+            if (TerrainBrush.AdjustModeActive)
+            {
+                __result = 0f;
+                return false;
+            }
+            return true;
+        }
+    }
+
     /// <summary>Records undo actions so scaled radii can be restored after placement.</summary>
     internal sealed class PlacementRadiusScope
     {

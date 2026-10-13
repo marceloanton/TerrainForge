@@ -43,6 +43,11 @@ namespace TerrainForge
         private readonly List<Vector3> _rampPath = new List<Vector3>();
         private readonly List<float> _rampPathH = new List<float>();
         private float _rampPathLast = -999f;
+        private float _lastUndo = -999f;
+        private float _lastRedo = -999f;
+        private bool _adjustMode;
+
+        internal static bool AdjustModeActive { get; private set; }
         private static bool s_clearMarks;
 
         internal static void RequestClearMarks() => s_clearMarks = true;
@@ -62,6 +67,8 @@ namespace TerrainForge
             if (p == null || !p.Enabled.Value)
             {
                 _preview.Hide();
+                _adjustMode = false;
+                AdjustModeActive = false;
                 return;
             }
 
@@ -75,6 +82,8 @@ namespace TerrainForge
                 p.UseFixedHeight.Value = false;
                 ClearShapeMarks();
                 ClearRampPath();
+                _adjustMode = false;
+                AdjustModeActive = false;
                 return;
             }
 
@@ -129,6 +138,14 @@ namespace TerrainForge
             ItemDrop.ItemData weapon = GetHeldItem(player);
             bool equipped = IsToolEquipped(p, weapon);
 
+            if (equipped && !p.SeenTutorial.Value)
+            {
+                p.SeenTutorial.Value = true;
+                try { p.Config.Save(); } catch { }
+                TerrainForgePlugin.Message(Loc.T("tut.1"));
+                TerrainForgePlugin.Message(Loc.T("tut.2"));
+            }
+
             Vector3 aim;
             bool hasAim = TryGetAim(out aim);
 
@@ -159,10 +176,24 @@ namespace TerrainForge
                 }
                 if (p.CyclePaintKey.Value.IsDown())
                     CyclePaint(p);
-                if (p.UndoKey.Value.IsDown())
+                if (p.UndoKey.Value.IsDown() ||
+                    (Held(p.UndoKey.Value) && Time.time - _lastUndo > 0.35f))
+                {
+                    _lastUndo = Time.time;
                     DoUndo();
-                if (p.RedoKey.Value.IsDown())
+                }
+                if (p.RedoKey.Value.IsDown() ||
+                    (Held(p.RedoKey.Value) && Time.time - _lastRedo > 0.35f))
+                {
+                    _lastRedo = Time.time;
                     DoRedo();
+                }
+                if (p.AdjustModeKey.Value.IsDown())
+                {
+                    _adjustMode = !_adjustMode;
+                    AdjustModeActive = _adjustMode;
+                    Flash(_adjustMode ? Loc.T("flash.adjust.on") : Loc.T("flash.adjust.off"));
+                }
                 if (p.EyedropKey.Value.IsDown())
                     ToggleEyedrop(groundCenter);
                 if (p.RampModeKey.Value.IsDown())
@@ -312,6 +343,7 @@ namespace TerrainForge
                     SlopeDeg = _slopeDeg,
                     GuidesOn = guides,
                     LevelY = guides ? _levelY : float.NaN,
+                    Blocked = equipped && !canEdit,
                 });
             }
             else
@@ -634,7 +666,9 @@ namespace TerrainForge
             float scroll = Input.mouseScrollDelta.y;
             if (Mathf.Abs(scroll) > 0.01f)
             {
-                if (angleMode)
+                if (_adjustMode)
+                    AdjustRadius(p, Mathf.Sign(scroll) * p.RadiusStep.Value);
+                else if (angleMode)
                     AdjustAngle(p, Mathf.Sign(scroll) * 2.5f);
                 else if (ctrl)
                     AdjustRadius(p, Mathf.Sign(scroll) * p.RadiusStep.Value);
@@ -1208,6 +1242,8 @@ namespace TerrainForge
             }
             status += string.Format("   |   {0} {1} / {2} {3}",
                 Loc.T("hud.undo"), TerrainEngine.UndoCount, Loc.T("hud.redo"), TerrainEngine.RedoCount);
+            if (_adjustMode)
+                status += "   |   " + Loc.T("hud.adjust");
             if (!_serverAllowed)
                 status += "   |   " + Loc.T("hud.blocked");
             if (!_wardOk)

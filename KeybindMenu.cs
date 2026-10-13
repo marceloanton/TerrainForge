@@ -261,6 +261,7 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.eyedrop"), Bind = p.EyedropKey });
             _entries.Add(new Entry { Label = Loc.T("key.rampMode"), Bind = p.RampModeKey });
             _entries.Add(new Entry { Label = Loc.T("key.radial"), Bind = p.RadialKey });
+            _entries.Add(new Entry { Label = Loc.T("key.adjust"), Bind = p.AdjustModeKey });
             _entries.Add(new Entry { Label = Loc.T("key.give"), Bind = p.GiveToolKey });
             _entries.Add(new Entry { Label = Loc.T("key.menu"), Bind = p.RebindMenuKey });
             _langBuilt = p.Language != null ? p.Language.Value : ModLanguage.Español;

@@ -26,6 +26,7 @@ namespace TerrainForge
         public float SlopeDeg;
         public bool GuidesOn;
         public float LevelY; // NaN = hide the target-level marker
+        public bool Blocked; // server/ward deny: draw guides greyed out
     }
 
     /// <summary>
@@ -175,7 +176,7 @@ namespace TerrainForge
             SetWidth(_rampL, w * 0.42f);
             SetWidth(_rampR, w * 0.42f);
 
-            Color c = s.Color;
+            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
             // Slope shading: tint the footprint edge toward red as the ground
             // under the aim gets steeper (guides only, op color is preserved
             // on flat ground).
