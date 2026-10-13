@@ -54,6 +54,8 @@ paint. Guides can be turned off with `Preview > ShowGuides`.
 | Toggle circle / square | `.` |
 | Cycle paint type | `/` |
 | Use aimed height (instead of your own) for Flatten | Hold `Left Shift` |
+| Undo last brush application | `Ctrl+Z` |
+| Redo an undone application | `Ctrl+Y` |
 | Give yourself the TerrainForge Rod | `F8` |
 | Open the key binding + help menu | `F5` |
 

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Undo / redo** of brush applications (`Ctrl+Z` / `Ctrl+Y`, rebindable): every
+  application (including ramps, paint and restore) records the old values of
+  exactly the vertices it overwrites, so one step back restores them. Configurable
+  history depth (`History > UndoDepth`, 0-500, 0 disables) with a slider + exact
+  textbox in the in-game menu (TECLAS tab), live undo/redo counts and flash
+  messages in the status HUD. History is cleared when leaving the world.
+
 ## [0.1.0] - 2026-10-12
 
 Initial release.

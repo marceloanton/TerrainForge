@@ -80,6 +80,12 @@ namespace TerrainForge
 
             bool changed = false;
 
+            // One undo frame per Apply call: every comp touched below records
+            // the old values of exactly the vertices it overwrites.
+            List<UndoEntry> frame = null;
+            if (GetDepth() > 0)
+                frame = new List<UndoEntry>();
+
             for (int i = 0; i < s_hmaps.Count; i++)
             {
                 Heightmap hm = s_hmaps[i];
@@ -93,7 +99,7 @@ namespace TerrainForge
                 if (!EnsureOwnership(comp))
                     continue;
 
-                if (ApplyToComp(comp, hm, center, spec))
+                if (ApplyToComp(comp, hm, center, spec, frame))
                 {
                     Save(comp);
                     hm.Poke(0);
@@ -104,7 +110,206 @@ namespace TerrainForge
             if (changed && ClutterSystem.instance != null)
                 ClutterSystem.instance.ResetGrass(center, searchRadius + 1f);
 
+            if (changed && frame != null && frame.Count > 0)
+            {
+                PushUndo(new UndoFrame
+                {
+                    Label = spec.Operation.ToString(),
+                    Center = center,
+                    Radius = searchRadius,
+                    Entries = frame
+                });
+            }
+            else if (GetDepth() <= 0)
+            {
+                ClearHistory();
+            }
+
             return changed;
+        }
+
+        // ---- undo / redo -------------------------------------------------------
+
+        private static readonly List<UndoFrame> s_undo = new List<UndoFrame>();
+        private static readonly List<UndoFrame> s_redo = new List<UndoFrame>();
+
+        public static int UndoCount => s_undo.Count;
+        public static int RedoCount => s_redo.Count;
+
+        public static void ClearHistory()
+        {
+            s_undo.Clear();
+            s_redo.Clear();
+        }
+
+        private static int GetDepth()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || p.UndoDepth == null)
+                return 50;
+            return Mathf.Clamp(p.UndoDepth.Value, 0, 500);
+        }
+
+        private static void PushUndo(UndoFrame f)
+        {
+            s_undo.Add(f);
+            TrimStack(s_undo);
+            s_redo.Clear();
+        }
+
+        private static void TrimStack(List<UndoFrame> stack)
+        {
+            int depth = GetDepth();
+            while (stack.Count > depth)
+                stack.RemoveAt(0);
+        }
+
+        public static bool Undo(out string label) => Step(s_undo, s_redo, out label);
+        public static bool Redo(out string label) => Step(s_redo, s_undo, out label);
+
+        private static bool Step(List<UndoFrame> from, List<UndoFrame> to, out string label)
+        {
+            label = null;
+            if (from.Count == 0)
+                return false;
+
+            UndoFrame f = from[from.Count - 1];
+            from.RemoveAt(from.Count - 1);
+
+            var back = new UndoFrame { Label = f.Label, Center = f.Center, Radius = f.Radius };
+            bool ok = false;
+            for (int i = 0; i < f.Entries.Count; i++)
+            {
+                UndoEntry restored = CaptureAndRestore(f.Entries[i]);
+                if (restored != null)
+                {
+                    back.Entries.Add(restored);
+                    ok = true;
+                }
+            }
+
+            if (back.Entries.Count > 0)
+            {
+                to.Add(back);
+                TrimStack(to);
+            }
+
+            if (ok && ClutterSystem.instance != null)
+                ClutterSystem.instance.ResetGrass(f.Center, f.Radius + 1f);
+
+            label = f.Label;
+            return ok;
+        }
+
+        /// <summary>
+        /// Writes an entry's old values back into its TerrainComp and returns a new
+        /// entry holding the values that were there (for the opposite direction).
+        /// Returns null when the comp is gone or ownership failed.
+        /// </summary>
+        private static UndoEntry CaptureAndRestore(UndoEntry e)
+        {
+            if (e == null || e.Comp == null || e.Before == null || e.Before.Count == 0)
+                return null;
+            if (!EnsureOwnership(e.Comp))
+                return null;
+
+            float[] level = LevelDelta(e.Comp);
+            float[] smooth = e.WithSmooth ? SmoothDelta(e.Comp) : null;
+            bool[] modHeight = null;
+            Color[] paint = e.WithPaint ? PaintMask(e.Comp) : null;
+            bool[] modPaint = e.WithPaint ? ModifiedPaint(e.Comp) : null;
+            try { modHeight = (bool[])f_modifiedHeight.GetValue(e.Comp); }
+            catch { modHeight = null; }
+
+            if (level == null || modHeight == null)
+                return null;
+            if (e.WithSmooth && smooth == null)
+                return null;
+            if (e.WithPaint && (paint == null || modPaint == null))
+                return null;
+
+            var back = new UndoEntry
+            {
+                Comp = e.Comp,
+                Hm = e.Hm,
+                WithSmooth = e.WithSmooth,
+                WithPaint = e.WithPaint
+            };
+
+            for (int k = 0; k < e.Before.Count; k++)
+            {
+                UndoCell old = e.Before[k];
+                int idx = old.Index;
+                if (idx < 0 || idx >= level.Length)
+                    continue;
+
+                back.Before.Add(new UndoCell
+                {
+                    Index = idx,
+                    Level = level[idx],
+                    Smooth = smooth != null ? smooth[idx] : 0f,
+                    ModifiedHeight = modHeight[idx],
+                    Paint = paint != null ? paint[idx] : default(Color),
+                    ModifiedPaint = modPaint != null && modPaint[idx]
+                });
+
+                level[idx] = old.Level;
+                if (smooth != null)
+                    smooth[idx] = old.Smooth;
+                modHeight[idx] = old.ModifiedHeight;
+                if (paint != null)
+                    paint[idx] = old.Paint;
+                if (modPaint != null)
+                    modPaint[idx] = old.ModifiedPaint;
+            }
+
+            Save(e.Comp);
+            if (e.Hm != null)
+            {
+                try { e.Hm.Poke(0); }
+                catch { /* heightmap gone */ }
+            }
+
+            return back;
+        }
+
+        /// <summary>
+        /// Collects the pre-write values of touched vertices. Pass null arrays for
+        /// channels an operation never writes (e.g. the ramp only writes level).
+        /// </summary>
+        private sealed class Recorder
+        {
+            public readonly List<UndoCell> Cells = new List<UndoCell>();
+            private readonly float[] _level;
+            private readonly float[] _smooth;
+            private readonly bool[] _modH;
+            private readonly Color[] _paint;
+            private readonly bool[] _modP;
+
+            public Recorder(float[] level, float[] smooth, bool[] modH, Color[] paint, bool[] modP)
+            {
+                _level = level;
+                _smooth = smooth;
+                _modH = modH;
+                _paint = paint;
+                _modP = modP;
+            }
+
+            public bool TrackSmooth => _smooth != null;
+            public bool TrackPaint => _paint != null;
+
+            public void Add(int idx)
+            {
+                Cells.Add(new UndoCell
+                {
+                    Index = idx,
+                    Level = _level[idx],
+                    Smooth = _smooth != null ? _smooth[idx] : 0f,
+                    ModifiedHeight = _modH[idx],
+                    Paint = _paint != null ? _paint[idx] : default(Color),
+                    ModifiedPaint = _modP != null && _modP[idx]
+                });
+            }
         }
 
         private static bool EnsureOwnership(TerrainComp comp)
@@ -139,10 +344,10 @@ namespace TerrainForge
             }
         }
 
-        private static bool ApplyToComp(TerrainComp comp, Heightmap hm, Vector3 center, BrushSpec spec)
+        private static bool ApplyToComp(TerrainComp comp, Heightmap hm, Vector3 center, BrushSpec spec, List<UndoEntry> frame)
         {
             if (spec.Operation == TerrainOperation.Ramp && spec.HasRampLine)
-                return ApplyRampLine(comp, hm, spec);
+                return ApplyRampLine(comp, hm, spec, frame);
 
             int width = hm.m_width;
             int pitch = width + 1;
@@ -168,6 +373,10 @@ namespace TerrainForge
 
             Color paintTarget = PaintColor(spec.Paint);
             bool any = false;
+
+            Recorder rec = frame != null
+                ? new Recorder(level, smooth, modHeight, paint, modPaint)
+                : null;
 
             int y0 = Mathf.Max(0, cy - span);
             int y1 = Mathf.Min(width, cy + span);
@@ -215,9 +424,14 @@ namespace TerrainForge
                         case TerrainOperation.Flatten:
                         {
                             float newWorld = Mathf.Lerp(curWorld, spec.TargetWorld, w);
-                            level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
-                            modHeight[idx] = true;
-                            any = true;
+                            if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !modHeight[idx])
+                            {
+                                if (rec != null)
+                                    rec.Add(idx);
+                                level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
+                                modHeight[idx] = true;
+                                any = true;
+                            }
                             break;
                         }
                         case TerrainOperation.Raise:
@@ -225,9 +439,14 @@ namespace TerrainForge
                         {
                             float sign = spec.Operation == TerrainOperation.Lower ? -1f : 1f;
                             float delta = spec.RaiseDelta * w * sign;
-                            level[idx] = ClampDelta(level[idx] + delta, spec);
-                            modHeight[idx] = true;
-                            any = true;
+                            if (Mathf.Abs(delta) > 0.0001f || !modHeight[idx])
+                            {
+                                if (rec != null)
+                                    rec.Add(idx);
+                                level[idx] = ClampDelta(level[idx] + delta, spec);
+                                modHeight[idx] = true;
+                                any = true;
+                            }
                             break;
                         }
                         case TerrainOperation.Smooth:
@@ -253,9 +472,14 @@ namespace TerrainForge
 
                             float avg = n > 0 ? sum / n : curWorld;
                             float newWorld = Mathf.Lerp(curWorld, avg, w);
-                            level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
-                            modHeight[idx] = true;
-                            any = true;
+                            if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !modHeight[idx])
+                            {
+                                if (rec != null)
+                                    rec.Add(idx);
+                                level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
+                                modHeight[idx] = true;
+                                any = true;
+                            }
                             break;
                         }
                         case TerrainOperation.Paint:
@@ -264,21 +488,28 @@ namespace TerrainForge
                             {
                                 if (modPaint[idx])
                                 {
+                                    if (rec != null)
+                                        rec.Add(idx);
                                     modPaint[idx] = false;
                                     any = true;
                                 }
                             }
                             else
                             {
-                                Color c = paint[idx];
-                                float a = c.a;
                                 float k = Mathf.Clamp01(spec.PaintStrength) * w;
-                                c = Color.Lerp(c, paintTarget, k);
-                                if (spec.Paint != TerrainPaint.ClearVegetation)
-                                    c.a = a;
-                                paint[idx] = c;
-                                modPaint[idx] = true;
-                                any = true;
+                                if (k > 0.0001f)
+                                {
+                                    Color c = paint[idx];
+                                    float a = c.a;
+                                    c = Color.Lerp(c, paintTarget, k);
+                                    if (spec.Paint != TerrainPaint.ClearVegetation)
+                                        c.a = a;
+                                    if (rec != null)
+                                        rec.Add(idx);
+                                    paint[idx] = c;
+                                    modPaint[idx] = true;
+                                    any = true;
+                                }
                             }
                             break;
                         }
@@ -286,6 +517,8 @@ namespace TerrainForge
                         {
                             if (level[idx] != 0f || smooth[idx] != 0f || modHeight[idx] || modPaint[idx])
                             {
+                                if (rec != null)
+                                    rec.Add(idx);
                                 level[idx] = 0f;
                                 smooth[idx] = 0f;
                                 modHeight[idx] = false;
@@ -298,6 +531,18 @@ namespace TerrainForge
                 }
             }
 
+            if (any && frame != null && rec != null && rec.Cells.Count > 0)
+            {
+                frame.Add(new UndoEntry
+                {
+                    Comp = comp,
+                    Hm = hm,
+                    WithSmooth = true,
+                    WithPaint = true,
+                    Before = rec.Cells
+                });
+            }
+
             return any;
         }
 
@@ -307,7 +552,7 @@ namespace TerrainForge
         /// the linear slope between the terrain heights at A and B, fading out to the
         /// sides so it blends into the surrounding terrain.
         /// </summary>
-        private static bool ApplyRampLine(TerrainComp comp, Heightmap hm, BrushSpec spec)
+        private static bool ApplyRampLine(TerrainComp comp, Heightmap hm, BrushSpec spec, List<UndoEntry> frame)
         {
             int width = hm.m_width;
             int pitch = width + 1;
@@ -342,6 +587,11 @@ namespace TerrainForge
             if (level == null || modHeight == null)
                 return false;
 
+            // The ramp only writes level deltas, so only those are recorded.
+            Recorder rec = frame != null
+                ? new Recorder(level, null, modHeight, null, null)
+                : null;
+
             int x0 = Mathf.Max(0, Mathf.Min(ax, bx) - halfIdx);
             int x1 = Mathf.Min(width, Mathf.Max(ax, bx) + halfIdx);
             int y0 = Mathf.Max(0, Mathf.Min(ay, by) - halfIdx);
@@ -374,10 +624,27 @@ namespace TerrainForge
                     float newWorld = Mathf.Lerp(curWorld, target, wl);
 
                     int idx = i * pitch + j;
-                    level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
-                    modHeight[idx] = true;
-                    any = true;
+                    if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !modHeight[idx])
+                    {
+                        if (rec != null)
+                            rec.Add(idx);
+                        level[idx] = ClampDelta(level[idx] + (newWorld - curWorld), spec);
+                        modHeight[idx] = true;
+                        any = true;
+                    }
                 }
+            }
+
+            if (any && frame != null && rec != null && rec.Cells.Count > 0)
+            {
+                frame.Add(new UndoEntry
+                {
+                    Comp = comp,
+                    Hm = hm,
+                    WithSmooth = false,
+                    WithPaint = false,
+                    Before = rec.Cells
+                });
             }
 
             return any;

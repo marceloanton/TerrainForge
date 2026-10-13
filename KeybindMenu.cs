@@ -30,6 +30,7 @@ namespace TerrainForge
 
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
+        private string _undoDepthText;
 
         private GUIStyle _winStyle;
         private GUIStyle _headerStyle;
@@ -66,6 +67,8 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = "Cambiar forma", Bind = p.CycleShapeKey });
             _entries.Add(new Entry { Label = "Cambiar pintura", Bind = p.CyclePaintKey });
             _entries.Add(new Entry { Label = "Nivelar a tus pies (mod.)", Bind = p.AimHeightModifierKey });
+            _entries.Add(new Entry { Label = "Deshacer", Bind = p.UndoKey });
+            _entries.Add(new Entry { Label = "Rehacer", Bind = p.RedoKey });
             _entries.Add(new Entry { Label = "Obtener herramienta", Bind = p.GiveToolKey });
             _entries.Add(new Entry { Label = "Abrir este menu", Bind = p.RebindMenuKey });
         }
@@ -143,6 +146,10 @@ namespace TerrainForge
                 _cursorLock = Cursor.lockState;
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
+
+                TerrainForgePlugin p = TerrainForgePlugin.Instance;
+                if (p != null && p.UndoDepth != null)
+                    _undoDepthText = p.UndoDepth.Value.ToString();
             }
             else
             {
@@ -217,12 +224,57 @@ namespace TerrainForge
             }
 
             GUILayout.Space(10f);
+            DrawHistorySection();
+
+            GUILayout.Space(6f);
             if (GUILayout.Button("Obtener la herramienta ahora", _btnStyle, GUILayout.Height(28f)))
                 TerrainTool.Give(Player.m_localPlayer);
 
             GUILayout.Space(6f);
             if (GUILayout.Button("Cerrar", _btnStyle, GUILayout.Height(28f)))
                 Toggle(false);
+        }
+
+        private void DrawHistorySection()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || p.UndoDepth == null)
+                return;
+
+            GUILayout.Label("Historial de deshacer (pasos guardados)", _hintStyle);
+
+            int depth = Mathf.Clamp(p.UndoDepth.Value, 0, 500);
+            float f = GUILayout.HorizontalSlider(depth, 0f, 200f);
+            int fromSlider = Mathf.RoundToInt(f);
+            if (fromSlider != depth)
+            {
+                p.UndoDepth.Value = fromSlider;
+                _undoDepthText = fromSlider.ToString();
+                if (fromSlider <= 0)
+                    TerrainEngine.ClearHistory();
+            }
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Exacto (0-500):", _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+            string t = GUILayout.TextField(_undoDepthText ?? depth.ToString(), GUILayout.Width(205f), GUILayout.Height(26f));
+            if (t != _undoDepthText)
+            {
+                _undoDepthText = t;
+                if (int.TryParse(t, out int v))
+                {
+                    v = Mathf.Clamp(v, 0, 500);
+                    if (v != p.UndoDepth.Value)
+                    {
+                        p.UndoDepth.Value = v;
+                        if (v <= 0)
+                            TerrainEngine.ClearHistory();
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label("Guardados: deshacer " + TerrainEngine.UndoCount +
+                            "  ·  rehacer " + TerrainEngine.RedoCount, _hintStyle);
         }
 
         private void DrawHelpTab()
@@ -264,7 +316,10 @@ namespace TerrainForge
                  "\u2022 \"Nivelar a tus pies\" (Shift): Flatten toma esa altura en " +
                  "vez de la apuntada.\n" +
                  "\u2022 El HUD (arriba a la izquierda) muestra operacion, radio, forma y " +
-                 "pintura actuales.");
+                 "pintura actuales.\n" +
+                 "\u2022 \"Deshacer\" (Ctrl+Z) revierte la ultima aplicacion y \"Rehacer\" " +
+                 "(Ctrl+Y) la recupera. La profundidad del historial se ajusta en la " +
+                 "pesta\u00F1a TECLAS (0 lo desactiva y borra lo guardado).");
 
             Topic("Vista previa");
             Body("\u2022 La linea solida marca el borde real: donde se genera terreno.\n" +

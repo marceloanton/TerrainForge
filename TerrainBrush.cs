@@ -21,6 +21,8 @@ namespace TerrainForge
 
         private GUIStyle _hud;
         private Texture2D _hudBg;
+        private string _flashMsg;
+        private float _flashUntil;
 
         private void OnDestroy()
         {
@@ -45,6 +47,7 @@ namespace TerrainForge
             {
                 _toolGiven = false;
                 _preview.Hide();
+                TerrainEngine.ClearHistory();
                 return;
             }
 
@@ -99,6 +102,10 @@ namespace TerrainForge
                     CycleShape(p);
                 if (p.CyclePaintKey.Value.IsDown())
                     CyclePaint(p);
+                if (p.UndoKey.Value.IsDown())
+                    DoUndo();
+                if (p.RedoKey.Value.IsDown())
+                    DoRedo();
             }
 
             TerrainOperation op = p.DefaultOperation.Value;
@@ -256,6 +263,30 @@ namespace TerrainForge
         private static void CycleShape(TerrainForgePlugin p)
         {
             p.Shape.Value = p.Shape.Value == TerrainShape.Circle ? TerrainShape.Square : TerrainShape.Circle;
+        }
+
+        private void DoUndo()
+        {
+            if (TerrainEngine.Undo(out string label))
+                Flash("Deshecho" + (string.IsNullOrEmpty(label) ? "" : ": " + label) +
+                      "  (quedan " + TerrainEngine.UndoCount + ")");
+            else
+                Flash("Nada que deshacer");
+        }
+
+        private void DoRedo()
+        {
+            if (TerrainEngine.Redo(out string label))
+                Flash("Rehecho" + (string.IsNullOrEmpty(label) ? "" : ": " + label) +
+                      "  (quedan " + TerrainEngine.RedoCount + ")");
+            else
+                Flash("Nada que rehacer");
+        }
+
+        private void Flash(string msg)
+        {
+            _flashMsg = msg;
+            _flashUntil = Time.time + 2.5f;
         }
 
         private static void CyclePaint(TerrainForgePlugin p)
@@ -493,6 +524,10 @@ namespace TerrainForge
                 p.DefaultOperation.Value, p.Radius.Value, p.Shape.Value, p.Paint.Value);
             if (p.DefaultOperation.Value == TerrainOperation.Ramp && _rampHasA)
                 status += "   |   RAMPA: punto A fijado, apunta a B";
+            status += string.Format("   |   deshacer {0} / rehacer {1}",
+                TerrainEngine.UndoCount, TerrainEngine.RedoCount);
+            if (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil)
+                status += "   |   " + _flashMsg;
 
             Color prev = GUI.color;
             Color c = BrushColor(p);

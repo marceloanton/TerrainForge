@@ -22,8 +22,12 @@ This document breaks down the requested features into a testable sequence, pinni
 - [ ] Confirm no new publicizer needed (reflection only).
 - [ ] Review `LogOutput.log` quick scan for early errors after deploy.
 
-## Phase 1 – Undo/Redo (★ highest priority)
+## Phase 1 – Undo/Redo (★ highest priority) — DONE
 Goal: let `Ctrl+Z` undo last brush application(s) and `Ctrl+Y` redo. Track per application a minimal "delta set".
+
+Implemented: sparse per-vertex recording in `TerrainEngine` (one frame per `Apply`
+call, ramp included), `History > UndoDepth` (0-500, slider + exact textbox in the
+TECLAS tab), HUD undo/redo counts + flash messages, history cleared on world exit.
 
 **Design**
 - Keep a history per-heightmap? Or just remember what `TerrainEngine` wrote: for each affected `TerrainComp` (by `nview.GetZDO().m_uid` or the comp instance), snapshot the changed indices of `levelDelta`, `smoothDelta`, `modifiedHeight`, `paintMask`, `modifiedPaint` (and maybe whether created/restored). Also remember centre/search radius used.
@@ -38,11 +42,12 @@ Goal: let `Ctrl+Z` undo last brush application(s) and `Ctrl+Y` redo. Track per a
 - `Plugin.cs`: config for keys + `UndoDepth`
 
 **Acceptance**
-- [ ] One `Apply` → `Ctrl+Z` reverts terrain to before.
-- [ ] Ramp creation undoable.
-- [ ] Paint/Restore undoable.
-- [ ] Redo works after undo.
-- [ ] History bounded.
+- [x] One `Apply` → `Ctrl+Z` reverts terrain to before.
+- [x] Ramp creation undoable.
+- [x] Paint/Restore undoable.
+- [x] Redo works after undo.
+- [x] History bounded.
+- [ ] Verify in-game (player test + `LogOutput.log` check).
 
 **Effort:** M–L | **Risk:** medium (must write deltas back carefully)
 

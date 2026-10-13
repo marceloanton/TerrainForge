@@ -66,4 +66,36 @@ namespace TerrainForge
 
         public TerrainPaint PaintType => Paint;
     }
+
+    /// <summary>Old values of one touched terrain vertex, for undo/redo.</summary>
+    internal struct UndoCell
+    {
+        public int Index;
+        public float Level;
+        public float Smooth;
+        public bool ModifiedHeight;
+        public Color Paint;
+        public bool ModifiedPaint;
+    }
+
+    /// <summary>All vertices changed on one TerrainComp by one brush application.</summary>
+    internal sealed class UndoEntry
+    {
+        public TerrainComp Comp;
+        public Heightmap Hm;
+        public bool WithSmooth;
+        public bool WithPaint;
+        public System.Collections.Generic.List<UndoCell> Before =
+            new System.Collections.Generic.List<UndoCell>();
+    }
+
+    /// <summary>One undoable step: every comp touched by a single Apply call.</summary>
+    internal sealed class UndoFrame
+    {
+        public string Label;
+        public Vector3 Center;
+        public float Radius;
+        public System.Collections.Generic.List<UndoEntry> Entries =
+            new System.Collections.Generic.List<UndoEntry>();
+    }
 }

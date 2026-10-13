@@ -60,6 +60,11 @@ namespace TerrainForge
         public ConfigEntry<bool> ShowPreview;
         public ConfigEntry<bool> ShowGuides;
 
+        // History
+        public ConfigEntry<int> UndoDepth;
+        public ConfigEntry<KeyboardShortcut> UndoKey;
+        public ConfigEntry<KeyboardShortcut> RedoKey;
+
         private Harmony _harmony;
 
         private void Awake()
@@ -138,6 +143,14 @@ namespace TerrainForge
 
             ShowGuides = Config.Bind("Preview", "ShowGuides", true,
                 "Draw the faint reach guides: full-strength zone, maximum radius, maximum aim distance and the ramp corridor.");
+
+            UndoDepth = Config.Bind("History", "UndoDepth", 50,
+                new ConfigDescription("How many brush applications Ctrl+Z can step back through (0 disables history).",
+                    new AcceptableValueRange<int>(0, 500)));
+            UndoKey = Config.Bind("Input", "UndoKey", new KeyboardShortcut(KeyCode.Z, KeyCode.LeftControl),
+                "Undo the last brush application.");
+            RedoKey = Config.Bind("Input", "RedoKey", new KeyboardShortcut(KeyCode.Y, KeyCode.LeftControl),
+                "Redo an undone brush application.");
 
             TerrainEngine.Cache();
 
