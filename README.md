@@ -2,8 +2,10 @@
 
 A free-form terrain brush for Valheim.
 
-Flatten, raise, lower, smooth, **ramp**, paint and restore terrain of any size,
-beyond the vanilla +/-8 m limit, without build cost or zone restrictions.
+Flatten, raise, lower, smooth, **ramp** (two-point, fixed-angle and path),
+**shore**, paint and restore terrain of any size, beyond the vanilla +/-8 m
+limit, with undo/redo, five brush shapes, a radial menu, named presets and
+EN/ES localization.
 
 The mod ships its own **TerrainForge Rod** (a clone of the Hammer) as the brush
 tool, hands it to you automatically and documents everything in an **in-game help
@@ -53,7 +55,7 @@ target and the local slope in degrees. Guides can be turned off with
 | Increase radius | `=` (also `Ctrl` + mouse wheel) |
 | Decrease radius | `-` (also `Ctrl` + mouse wheel) |
 | Cycle operation | `,` |
-| Toggle circle / square | `.` |
+| Cycle shape (circle/square/line/rect/poly) | `.` |
 | Cycle paint type | `/` |
 | Use aimed height (instead of your own) for Flatten | Hold `Left Shift` |
 | Undo last brush application | `Ctrl+Z` |
@@ -62,10 +64,6 @@ target and the local slope in degrees. Guides can be turned off with
 | Toggle ramp mode (two-point / fixed angle / path) | `H` |
 | Adjust fixed ramp angle (Ramp selected) | Hold `Alt` + radius keys / wheel |
 | Operation radial menu (hold, release to confirm) | `Q` |
-
-Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab,
-including menu/HUD language `Español`/`English` and named brush **presets** to
-save and reload the whole brush setup).
 | Give yourself the TerrainForge Rod | `F8` |
 | Open the key binding + help menu | `F5` |
 
@@ -73,8 +71,9 @@ Operations cycle through: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`
 `Restore`, `Shore` (flattens toward water level + offset, for beaches).
 
 Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab):
-operation / shape / paint / ramp-mode / smooth-mode, all sizes via sliders and
-every toggle. Saved when the menu closes.
+operation / shape / paint / ramp-mode / smooth-mode, all sizes via sliders,
+every toggle, menu/HUD language (`Español`/`English`) and named brush
+**presets**. Saved when the menu closes.
 
 **Terrain snapshots** (backups) live in the same tab: name a snapshot to save
 every edited tile to `BepInEx/config/TerrainForge/snapshots/<name>.dat`, then
@@ -93,10 +92,11 @@ operations apply over these footprints with undo support.
   your own feet instead.
 - **Smooth** averages each point with its neighbours (a real blur), smoothing bumps,
   steps and noise. Hold it down to smooth progressively.
-- **Ramp** is two-point: with the Ramp operation selected, press *apply* once to
-  mark point **A**, aim elsewhere and press *apply* again to mark point **B**. A
-  straight slope joining the two heights is built along the A-B corridor; the
-  brush radius sets the ramp width and softness softens only the side edges.
+- **Ramp** has three modes (`H`): **two-point** (mark **A** then **B**, a straight
+  slope joins both heights), **fixed-angle** (**B** sets direction/length, height
+  follows `SlopeAngle`, adjustable with `Alt` + radius keys), and **path** (mark
+  a curve **A→B→C…**, double-press to close). The brush radius sets the ramp
+  width and softness softens only the side edges.
 
 ### In-game help
 
@@ -114,23 +114,31 @@ All hotkeys are also editable directly in `BepInEx/config/com.terrainforge.valhe
 
 Config file: `BepInEx/config/com.terrainforge.valheim.cfg`
 
+- **General**: `Enabled`, `PlayEffects` (dust + thud on apply), `Language`
+  (`Español` / `English`).
 - **Brush**: `Radius`, `RadiusMin/Max`, `RadiusStep`, `Softness`, `FalloffPower`,
   `RaiseLowerMeters`, `PaintStrength`, `DefaultOperation`, `Shape`, `Paint`,
-  `RampMode` (`TwoPoint` / `FixedAngle`), `SlopeAngle` (5-60°).
+  `RampMode` (`TwoPoint` / `FixedAngle` / `Path`), `SlopeAngle` (5-60°),
+  `SmoothMode` (`Full` / `Bumps` / `Dips`), `ShoreOffset`,
+  `UseFixedHeight` / `FixedHeight` (eyedropper state).
+- **Input**: all hotkeys (`ApplyKey`, radius, cycles, `AimHeightModifierKey`,
+  `UndoKey`/`RedoKey`, `EyedropKey`, `RampModeKey`, `RadialKey`, `GiveToolKey`,
+  `RebindMenuKey`), plus `RequiredTool` (`Any`, `Pickaxe`, or the mod's
+  `TerrainForgeTool` — default) and `AutoGiveTool` (hand out the rod on entering
+  a world, default `true`).
 - **Limits**: `UnlockDeltaLimit` (default **true**), `MaxUpDelta`, `MaxDownDelta`.
   Raising these allows terrain edits past the vanilla +/-8 m; keep them equal on
   server and clients.
-- **Input**: all hotkeys, plus `RequiredTool` (`Any`, `Pickaxe`, or the mod's
-  `TerrainForgeTool` — default), `AutoGiveTool` (hand out the rod on entering a
-  world, default `true`) and `GiveToolKey`.
 - **VanillaTools** (best effort / optional):
   - `ScaleVanillaToolRadius` – enlarge the vanilla hoe / cultivator radius.
     This only affects the client that applies the op and may not stay consistent
     across clients, so it is **off by default**.
   - `NoBuildCost` – remove material / workstation requirements.
   - `AllowInProtectedZones` – ignore no-build and ward zones (bypasses protection).
-- **Preview**: `ShowPreview`.
+- **Preview**: `ShowPreview`, `ShowGuides` (reach guides, slope tint, level ring).
 - **History**: `UndoDepth` (0-500, default 50; 0 disables undo history).
+- **Presets**: `Slots` (named brush setups, managed in-game).
+- **Performance**: `ChunkCompsPerFrame` (1-32, default 4 tiles per frame).
 - **Server** (authoritative when the server runs the mod — its values win through
   config sync): `AllowTerrainEdits` (default `true`; when `false`, clients cannot
   apply, undo or redo) and `AdminOnlyEdits` (default `false`; only admins / host

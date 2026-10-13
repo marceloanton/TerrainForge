@@ -203,6 +203,18 @@ clicks drain inside `Apply`), undo pushed once at completion.
 - Package `TerrainForge.dll + README + CHANGELOG (+ icon)` → manual upload
   (uploading can't be done from here).
 
+Implemented: version `0.1.0 → 0.2.0` (`csproj` + `BepInPlugin` + manifest),
+manifest description refresh, `CHANGELOG` Unreleased → `0.2.0` dated, README
+final pass (fixed mid-table paragraph, 5-shape key, 3-mode ramp, full config
+reference incl. `General`/`Presets`/`Performance`).
+
+**Acceptance**
+- [x] Versions consistent in all three places
+- [x] README accurate (ops, shapes, keys, config, snapshots)
+- [ ] `icon.png` provided by player and added to the package
+- [ ] Smoke checklist passed in-game (below)
+- [ ] Uploaded to Thunderstore manually
+
 **Effort:** S | **Risk:** none
 
 ## Suggested order
