@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   history depth (`History > UndoDepth`, 0-500, 0 disables) with a slider + exact
   textbox in the in-game menu (TECLAS tab), live undo/redo counts and flash
   messages in the status HUD. History is cleared when leaving the world.
+- **Live HUD data**: a second status line shows the aimed ground height, the
+  current target (Flatten height / Raise-Lower step / paint / ramp A→B heights)
+  and the local slope in degrees, updated every frame while aiming.
 
 ## [0.1.0] - 2026-10-12
 

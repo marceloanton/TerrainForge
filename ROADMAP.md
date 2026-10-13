@@ -51,17 +51,23 @@ TECLAS tab), HUD undo/redo counts + flash messages, history cleared on world exi
 
 **Effort:** M–L | **Risk:** medium (must write deltas back carefully)
 
-## Phase 2 – HUD with live data (★)
+## Phase 2 – HUD with live data (★) — DONE
 Show: current world height under crosshair (`ZoneSystem.GetGroundHeight(aim)`), target height (what tool will use), slope in degrees, paint strength etc.
+
+Implemented: second HUD line (`apuntado Y m | objetivo | pendiente °`) computed
+every frame in `TerrainBrush.Update` (gradient from 4 ground samples 1 m around
+the aim point); per-operation target text (Flatten height incl. Shift modifier,
+Raise/Lower step, Smooth, paint + strength, Restore, ramp A→B heights).
 
 **Files**
 - `TerrainBrush.cs` (`OnGUI`, `EnsureHudStyle`): extend `status` string; compute slope: `deltaHeight / horizontalDist` over small ray/step or `Vector3.Angle(Vector3.up, normal)` approx via two nearby ground samples? Or sample 4 points around centre to get gradient.
 - `TerrainPreview.cs`: optional slope shading later but HUD first.
 
 **Acceptance**
-- [ ] HUD shows `Aim Y: … m`, `Target: … m`, `Slope: …°`
-- [ ] Updates every frame while equipped
-- [ ] No layout break on small widths
+- [x] HUD shows `Aim Y: … m`, `Target: … m`, `Slope: …°`
+- [x] Updates every frame while equipped
+- [x] No layout break on small widths
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** S | **Risk:** low
 

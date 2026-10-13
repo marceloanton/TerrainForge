@@ -43,7 +43,9 @@ While aiming, a solid ring marks the real generated area, with thin, faint guide
 in the operation colour around it (full-strength zone, maximum brush radius and
 maximum aim distance). In the Ramp operation the real A-B corridor is drawn while
 marking. The status HUD (top-left) shows the current operation, radius, shape and
-paint. Guides can be turned off with `Preview > ShowGuides`.
+paint, plus undo/redo counts; a second line shows the aimed height, the current
+target and the local slope in degrees. Guides can be turned off with
+`Preview > ShowGuides`.
 
 | Action | Default key |
 | --- | --- |

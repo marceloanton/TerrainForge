@@ -316,7 +316,8 @@ namespace TerrainForge
                  "\u2022 \"Nivelar a tus pies\" (Shift): Flatten toma esa altura en " +
                  "vez de la apuntada.\n" +
                  "\u2022 El HUD (arriba a la izquierda) muestra operacion, radio, forma y " +
-                 "pintura actuales.\n" +
+                 "pintura actuales, mas una segunda linea con altura apuntada, objetivo " +
+                 "y pendiente en grados.\n" +
                  "\u2022 \"Deshacer\" (Ctrl+Z) revierte la ultima aplicacion y \"Rehacer\" " +
                  "(Ctrl+Y) la recupera. La profundidad del historial se ajusta en la " +
                  "pesta\u00F1a TECLAS (0 lo desactiva y borra lo guardado).");

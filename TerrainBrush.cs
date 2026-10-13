@@ -23,6 +23,9 @@ namespace TerrainForge
         private Texture2D _hudBg;
         private string _flashMsg;
         private float _flashUntil;
+        private float _aimY;
+        private string _targetTxt = "";
+        private float _slopeDeg;
 
         private void OnDestroy()
         {
@@ -123,6 +126,13 @@ namespace TerrainForge
                 {
                     _applying = TryApply(p, player, groundCenter);
                 }
+            }
+
+            if (equipped)
+            {
+                _aimY = groundCenter.y;
+                _targetTxt = TargetText(p, player, groundCenter);
+                _slopeDeg = SlopeDeg(groundCenter);
             }
 
             if (equipped && p.ShowPreview.Value)
@@ -287,6 +297,45 @@ namespace TerrainForge
         {
             _flashMsg = msg;
             _flashUntil = Time.time + 2.5f;
+        }
+
+        private string TargetText(TerrainForgePlugin p, Player player, Vector3 center)
+        {
+            switch (p.DefaultOperation.Value)
+            {
+                case TerrainOperation.Flatten:
+                {
+                    bool own = Held(p.AimHeightModifierKey.Value);
+                    float t = own ? GroundHeight(player.transform.position) : center.y;
+                    return string.Format("objetivo {0:0.0} m", t);
+                }
+                case TerrainOperation.Raise:
+                    return "+" + p.RaiseDelta.Value.ToString("0.#") + " m/aplic.";
+                case TerrainOperation.Lower:
+                    return "-" + p.RaiseDelta.Value.ToString("0.#") + " m/aplic.";
+                case TerrainOperation.Smooth:
+                    return "promedio vecinos";
+                case TerrainOperation.Paint:
+                    return p.Paint.Value + " " + (p.PaintStrength.Value * 100f).ToString("0") + "%";
+                case TerrainOperation.Restore:
+                    return "original";
+                case TerrainOperation.Ramp:
+                    if (_rampHasA)
+                        return string.Format("A {0:0.0} \u2192 B {1:0.0} m",
+                            GroundHeight(_rampA), center.y);
+                    return "marca A y B";
+                default:
+                    return "";
+            }
+        }
+
+        private static float SlopeDeg(Vector3 c)
+        {
+            const float e = 1f;
+            float hx = GroundHeight(c + new Vector3(e, 0f, 0f)) - GroundHeight(c - new Vector3(e, 0f, 0f));
+            float hz = GroundHeight(c + new Vector3(0f, 0f, e)) - GroundHeight(c - new Vector3(0f, 0f, e));
+            float grad = Mathf.Sqrt(hx * hx + hz * hz) / (2f * e);
+            return Mathf.Atan(grad) * Mathf.Rad2Deg;
         }
 
         private static void CyclePaint(TerrainForgePlugin p)
@@ -546,6 +595,23 @@ namespace TerrainForge
             GUI.color = prev;
 
             GUI.Label(new Rect(rect.x + 12f, rect.y, rect.width - 20f, rect.height), full, _hud);
+
+            string line2 = string.Format("apuntado {0:0.0} m   |   {1}   |   pendiente {2:0}\u00B0",
+                _aimY, _targetTxt, _slopeDeg);
+            Vector2 size2 = _hud.CalcSize(new GUIContent(line2));
+            float w2 = Mathf.Max(320f, size2.x + 28f);
+            w2 = Mathf.Min(w2, Mathf.Max(200f, Screen.width - 24f));
+            float h2 = Mathf.Max(30f, size2.y + 12f);
+            var rect2 = new Rect(12f, rect.y + rect.height + 4f, w2, h2);
+
+            GUI.color = new Color(0f, 0f, 0f, 0.55f);
+            GUI.DrawTexture(rect2, _hudBg);
+            GUI.color = prev;
+
+            Color prevText = _hud.normal.textColor;
+            _hud.normal.textColor = Color.white;
+            GUI.Label(new Rect(rect2.x + 12f, rect2.y, rect2.width - 20f, rect2.height), line2, _hud);
+            _hud.normal.textColor = prevText;
         }
 
         private void EnsureHudStyle()
