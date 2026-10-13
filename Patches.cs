@@ -266,7 +266,10 @@ namespace TerrainForge
         private static void AddButton(Menu menu)
         {
             if (menu == null || menu.m_settingsButton == null || menu.menuEntriesParent == null)
+            {
+                TerrainForgePlugin.Log?.LogWarning("TerrainForge pause menu: settings button or entries parent missing.");
                 return;
+            }
 
             Transform parent = menu.menuEntriesParent;
             if (parent.Find(ButtonName) != null)
@@ -293,6 +296,8 @@ namespace TerrainForge
                 s_updateNavigation?.Invoke(menu, null);
             }
             catch { /* mouse users unaffected */ }
+
+            TerrainForgePlugin.Log?.LogInfo("TerrainForge pause menu button added.");
         }
     }
 
