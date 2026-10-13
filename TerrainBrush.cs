@@ -27,6 +27,7 @@ namespace TerrainForge
         private float _aimY;
         private string _targetTxt = "";
         private float _slopeDeg;
+        private float _levelY = float.NaN;
         private bool _serverAllowed = true;
         private string _serverWhy;
         private bool _hasPicked;
@@ -37,6 +38,9 @@ namespace TerrainForge
         private Vector3 _rectA;
         private readonly List<Vector3> _polyPoints = new List<Vector3>();
         private float _polyLastClick = -999f;
+        private static bool s_clearMarks;
+
+        internal static void RequestClearMarks() => s_clearMarks = true;
 
         private void OnDestroy()
         {
@@ -72,6 +76,13 @@ namespace TerrainForge
             {
                 _preview.Hide();
                 return;
+            }
+
+            if (s_clearMarks)
+            {
+                s_clearMarks = false;
+                _rampHasA = false;
+                ClearShapeMarks();
             }
 
             if (p.AutoGiveTool.Value && !_toolGiven)
@@ -188,6 +199,21 @@ namespace TerrainForge
                 _aimY = groundCenter.y;
                 _targetTxt = TargetText(p, player, groundCenter);
                 _slopeDeg = SlopeDeg(groundCenter);
+
+                // Level marker: the horizontal plane Flatten/Shore (or a fixed
+                // eyedrop height) would produce, for circle/square brushes.
+                _levelY = float.NaN;
+                if (p.Shape.Value == TerrainShape.Circle || p.Shape.Value == TerrainShape.Square)
+                {
+                    if (p.DefaultOperation.Value == TerrainOperation.Shore)
+                        _levelY = TerrainEngine.WaterLevel() + p.ShoreOffset.Value;
+                    else if (p.DefaultOperation.Value == TerrainOperation.Flatten || _hasPicked)
+                        _levelY = _hasPicked
+                            ? _pickedHeight
+                            : (Held(p.AimHeightModifierKey.Value)
+                                ? GroundHeight(player.transform.position)
+                                : groundCenter.y);
+                }
             }
 
             if (equipped && p.ShowPreview.Value)
@@ -225,6 +251,9 @@ namespace TerrainForge
                     RectA = _rectA,
                     RectB = groundCenter,
                     PolyPreview = polyPreview,
+                    SlopeDeg = _slopeDeg,
+                    GuidesOn = guides,
+                    LevelY = guides ? _levelY : float.NaN,
                 });
             }
             else
@@ -302,7 +331,10 @@ namespace TerrainForge
 
             Vector3 mid = (a + ground) * 0.5f;
             if (TerrainEngine.Apply(mid, spec))
+            {
                 TerrainForgePlugin.Message(doneMsg);
+                TerrainFx.Play(mid, true);
+            }
             else
                 TerrainForgePlugin.Message("Rampa: no se pudo crear (puntos muy cortos o sin terreno).");
         }
@@ -335,7 +367,9 @@ namespace TerrainForge
                 TargetWorld = _hasPicked ? _pickedHeight : (ownHeight ? playerGround : center.y),
                 PaintStrength = p.PaintStrength.Value,
                 MaxUp = p.UnlockDeltaLimit.Value ? p.MaxUpDelta.Value : 8f,
-                MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f
+                MaxDown = p.UnlockDeltaLimit.Value ? p.MaxDownDelta.Value : 8f,
+                SmoothMode = p.SmoothMode.Value,
+                ShoreTarget = TerrainEngine.WaterLevel() + p.ShoreOffset.Value
             };
         }
 
@@ -347,7 +381,10 @@ namespace TerrainForge
             BrushSpec spec = BaseSpec(p, player, center);
 
             _lastApply = Time.time;
-            return TerrainEngine.Apply(center, spec);
+            bool ok = TerrainEngine.Apply(center, spec);
+            if (ok)
+                TerrainFx.Play(center, false);
+            return ok;
         }
 
         /// <summary>
@@ -382,6 +419,8 @@ namespace TerrainForge
                     Vector3 mid = (a + point) * 0.5f;
                     bool ok = TerrainEngine.Apply(mid, spec);
                     TerrainForgePlugin.Message(ok ? "Línea aplicada." : "Línea: sin terreno en la zona.");
+                    if (ok)
+                        TerrainFx.Play(mid, true);
                     return ok;
                 }
                 case TerrainShape.Rect:
@@ -409,6 +448,8 @@ namespace TerrainForge
                     Vector3 mid = (ra + point) * 0.5f;
                     bool ok = TerrainEngine.Apply(mid, spec);
                     TerrainForgePlugin.Message(ok ? "Rectángulo aplicado." : "Rectángulo: sin terreno en la zona.");
+                    if (ok)
+                        TerrainFx.Play(mid, true);
                     return ok;
                 }
                 case TerrainShape.Poly:
@@ -428,6 +469,8 @@ namespace TerrainForge
                         TerrainForgePlugin.Message(ok
                             ? "Polígono aplicado (" + n + " puntos)."
                             : "Polígono: sin terreno en la zona.");
+                        if (ok)
+                            TerrainFx.Play(c, true);
                         return ok;
                     }
                     if (_polyPoints.Count == 0 ||
@@ -496,7 +539,7 @@ namespace TerrainForge
 
         private static void CycleOperation(TerrainForgePlugin p)
         {
-            p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 7);
+            p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 8);
         }
 
         private static void CycleShape(TerrainForgePlugin p)
@@ -592,7 +635,15 @@ namespace TerrainForge
                 case TerrainOperation.Lower:
                     return "-" + p.RaiseDelta.Value.ToString("0.#") + " m/aplic.";
                 case TerrainOperation.Smooth:
-                    return "promedio vecinos";
+                    switch (p.SmoothMode.Value)
+                    {
+                        case SmoothMode.Bumps: return "solo lomos";
+                        case SmoothMode.Dips: return "solo hoyos";
+                        default: return "promedio vecinos";
+                    }
+                case TerrainOperation.Shore:
+                    return string.Format("costa {0:0.0} m",
+                        TerrainEngine.WaterLevel() + p.ShoreOffset.Value);
                 case TerrainOperation.Paint:
                     return p.Paint.Value + " " + (p.PaintStrength.Value * 100f).ToString("0") + "%";
                 case TerrainOperation.Restore:
@@ -816,6 +867,7 @@ namespace TerrainForge
                 case TerrainOperation.Smooth: return new Color(0.40f, 0.92f, 0.92f);
                 case TerrainOperation.Restore: return new Color(0.90f, 0.45f, 0.95f);
                 case TerrainOperation.Ramp: return new Color(0.98f, 0.78f, 0.40f);
+                case TerrainOperation.Shore: return new Color(0.93f, 0.87f, 0.66f);
                 case TerrainOperation.Paint: return PaintColor(p.Paint.Value);
                 default: return new Color(0.45f, 0.92f, 0.50f);
             }
@@ -960,6 +1012,40 @@ namespace TerrainForge
         {
             c.a = a;
             return c;
+        }
+    }
+
+    /// <summary>
+    /// One-shot feedback (dust + thud) when the brush writes terrain. Reuses the
+    /// tool's own terrain-hit effect, so no prefab names are needed. Local only,
+    /// throttled while holding, always on discrete applications.
+    /// </summary>
+    internal static class TerrainFx
+    {
+        private static float _last;
+
+        public static void Play(Vector3 pos, bool force)
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p != null && p.PlayEffects != null && !p.PlayEffects.Value)
+                return;
+            if (!force && Time.time - _last < 0.6f)
+                return;
+            _last = Time.time;
+
+            try
+            {
+                EffectList fx = TerrainTool.Shared != null
+                    ? TerrainTool.Shared.m_hitTerrainEffect
+                    : null;
+                if (fx == null)
+                    return;
+                fx.Create(pos + new Vector3(0f, 0.3f, 0f), Quaternion.identity);
+            }
+            catch
+            {
+                // Feedback must never break an edit.
+            }
         }
     }
 }

@@ -23,6 +23,9 @@ namespace TerrainForge
         public Vector3 RectA;
         public Vector3 RectB;
         public Vector3[] PolyPreview;
+        public float SlopeDeg;
+        public bool GuidesOn;
+        public float LevelY; // NaN = hide the target-level marker
     }
 
     /// <summary>
@@ -50,6 +53,7 @@ namespace TerrainForge
         private LineRenderer _rampR;     // ramp corridor right edge (world)
         private LineRenderer _rect;      // rectangle footprint outline (world)
         private LineRenderer _poly;      // polygon footprint outline (world)
+        private LineRenderer _level;     // target-level marker ring (world)
 
         private Vector3[] _unitRing;
 
@@ -86,6 +90,7 @@ namespace TerrainForge
             _rampR = MakeLine("rampR", 0, true);
             _rect = MakeLine("rect", 0, true);
             _poly = MakeLine("poly", 0, true);
+            _level = MakeLine("level", 2, true);
 
             BuildRing();
             _root.SetActive(false);
@@ -170,7 +175,17 @@ namespace TerrainForge
             SetWidth(_rampR, w * 0.42f);
 
             Color c = s.Color;
-            SetColor(_edge, c);
+            // Slope shading: tint the footprint edge toward red as the ground
+            // under the aim gets steeper (guides only, op color is preserved
+            // on flat ground).
+            Color edgeC = c;
+            if (s.GuidesOn && s.SlopeDeg > 15f)
+            {
+                edgeC = Color.Lerp(c,
+                    new Color(1f, 0.3f, 0.25f, c.a),
+                    Mathf.Clamp01((s.SlopeDeg - 15f) / 30f));
+            }
+            SetColor(_edge, edgeC);
             SetColor(_full, Col(c, 0.42f));
             SetColor(_reach, Col(c, 0.20f));
             SetColor(_aim, Col(c, 0.15f));
@@ -290,6 +305,43 @@ namespace TerrainForge
                 SetActive(_poly, false);
             }
 
+            // Target-level marker: a horizontal ring at the height Flatten /
+            // Shore (or a fixed eyedrop height) would produce. Terrain occludes
+            // it naturally, so it reads as a contour line on slopes.
+            if (!suppress && !float.IsNaN(s.LevelY))
+            {
+                float ly = s.LevelY + 0.05f;
+                if (s.Shape == TerrainShape.Square)
+                {
+                    float r = s.Radius;
+                    _level.positionCount = 5;
+                    _level.SetPosition(0, new Vector3(s.Center.x - r, ly, s.Center.z - r));
+                    _level.SetPosition(1, new Vector3(s.Center.x - r, ly, s.Center.z + r));
+                    _level.SetPosition(2, new Vector3(s.Center.x + r, ly, s.Center.z + r));
+                    _level.SetPosition(3, new Vector3(s.Center.x + r, ly, s.Center.z - r));
+                    _level.SetPosition(4, new Vector3(s.Center.x - r, ly, s.Center.z - r));
+                }
+                else
+                {
+                    _level.positionCount = Segments + 1;
+                    for (int k = 0; k < Segments; k++)
+                    {
+                        float a = (float)k / Segments * Mathf.PI * 2f;
+                        _level.SetPosition(k, new Vector3(
+                            s.Center.x + Mathf.Cos(a) * s.Radius, ly,
+                            s.Center.z + Mathf.Sin(a) * s.Radius));
+                    }
+                    _level.SetPosition(Segments, _level.GetPosition(0));
+                }
+                SetWidth(_level, w * 0.45f);
+                SetColor(_level, Col(c, 0.55f));
+                SetActive(_level, true);
+            }
+            else
+            {
+                SetActive(_level, false);
+            }
+
             if (!_root.activeSelf)
                 _root.SetActive(true);
         }
@@ -360,6 +412,7 @@ namespace TerrainForge
                 _rampR = null;
                 _rect = null;
                 _poly = null;
+                _level = null;
             }
         }
 

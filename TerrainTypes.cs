@@ -10,7 +10,15 @@ namespace TerrainForge
         Smooth,
         Paint,
         Restore,
-        Ramp
+        Ramp,
+        Shore
+    }
+
+    public enum SmoothMode
+    {
+        Full,
+        Bumps,
+        Dips
     }
 
     public enum TerrainShape
@@ -66,6 +74,8 @@ namespace TerrainForge
         public float PaintStrength;  // 0..1
         public float MaxUp;          // clamp on levelDelta above base
         public float MaxDown;        // clamp on levelDelta below base (positive number)
+        public SmoothMode SmoothMode;// Full = blur both ways, Bumps = only lower, Dips = only raise
+        public float ShoreTarget;    // world Y used by the Shore operation
 
         // Two-point ramp: when set, a straight ramp is built along the A->B segment
         // (width = Radius) instead of using the circular brush footprint.

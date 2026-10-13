@@ -65,7 +65,11 @@ target and the local slope in degrees. Guides can be turned off with
 | Open the key binding + help menu | `F5` |
 
 Operations cycle through: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`,
-`Restore`.
+`Restore`, `Shore` (flattens toward water level + offset, for beaches).
+
+Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab):
+operation / shape / paint / ramp-mode / smooth-mode, all sizes via sliders and
+every toggle. Saved when the menu closes.
 
 Shapes cycle through: `Circle`, `Square`, `Line`, `Rect`, `Poly` (`.` key).
 `Line`/`Rect` are marked with two `Apply` presses (A then B; line half-width =

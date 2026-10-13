@@ -558,6 +558,22 @@ namespace TerrainForge
 
                         float avg = n > 0 ? sum / n : curWorld;
                         float newWorld = Mathf.Lerp(curWorld, avg, w);
+                        bool dirOk = spec.SmoothMode == SmoothMode.Full ||
+                            (spec.SmoothMode == SmoothMode.Bumps && newWorld < curWorld) ||
+                            (spec.SmoothMode == SmoothMode.Dips && newWorld > curWorld);
+                        if (dirOk && (Mathf.Abs(newWorld - curWorld) > 0.0001f || !ModH[idx]))
+                        {
+                            if (Rec != null)
+                                Rec.Add(idx);
+                            Level[idx] = ClampDelta(Level[idx] + (newWorld - curWorld), spec);
+                            ModH[idx] = true;
+                            Any = true;
+                        }
+                        break;
+                    }
+                    case TerrainOperation.Shore:
+                    {
+                        float newWorld = Mathf.Lerp(curWorld, spec.ShoreTarget, w);
                         if (Mathf.Abs(newWorld - curWorld) > 0.0001f || !ModH[idx])
                         {
                             if (Rec != null)
@@ -989,6 +1005,13 @@ namespace TerrainForge
             if (ZoneSystem.instance != null)
                 return ZoneSystem.instance.GetGroundHeight(pos);
             return pos.y;
+        }
+
+        internal static float WaterLevel()
+        {
+            if (ZoneSystem.instance != null)
+                return ZoneSystem.instance.m_waterLevel;
+            return ZoneSystem.c_WaterLevel;
         }
 
         private static Color PaintColor(TerrainPaint paint)

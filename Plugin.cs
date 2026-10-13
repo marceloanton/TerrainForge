@@ -18,6 +18,7 @@ namespace TerrainForge
 
         // General
         public ConfigEntry<bool> Enabled;
+        public ConfigEntry<bool> PlayEffects;
 
         // Brush
         public ConfigEntry<float> Radius;
@@ -33,6 +34,8 @@ namespace TerrainForge
         public ConfigEntry<TerrainPaint> Paint;
         public ConfigEntry<RampMode> RampMode;
         public ConfigEntry<float> SlopeAngle;
+        public ConfigEntry<SmoothMode> SmoothMode;
+        public ConfigEntry<float> ShoreOffset;
 
         // Limits
         public ConfigEntry<bool> UnlockDeltaLimit;
@@ -83,6 +86,8 @@ namespace TerrainForge
 
             Enabled = Config.Bind("General", "Enabled", true,
                 "Master switch for TerrainForge.");
+            PlayEffects = Config.Bind("General", "PlayEffects", true,
+                "Play the tool's terrain-hit effect (dust + thud) when the brush applies.");
 
             Radius = Config.Bind("Brush", "Radius", 8f,
                 new ConfigDescription("Brush radius in meters.", new AcceptableValueRange<float>(1f, 100f)));
@@ -112,6 +117,11 @@ namespace TerrainForge
                 new ConfigDescription("Slope used by fixed-angle ramps (degrees). " +
                     "Adjust in-game with Alt + radius keys/wheel while Ramp is selected.",
                     new AcceptableValueRange<float>(5f, 60f)));
+            SmoothMode = Config.Bind("Brush", "SmoothMode", global::TerrainForge.SmoothMode.Full,
+                "Smooth behavior: Full blurs both ways, Bumps only lowers bumps, Dips only fills dips.");
+            ShoreOffset = Config.Bind("Brush", "ShoreOffset", 0.5f,
+                new ConfigDescription("Height above the water level targeted by the Shore operation (meters).",
+                    new AcceptableValueRange<float>(-2f, 5f)));
 
             UnlockDeltaLimit = Config.Bind("Limits", "UnlockDeltaLimit", true,
                 "Replace the hard-coded +/-8 m clamp so edits beyond 8 m survive terrain regeneration. " +

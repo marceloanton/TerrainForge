@@ -94,12 +94,16 @@ Implemented (`Plugin.cs` `Server` section + `TerrainBrush.ServerAllows` gate):
 
 **Effort:** M | **Risk:** low–medium
 
-## Phase 4 – "Smooth" polish + selective smooth (optional next)
-Current smooth is 3x3 blur of original neighbours – good. Add "smooth selective": only where `|cur - avg| > threshold` or only up/down? Or `Gaussian` small kernel? Also "smooth along path" later.
+## Phase 4 – "Smooth" polish + selective smooth — DONE
+`SmoothMode { Full, Bumps, Dips }` (`Brush > SmoothMode`, AJUSTES cycler, HUD
+shows `promedio vecinos` / `solo lomos` / `solo hoyos`): the 3x3 blur only writes
+when moving in the allowed direction. Smooth-along-path = Line shape + Smooth op
+(composition, no extra code).
 
-But keep minimal: maybe `SmoothMode { Full, UpOnly, DownOnly }` in enum + config + HUD.
-
-**Files:** `TerrainTypes.cs`, `TerrainEngine.cs` (filter), `TerrainBrush.cs` (cycle mode), `KeybindMenu.cs` help.
+**Acceptance**
+- [x] Selective smoothing in both directions
+- [x] Path smoothing via Line footprint
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** S | **Risk:** low
 
@@ -170,18 +174,35 @@ Need to mirror Jotunn's clone carefully (instantiate, copy components, don't tou
 
 **Effort:** M–L | **Risk:** medium (networking/prefab lifecycle)
 
-## Phase 9 – Localisation + radial + profiles
+## Phase 9 – Localisation + radial + profiles — PENDING (final technical batch)
 - Localisation: simple CSV/JSON or `LocalizationManager`? But if removing Jotunn maybe own. Or use BepInEx config text + translate keys in `KeybindMenu`.
 - Radial: IMGUI radial or Unity UI? Keep IMGUI to avoid extra assets. Draw pie, highlight sector, click to select.
 - Profiles: save `Radius`, `Softness`, `Operation`, `Shape`, `Paint`, `FalloffPower` as named sets in config or separate file.
 
 **Effort:** M | **Risk:** low
 
+## Remaining gameplay/visual items — DONE in the "finish the roadmap" batch
+- **Shore / beach** (`TerrainOperation.Shore`, 8th op): flattens toward
+  `ZoneSystem` water level + `Brush > ShoreOffset`, softness blending, sandy
+  preview color, HUD target, undo support.
+- **Slope shading in preview**: footprint edge tints toward red past 15° of
+  slope (guides only).
+- **Level markers**: target-level ring for Flatten/Shore/eyedrop (reads as a
+  contour on slopes, occluded by terrain).
+- **Sound/particles**: `TerrainFx` reuses the tool's own `m_hitTerrainEffect`
+  (no prefab names); throttled while holding, always on discrete applications;
+  `General > PlayEffects` toggle.
+- **Full F5 menu integration**: new AJUSTES tab with cyclers (operation, shape,
+  paint, ramp mode, smooth mode), sliders (radius, softness, ramp angle,
+  raise/lower, paint strength, falloff, shore offset) and every toggle;
+  config saved on menu close; mark state cleared when cycling from the menu.
+
 ## Suggested immediate order
 1. **Undo/Redo** (Phase 1) – biggest quality-of-life, directly requested.
 2. **HUD live data** (Phase 2) – quick win, useful for all ops.
 3. **Server permissions** (Phase 3) – multiplayer safety.
-4. **Remove Jotunn** (Phase 8) – matches "depend lo menos posible" goal.
+4. ~~**Remove Jotunn** (Phase 8)~~ – postponed by decision (server authority leans
+   on its config sync; revisit on a concrete need).
 5. **Slope fixed + Eyedropper** (6–5) – very practical.
 6. **Forms** (7) – most work, highest UX.
 

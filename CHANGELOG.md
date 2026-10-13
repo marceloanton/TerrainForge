@@ -29,6 +29,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   edges from radius + softness) and `Poly` (one point per press, double-press
   with 3+ points closes and applies). All area operations work over them, with
   undo support and HUD + preview state.
+- **In-game AJUSTES tab** (F5 menu): everything is now editable live without
+  touching the config file — operation / shape / paint / ramp-mode / smooth-mode
+  cyclers, sliders (radius, softness, ramp angle, raise-lower meters, paint
+  strength, falloff, shore offset) and all toggles (preview, guides, effects,
+  no-cost, protected zones, delta limit, server authority). Saved on menu close.
+- **Smooth modes**: `Full` blurs both ways, `Bumps` only lowers bumps, `Dips`
+  only fills dips (AJUSTES cycler). Line shape + Smooth = smoothing along a path.
+- **Shore operation**: flattens toward the water level plus an offset (beaches /
+  coastlines), with softness blending like Flatten.
+- **Preview upgrades**: footprint edge tints toward red on steep ground (slope
+  shading) and Flatten/Shore show a target-level marker ring that reads as a
+  contour on slopes.
+- **Feedback effects**: the tool's own terrain-hit effect (dust + thud) plays on
+  every application (throttled while holding, always on ramps/shapes); toggle
+  with `General > PlayEffects`.
 - **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
   When the server runs the mod, its values win through config sync and clients
   cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the
