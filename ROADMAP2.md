@@ -134,10 +134,16 @@ Save terrain to disk and restore it later (backups, sharing designs).
 - `TerrainBrush.cs`: thin call wrappers + messages. `KeybindMenu.cs`: UI + help.
 - `TerrainTypes.cs`: `Loc` keys.
 
+Implemented: `TFSS` v1 binary (magic + version + per-tile arrays), history comps
+as the snapshot set, two-pass import (resolve + own everything before writing),
+diff-write through the recorder (import is undoable), 12-file cap,
+`BepInEx/config/TerrainForge/snapshots/`, AJUSTES UI mirroring presets.
+
 **Acceptance**
-- [ ] Snapshot → flatten the area → import → terrain back, then undo the import
-- [ ] Missing-tile import reports cleanly; corrupt file never half-applies
-- [ ] 12-file cap, both languages
+- [x] Snapshot → flatten the area → import → terrain back, then undo the import
+- [x] Missing-tile import reports cleanly; corrupt file never half-applies
+- [x] 12-file cap, both languages
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** M–L | **Risk:** medium (file IO, format)
 

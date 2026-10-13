@@ -1174,6 +1174,447 @@ namespace TerrainForge
             return ZoneSystem.c_WaterLevel;
         }
 
+        // ---- terrain snapshots -------------------------------------------------
+
+        private const string SnapMagic = "TFSS";
+        private const int SnapVersion = 1;
+        private const int MaxSnapshots = 12;
+
+        private sealed class SnapComp
+        {
+            public float TileX, TileZ;
+            public int Width;
+            public float[] Level, Smooth;
+            public bool[] ModH, ModP;
+            public Color[] Paint;
+        }
+
+        private sealed class ReadySnap
+        {
+            public TerrainComp Comp;
+            public Heightmap Hm;
+            public SnapComp Rec;
+        }
+
+        private static string SnapDir()
+        {
+            string dir = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, "TerrainForge", "snapshots");
+            System.IO.Directory.CreateDirectory(dir);
+            return dir;
+        }
+
+        private static string SanitizeSnapshotName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+            char[] invalid = System.IO.Path.GetInvalidFileNameChars();
+            var sb = new System.Text.StringBuilder(name.Trim());
+            for (int i = 0; i < sb.Length; i++)
+            {
+                for (int k = 0; k < invalid.Length; k++)
+                {
+                    if (sb[i] == invalid[k])
+                    {
+                        sb[i] = '_';
+                        break;
+                    }
+                }
+            }
+            string clean = sb.ToString().Trim();
+            if (clean.Length == 0)
+                return null;
+            if (clean.Length > 60)
+                clean = clean.Substring(0, 60);
+            return clean;
+        }
+
+        public static List<string> SnapshotNames()
+        {
+            var list = new List<string>();
+            try
+            {
+                string[] files = System.IO.Directory.GetFiles(SnapDir(), "*.dat");
+                System.Array.Sort(files);
+                for (int i = 0; i < files.Length; i++)
+                    list.Add(System.IO.Path.GetFileNameWithoutExtension(files[i]));
+            }
+            catch { }
+            return list;
+        }
+
+        public static bool DeleteSnapshot(string name)
+        {
+            try
+            {
+                name = SanitizeSnapshotName(name);
+                if (string.IsNullOrEmpty(name))
+                    return false;
+                string path = System.IO.Path.Combine(SnapDir(), name + ".dat");
+                if (!System.IO.File.Exists(path))
+                    return false;
+                System.IO.File.Delete(path);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool ExportSnapshot(string name, out string message)
+        {
+            message = null;
+            Cache();
+            name = SanitizeSnapshotName(name);
+            if (string.IsNullOrEmpty(name))
+            {
+                message = Loc.T("snap.badname");
+                return false;
+            }
+
+            var comps = new List<TerrainComp>();
+            var tiles = new List<Vector3>();
+            var widths = new List<int>();
+            CollectHistoryComps(s_undo, comps, tiles, widths);
+            CollectHistoryComps(s_redo, comps, tiles, widths);
+
+            var records = new List<SnapComp>();
+            for (int i = 0; i < comps.Count; i++)
+            {
+                TerrainComp comp = comps[i];
+                float[] level = LevelDelta(comp);
+                float[] smooth = SmoothDelta(comp);
+                bool[] modH = null;
+                Color[] paint = PaintMask(comp);
+                bool[] modP = ModifiedPaint(comp);
+                try { modH = (bool[])f_modifiedHeight.GetValue(comp); }
+                catch { modH = null; }
+                if (level == null || smooth == null || modH == null || paint == null || modP == null)
+                    continue;
+                int pitch = widths[i] + 1;
+                if (level.Length != pitch * pitch)
+                    continue;
+                records.Add(new SnapComp
+                {
+                    TileX = tiles[i].x,
+                    TileZ = tiles[i].z,
+                    Width = widths[i],
+                    Level = (float[])level.Clone(),
+                    Smooth = (float[])smooth.Clone(),
+                    ModH = (bool[])modH.Clone(),
+                    Paint = (Color[])paint.Clone(),
+                    ModP = (bool[])modP.Clone()
+                });
+            }
+
+            if (records.Count == 0)
+            {
+                message = Loc.T("snap.empty");
+                return false;
+            }
+
+            try
+            {
+                string dir = SnapDir();
+                string path = System.IO.Path.Combine(dir, name + ".dat");
+                if (!System.IO.File.Exists(path) &&
+                    System.IO.Directory.GetFiles(dir, "*.dat").Length >= MaxSnapshots)
+                {
+                    message = Loc.T("snap.max");
+                    return false;
+                }
+                using (var fs = new System.IO.FileStream(path, System.IO.FileMode.Create,
+                    System.IO.FileAccess.Write, System.IO.FileShare.None))
+                using (var w = new System.IO.BinaryWriter(fs))
+                {
+                    w.Write(SnapMagic);
+                    w.Write(SnapVersion);
+                    w.Write(records.Count);
+                    for (int i = 0; i < records.Count; i++)
+                    {
+                        SnapComp r = records[i];
+                        w.Write(r.TileX);
+                        w.Write(r.TileZ);
+                        w.Write(r.Width);
+                        WriteFloats(w, r.Level);
+                        WriteFloats(w, r.Smooth);
+                        WriteBools(w, r.ModH);
+                        WriteColors(w, r.Paint);
+                        WriteBools(w, r.ModP);
+                    }
+                }
+                message = Loc.F("snap.saved", name, records.Count);
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                message = Loc.F("snap.ioerror", e.Message);
+                return false;
+            }
+        }
+
+        public static bool ImportSnapshot(string name, out string message)
+        {
+            message = null;
+            Cache();
+            name = SanitizeSnapshotName(name);
+            if (string.IsNullOrEmpty(name))
+            {
+                message = Loc.T("snap.badname");
+                return false;
+            }
+
+            List<SnapComp> records;
+            try
+            {
+                records = ReadSnapshot(name);
+            }
+            catch (System.Exception e)
+            {
+                message = Loc.F("snap.ioerror", e.Message);
+                return false;
+            }
+            if (records == null || records.Count == 0)
+            {
+                message = Loc.T("snap.badfile");
+                return false;
+            }
+
+            // Pass 1: resolve + own everything first so a failure never half-applies.
+            var ready = new List<ReadySnap>();
+            int missing = 0;
+            for (int i = 0; i < records.Count; i++)
+            {
+                SnapComp r = records[i];
+                var found = new List<Heightmap>();
+                Heightmap.FindHeightmap(new Vector3(r.TileX, 0f, r.TileZ), 2f, found);
+                TerrainComp comp = null;
+                Heightmap hm = null;
+                for (int k = 0; k < found.Count; k++)
+                {
+                    TerrainComp c = found[k] != null ? found[k].GetAndCreateTerrainCompiler() : null;
+                    if (c != null)
+                    {
+                        comp = c;
+                        hm = found[k];
+                        break;
+                    }
+                }
+                if (comp == null)
+                {
+                    missing++;
+                    continue;
+                }
+                int w = 0;
+                try { w = Width(comp); }
+                catch { w = 0; }
+                if (w != r.Width || (w + 1) * (w + 1) != r.Level.Length || !EnsureOwnership(comp))
+                {
+                    missing++;
+                    continue;
+                }
+                ready.Add(new ReadySnap { Comp = comp, Hm = hm, Rec = r });
+            }
+
+            if (ready.Count == 0)
+            {
+                message = missing > 0 ? Loc.F("snap.missing", missing) : Loc.T("snap.badfile");
+                return false;
+            }
+
+            // Pass 2: diff-write through the recorder, so the import is undoable.
+            var frame = new List<UndoEntry>();
+            float minx = float.MaxValue, maxx = float.MinValue;
+            float minz = float.MaxValue, maxz = float.MinValue;
+            for (int i = 0; i < ready.Count; i++)
+            {
+                TerrainComp comp = ready[i].Comp;
+                Heightmap hm = ready[i].Hm;
+                SnapComp r = ready[i].Rec;
+                float[] level = LevelDelta(comp);
+                float[] smooth = SmoothDelta(comp);
+                bool[] modH = null;
+                Color[] paint = PaintMask(comp);
+                bool[] modP = ModifiedPaint(comp);
+                try { modH = (bool[])f_modifiedHeight.GetValue(comp); }
+                catch { modH = null; }
+                if (level == null || smooth == null || modH == null || paint == null || modP == null)
+                    continue;
+                if (level.Length != r.Level.Length)
+                    continue;
+
+                var rec = new Recorder(level, smooth, modH, paint, modP);
+                bool any = false;
+                for (int idx = 0; idx < r.Level.Length; idx++)
+                {
+                    if (level[idx] != r.Level[idx] || smooth[idx] != r.Smooth[idx] ||
+                        modH[idx] != r.ModH[idx] || paint[idx] != r.Paint[idx] || modP[idx] != r.ModP[idx])
+                    {
+                        rec.Add(idx);
+                        level[idx] = r.Level[idx];
+                        smooth[idx] = r.Smooth[idx];
+                        modH[idx] = r.ModH[idx];
+                        paint[idx] = r.Paint[idx];
+                        modP[idx] = r.ModP[idx];
+                        any = true;
+                    }
+                }
+                if (any && rec.Cells.Count > 0)
+                {
+                    frame.Add(new UndoEntry
+                    {
+                        Comp = comp,
+                        Hm = hm,
+                        WithSmooth = true,
+                        WithPaint = true,
+                        Before = rec.Cells
+                    });
+                    Save(comp);
+                    if (hm != null)
+                    {
+                        try { hm.Poke(0); }
+                        catch { }
+                    }
+                    if (r.TileX < minx) minx = r.TileX;
+                    if (r.TileX > maxx) maxx = r.TileX;
+                    if (r.TileZ < minz) minz = r.TileZ;
+                    if (r.TileZ > maxz) maxz = r.TileZ;
+                }
+            }
+
+            Vector3 center = new Vector3((minx + maxx) * 0.5f, 0f, (minz + maxz) * 0.5f);
+            float radius = Mathf.Max(maxx - minx, maxz - minz) * 0.5f + 4f;
+            if (frame.Count > 0)
+            {
+                PushUndo(new UndoFrame
+                {
+                    Label = "Snapshot:" + name,
+                    Center = center,
+                    Radius = radius,
+                    Entries = frame
+                });
+                if (ClutterSystem.instance != null)
+                    ClutterSystem.instance.ResetGrass(center, radius + 1f);
+            }
+
+            message = Loc.F("snap.loaded", name) +
+                (missing > 0 ? " " + Loc.F("snap.missing", missing) : "");
+            return true;
+        }
+
+        private static void CollectHistoryComps(List<UndoFrame> stack, List<TerrainComp> comps,
+            List<Vector3> tiles, List<int> widths)
+        {
+            for (int f = 0; f < stack.Count; f++)
+            {
+                List<UndoEntry> entries = stack[f].Entries;
+                if (entries == null)
+                    continue;
+                for (int i = 0; i < entries.Count; i++)
+                {
+                    UndoEntry e = entries[i];
+                    if (e == null || e.Comp == null || comps.Contains(e.Comp))
+                        continue;
+                    Vector3 tp = e.Hm != null ? e.Hm.transform.position : e.Comp.transform.position;
+                    int w = 0;
+                    try { w = Width(e.Comp); }
+                    catch { w = 0; }
+                    if (w <= 0)
+                        continue;
+                    comps.Add(e.Comp);
+                    tiles.Add(tp);
+                    widths.Add(w);
+                }
+            }
+        }
+
+        private static List<SnapComp> ReadSnapshot(string name)
+        {
+            string path = System.IO.Path.Combine(SnapDir(), name + ".dat");
+            using (var fs = new System.IO.FileStream(path, System.IO.FileMode.Open,
+                System.IO.FileAccess.Read, System.IO.FileShare.Read))
+            using (var r = new System.IO.BinaryReader(fs))
+            {
+                if (r.ReadString() != SnapMagic)
+                    return null;
+                if (r.ReadInt32() != SnapVersion)
+                    return null;
+                int count = r.ReadInt32();
+                if (count < 0 || count > 512)
+                    return null;
+                var list = new List<SnapComp>();
+                for (int i = 0; i < count; i++)
+                {
+                    var rec = new SnapComp
+                    {
+                        TileX = r.ReadSingle(),
+                        TileZ = r.ReadSingle(),
+                        Width = r.ReadInt32()
+                    };
+                    if (rec.Width <= 0 || rec.Width > 512)
+                        return null;
+                    int len = (rec.Width + 1) * (rec.Width + 1);
+                    rec.Level = ReadFloats(r, len);
+                    rec.Smooth = ReadFloats(r, len);
+                    rec.ModH = ReadBools(r, len);
+                    rec.Paint = ReadColors(r, len);
+                    rec.ModP = ReadBools(r, len);
+                    if (rec.Level == null || rec.Smooth == null || rec.ModH == null ||
+                        rec.Paint == null || rec.ModP == null)
+                        return null;
+                    list.Add(rec);
+                }
+                return list;
+            }
+        }
+
+        private static void WriteFloats(System.IO.BinaryWriter w, float[] a)
+        {
+            for (int i = 0; i < a.Length; i++)
+                w.Write(a[i]);
+        }
+
+        private static float[] ReadFloats(System.IO.BinaryReader r, int len)
+        {
+            var a = new float[len];
+            for (int i = 0; i < len; i++)
+                a[i] = r.ReadSingle();
+            return a;
+        }
+
+        private static void WriteBools(System.IO.BinaryWriter w, bool[] a)
+        {
+            for (int i = 0; i < a.Length; i++)
+                w.Write(a[i] ? (byte)1 : (byte)0);
+        }
+
+        private static bool[] ReadBools(System.IO.BinaryReader r, int len)
+        {
+            var a = new bool[len];
+            for (int i = 0; i < len; i++)
+                a[i] = r.ReadByte() != 0;
+            return a;
+        }
+
+        private static void WriteColors(System.IO.BinaryWriter w, Color[] a)
+        {
+            for (int i = 0; i < a.Length; i++)
+            {
+                w.Write(a[i].r);
+                w.Write(a[i].g);
+                w.Write(a[i].b);
+                w.Write(a[i].a);
+            }
+        }
+
+        private static Color[] ReadColors(System.IO.BinaryReader r, int len)
+        {
+            var a = new Color[len];
+            for (int i = 0; i < len; i++)
+                a[i] = new Color(r.ReadSingle(), r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+            return a;
+        }
+
         private static Color PaintColor(TerrainPaint paint)
         {
             switch (paint)

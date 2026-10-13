@@ -76,6 +76,12 @@ Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab):
 operation / shape / paint / ramp-mode / smooth-mode, all sizes via sliders and
 every toggle. Saved when the menu closes.
 
+**Terrain snapshots** (backups) live in the same tab: name a snapshot to save
+every edited tile to `BepInEx/config/TerrainForge/snapshots/<name>.dat`, then
+load it back later (even in another session). Importing restores the arrays
+with ownership and is itself undoable; tiles that are not loaded report
+cleanly, so import near the place.
+
 Shapes cycle through: `Circle`, `Square`, `Line`, `Rect`, `Poly` (`.` key).
 `Line`/`Rect` are marked with two `Apply` presses (A then B; line half-width =
 brush radius, rect corners define the area with soft edges). `Poly` adds one

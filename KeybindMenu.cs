@@ -204,6 +204,7 @@ namespace TerrainForge
         private string _presetName = "";
         private ModLanguage _langBuilt;
         private string _fixedHeightText;
+        private string _snapshotName = "";
 
         private GUIStyle _winStyle;
         private GUIStyle _headerStyle;
@@ -502,6 +503,46 @@ namespace TerrainForge
             }
         }
 
+        private void DrawSnapshots()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("set.profilename"), _rowStyle, GUILayout.Width(90f), GUILayout.Height(26f));
+            _snapshotName = GUILayout.TextField(_snapshotName ?? "", GUILayout.Height(26f));
+            if (GUILayout.Button(Loc.T("set.profilesave"), _btnStyle, GUILayout.Width(130f), GUILayout.Height(26f)))
+            {
+                if (!string.IsNullOrEmpty((_snapshotName ?? "").Trim()))
+                {
+                    if (TerrainEngine.ExportSnapshot(_snapshotName.Trim(), out string msg))
+                        _snapshotName = "";
+                    TerrainForgePlugin.Message(msg);
+                }
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            List<string> names = TerrainEngine.SnapshotNames();
+            if (names.Count == 0)
+            {
+                GUILayout.Label(Loc.T("set.snapshotempty"), _hintStyle);
+                return;
+            }
+            for (int i = 0; i < names.Count; i++)
+            {
+                string nm = names[i];
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(nm, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+                if (GUILayout.Button(Loc.T("set.profileload"), _btnStyle, GUILayout.Width(120f), GUILayout.Height(26f)))
+                {
+                    TerrainEngine.ImportSnapshot(nm, out string msg);
+                    TerrainForgePlugin.Message(msg);
+                }
+                if (GUILayout.Button("X", _btnStyle, GUILayout.Width(60f), GUILayout.Height(26f)))
+                    TerrainEngine.DeleteSnapshot(nm);
+                GUILayout.EndHorizontal();
+                GUILayout.Space(3f);
+            }
+        }
+
         private void DrawHistorySection()
         {
             TerrainForgePlugin p = TerrainForgePlugin.Instance;
@@ -589,6 +630,9 @@ namespace TerrainForge
 
             SettingHeader(Loc.T("set.profiles"));
             DrawPresets(p);
+
+            SettingHeader(Loc.T("set.snapshots"));
+            DrawSnapshots();
 
             CycleRow(Loc.T("set.language"), p.Language.Value.ToString(), () =>
             {
