@@ -299,7 +299,12 @@ namespace TerrainForge
                     RampA = isRamp
                         ? (p.RampMode.Value == RampMode.Path && pathMarking ? _rampPath[_rampPath.Count - 1] : _rampA)
                         : _lineA,
-                    SuppressCircles = lineMarking || rectMarking || polyMarking || pathMarking,
+                    // Non-circular shapes never show the round footprint: only the
+                    // marked outline (line corridor, rect, poly trail) is drawn.
+                    SuppressCircles = pathMarking ||
+                        (!isRamp && (p.Shape.Value == TerrainShape.Line ||
+                                     p.Shape.Value == TerrainShape.Rect ||
+                                     p.Shape.Value == TerrainShape.Poly)),
                     HasRect = rectMarking,
                     RectA = _rectA,
                     RectB = groundCenter,

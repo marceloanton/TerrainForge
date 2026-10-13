@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Line/Rect/Poly shapes never show the round guides (edge, full-strength, max
+  radius and aim-distance rings were meaningless there); only the marked
+  outline (corridor, rectangle, trail) is drawn.
+
+### Fixed
+
 - **Seamless Smooth**: border vertices now sample the neighbouring tile across
   the edge (exact vertex mapping), so smoothing blends both sides instead of
   opening a visible seam/crack in the mesh between tiles. Applies to every
