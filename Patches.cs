@@ -250,19 +250,28 @@ namespace TerrainForge
         private const string ButtonName = "TerrainForgeButton";
         private static MethodInfo s_updateNavigation;
         private static bool s_logged;
+        private static bool s_failed;
 
-        [HarmonyPatch(typeof(Menu), "Start")]
-        [HarmonyPatch(typeof(Menu), "Show")]
-        [HarmonyPostfix]
-        private static void Postfix(Menu __instance)
+        /// <summary>
+        /// Called every frame from the mod menu's Update: installs (or reinstalls)
+        /// the pause menu button as soon as the game's Menu exists. Needs no
+        /// Harmony hook, so it cannot silently miss its target.
+        /// </summary>
+        internal static void Ensure()
         {
+            if (s_failed)
+                return;
             try
             {
-                AddButton(__instance);
+                Menu menu = Menu.instance;
+                if (menu == null)
+                    return;
+                AddButton(menu);
             }
             catch (Exception e)
             {
-                TerrainForgePlugin.Log?.LogWarning("TerrainForge pause menu button failed: " + e.Message);
+                s_failed = true;
+                TerrainForgePlugin.Log?.LogWarning("TerrainForge pause menu hook failed: " + e.Message);
             }
         }
 

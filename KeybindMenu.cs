@@ -273,6 +273,8 @@ namespace TerrainForge
             if (p == null)
                 return;
 
+            PauseMenuPatch.Ensure();
+
             if (_capturing >= 0)
             {
                 PollCapture();
