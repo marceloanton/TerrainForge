@@ -66,6 +66,10 @@ namespace TerrainForge
         public static bool Apply(Vector3 center, BrushSpec spec)
         {
             Cache();
+            while (!Pump())
+            {
+                // Drain any previous stroke first (FIFO order).
+            }
             if (spec.Radius <= 0.01f)
                 return false;
 
@@ -117,17 +121,71 @@ namespace TerrainForge
             if (s_hmaps.Count == 0)
                 return false;
 
-            bool changed = false;
-
-            // One undo frame per Apply call: every comp touched below records
-            // the old values of exactly the vertices it overwrites.
-            List<UndoEntry> frame = null;
-            if (GetDepth() > 0)
-                frame = new List<UndoEntry>();
-
-            for (int i = 0; i < s_hmaps.Count; i++)
+            // Chunked application: tiles are processed a few per frame so huge
+            // radii never hitch the game. One undo frame spans the whole stroke.
+            s_pending = new PendingApply
             {
-                Heightmap hm = s_hmaps[i];
+                Hmaps = new List<Heightmap>(s_hmaps),
+                Index = 0,
+                Center = center,
+                SearchCenter = searchCenter,
+                SearchRadius = searchRadius,
+                Spec = spec,
+                Frame = GetDepth() > 0 ? new List<UndoEntry>() : null,
+                Changed = false,
+                Label = spec.Operation.ToString()
+            };
+            Pump();
+            return s_pending != null || s_pendingChanged;
+        }
+
+        private static bool s_pendingChanged;
+
+        /// <summary>
+        /// A brush stroke in progress: tiles left to process plus the undo frame
+        /// being accumulated. Completed strokes push a single undo step.
+        /// </summary>
+        private sealed class PendingApply
+        {
+            public List<Heightmap> Hmaps;
+            public int Index;
+            public Vector3 Center;
+            public Vector3 SearchCenter;
+            public float SearchRadius;
+            public BrushSpec Spec;
+            public List<UndoEntry> Frame;
+            public bool Changed;
+            public string Label;
+        }
+
+        private static PendingApply s_pending;
+
+        public static bool HasPending => s_pending != null;
+
+        private static int ChunkBudget()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || p.ChunkCompsPerFrame == null)
+                return 4;
+            return Mathf.Clamp(p.ChunkCompsPerFrame.Value, 1, 32);
+        }
+
+        /// <summary>
+        /// Processes up to ChunkCompsPerFrame tiles of the pending stroke.
+        /// Returns true when nothing remains pending.
+        /// </summary>
+        public static bool Pump()
+        {
+            PendingApply p = s_pending;
+            if (p == null)
+                return true;
+
+            int budget = ChunkBudget();
+            int n = 0;
+            while (p.Index < p.Hmaps.Count && n < budget)
+            {
+                Heightmap hm = p.Hmaps[p.Index++];
+                n++;
                 if (hm == null || hm.m_scale <= 0f)
                     continue;
 
@@ -138,25 +196,31 @@ namespace TerrainForge
                 if (!EnsureOwnership(comp))
                     continue;
 
-                if (ApplyToComp(comp, hm, center, spec, frame))
+                if (ApplyToComp(comp, hm, p.Center, p.Spec, p.Frame))
                 {
                     Save(comp);
                     hm.Poke(0);
-                    changed = true;
+                    p.Changed = true;
                 }
             }
 
-            if (changed && ClutterSystem.instance != null)
-                ClutterSystem.instance.ResetGrass(searchCenter, searchRadius + 1f);
+            if (p.Index < p.Hmaps.Count)
+            {
+                s_pendingChanged = p.Changed;
+                return false;
+            }
 
-            if (changed && frame != null && frame.Count > 0)
+            if (p.Changed && ClutterSystem.instance != null)
+                ClutterSystem.instance.ResetGrass(p.SearchCenter, p.SearchRadius + 1f);
+
+            if (p.Changed && p.Frame != null && p.Frame.Count > 0)
             {
                 PushUndo(new UndoFrame
                 {
-                    Label = spec.Operation.ToString(),
-                    Center = searchCenter,
-                    Radius = searchRadius,
-                    Entries = frame
+                    Label = p.Label,
+                    Center = p.SearchCenter,
+                    Radius = p.SearchRadius,
+                    Entries = p.Frame
                 });
             }
             else if (GetDepth() <= 0)
@@ -164,7 +228,9 @@ namespace TerrainForge
                 ClearHistory();
             }
 
-            return changed;
+            s_pendingChanged = p.Changed;
+            s_pending = null;
+            return true;
         }
 
         // ---- undo / redo -------------------------------------------------------

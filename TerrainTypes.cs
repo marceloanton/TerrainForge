@@ -237,6 +237,8 @@ namespace TerrainForge
                 { "set.respectwards", new[] { "RespectWards (wards ajenos)", "RespectWards (foreign wards)" } },
                 { "set.radiuscap", new[] { "Tope radio (server)", "Radius cap (server)" } },
                 { "set.deltacap", new[] { "Tope desnivel (server)", "Delta cap (server)" } },
+                { "set.chunkcomps", new[] { "Tiles por frame", "Tiles per frame" } },
+                { "flash.applying", new[] { "Aplicando…", "Applying…" } },
                 { "hud.ward", new[] { "WARD: SIN ACCESO", "WARD: NO ACCESS" } },
                 { "hud.radius", new[] { "radio", "radius" } },
                 { "hud.undo", new[] { "deshacer", "undo" } },

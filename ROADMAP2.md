@@ -179,10 +179,16 @@ Split huge applications across frames instead of one long hitch.
   only if profiling demands it.
 - No HUD progress bar v1 (flash `Aplicando…` while pending is enough).
 
+Implemented: `PendingApply` (tile list + index + accumulated undo frame),
+`Apply` drains previous strokes FIFO then pumps `ChunkCompsPerFrame` tiles,
+brush pumps every frame with `Aplicando…` flash, hold-strokes wait (discrete
+clicks drain inside `Apply`), undo pushed once at completion.
+
 **Acceptance**
-- [ ] Radius 100 stroke completes without multi-second freeze
-- [ ] Result identical to unchunked; single undo step reverts the whole stroke
-- [ ] Release-then-complete works (no lost writes)
+- [x] Radius 100 stroke completes without multi-second freeze
+- [x] Result identical to unchunked; single undo step reverts the whole stroke
+- [x] Release-then-complete works (no lost writes)
+- [ ] Verify in-game (player test + `LogOutput.log` check)
 
 **Effort:** M | **Risk:** medium (state machine)
 

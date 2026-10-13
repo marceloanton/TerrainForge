@@ -97,6 +97,17 @@ namespace TerrainForge
                 ClearRampPath();
             }
 
+            // Keep pumping a chunked stroke across frames (auto-continues even
+            // if the key was released); hold-strokes wait for it (one undo step
+            // per completed stroke), discrete clicks drain it inside Apply.
+            bool wasPending = TerrainEngine.HasPending;
+            if (wasPending)
+            {
+                TerrainEngine.Pump();
+                _applying = true;
+                Flash(Loc.T("flash.applying"));
+            }
+
             if (p.AutoGiveTool.Value && !_toolGiven)
             {
                 if (TerrainTool.Has(player))
@@ -213,7 +224,7 @@ namespace TerrainForge
                             Flash(why);
                     }
                 }
-                else if (Held(p.ApplyKey.Value))
+                else if (Held(p.ApplyKey.Value) && !wasPending)
                 {
                     if (canEdit)
                         _applying = TryApply(p, player, groundCenter);

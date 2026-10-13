@@ -84,6 +84,7 @@ namespace TerrainForge
         public ConfigEntry<bool> RespectWards;
         public ConfigEntry<float> RadiusCap;
         public ConfigEntry<float> DeltaCap;
+        public ConfigEntry<int> ChunkCompsPerFrame;
 
         private Harmony _harmony;
 
@@ -220,6 +221,10 @@ namespace TerrainForge
                 new ConfigDescription("Maximum terrain delta in meters enforced by " +
                     "the server on top of MaxUpDelta/MaxDownDelta (0 = no cap).",
                     new AcceptableValueRange<float>(0f, 64f)));
+            ChunkCompsPerFrame = Config.Bind("Performance", "ChunkCompsPerFrame", 4,
+                new ConfigDescription("Heightmap tiles processed per frame. Lower this " +
+                    "if huge radii hitch; raise it for faster large strokes (1-32).",
+                    new AcceptableValueRange<int>(1, 32)));
 
             TerrainEngine.Cache();
 

@@ -652,6 +652,7 @@ namespace TerrainForge
             BoolToggle(Loc.T("set.respectwards"), p.RespectWards);
             FloatSlider(Loc.T("set.radiuscap"), p.RadiusCap, 0f, 100f, "0.#");
             FloatSlider(Loc.T("set.deltacap"), p.DeltaCap, 0f, 64f, "0.#");
+            IntSlider(Loc.T("set.chunkcomps"), p.ChunkCompsPerFrame, 1, 32);
 
             GUILayout.EndScrollView();
 
@@ -682,6 +683,17 @@ namespace TerrainForge
             GUILayout.Label(label + ": " + entry.Value.ToString(fmt), _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
             float v = GUILayout.HorizontalSlider(entry.Value, min, max, GUILayout.Width(205f), GUILayout.Height(26f));
             if (!Mathf.Approximately(v, entry.Value))
+                entry.Value = v;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+        }
+
+        private void IntSlider(string label, ConfigEntry<int> entry, int min, int max)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label + ": " + entry.Value, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+            int v = Mathf.RoundToInt(GUILayout.HorizontalSlider(entry.Value, min, max, GUILayout.Width(205f), GUILayout.Height(26f)));
+            if (v != entry.Value)
                 entry.Value = v;
             GUILayout.EndHorizontal();
             GUILayout.Space(3f);

@@ -68,6 +68,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the game's own check; `RadiusCap`/`DeltaCap` let the server clamp radius and
   delta, visibly (HUD + preview use the effective values). HUD `WARD` tag and
   AJUSTES rows included.
+- **Chunked application**: big strokes process a few heightmap tiles per frame
+  (`Performance > ChunkCompsPerFrame`, AJUSTES slider) instead of hitching;
+  terrain appears progressively, one undo step per completed stroke, auto-
+  continues if the key is released, FIFO order kept.
 - **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
   When the server runs the mod, its values win through config sync and clients
   cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the
