@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TerrainForge
@@ -28,6 +29,11 @@ namespace TerrainForge
         public float LevelY; // NaN = hide the target-level marker
         public bool Blocked; // server/ward deny: draw guides greyed out
         public float WaterLevel; // for underwater preview: draw at water surface
+        public bool ShowStamp;           // stamp paste preview active
+        public Vector3 StampCenter;      // target center for stamp
+        public float StampRotation;      // rotation in degrees
+        public float StampScale;         // scale factor
+        public List<Vector3> StampTilePositions; // tile positions for wireframe
     }
 
     /// <summary>
@@ -59,6 +65,7 @@ namespace TerrainForge
         private LineRenderer _rect;      // rectangle footprint outline (world)
         private LineRenderer _poly;      // polygon footprint outline (world)
         private LineRenderer _level;     // target-level marker ring (world)
+        private LineRenderer _stamp;     // stamp paste preview wireframe (world)
 
         private Vector3[] _unitRing;
 
@@ -104,6 +111,8 @@ namespace TerrainForge
             _rect = MakeLine("rect", 0, true);
             _poly = MakeLine("poly", 0, true);
             _level = MakeLine("level", 2, true);
+            _stamp = MakeLine("stamp", 0, true);
+            _stamp.loop = false;
 
             BuildRing();
             _root.SetActive(false);
@@ -385,8 +394,45 @@ namespace TerrainForge
                 SetActive(_level, false);
             }
 
+            DrawStampPreview(s);
+
             if (!_root.activeSelf)
                 _root.SetActive(true);
+        }
+
+        private void DrawStampPreview(PreviewState s)
+        {
+            if (!s.ShowStamp || s.StampTilePositions == null || s.StampTilePositions.Count == 0)
+            {
+                SetActive(_stamp, false);
+                return;
+            }
+
+            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
+            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
+            Color stampC = new Color(c.r, c.g, c.b, c.a * 0.5f);
+
+            // Draw each tile as a square outline at its position
+            const float tileSize = 64f; // typical Heightmap tile size in meters (width * scale)
+            int totalPoints = s.StampTilePositions.Count * 5;
+            _stamp.positionCount = totalPoints;
+            int idx = 0;
+            foreach (Vector3 tp in s.StampTilePositions)
+            {
+                float x0 = tp.x - tileSize * 0.5f;
+                float x1 = tp.x + tileSize * 0.5f;
+                float z0 = tp.z - tileSize * 0.5f;
+                float z1 = tp.z + tileSize * 0.5f;
+                float y = DrawHeight(tp.x, tp.z, s) + 0.2f;
+                _stamp.SetPosition(idx++, new Vector3(x0, y, z0));
+                _stamp.SetPosition(idx++, new Vector3(x0, y, z1));
+                _stamp.SetPosition(idx++, new Vector3(x1, y, z1));
+                _stamp.SetPosition(idx++, new Vector3(x1, y, z0));
+                _stamp.SetPosition(idx++, new Vector3(x0, y, z0));
+            }
+            SetWidth(_stamp, w * 0.5f);
+            SetColor(_stamp, stampC);
+            SetActive(_stamp, true);
         }
 
         private void SetRing(LineRenderer lr, float radius, TerrainShape shape)
@@ -481,6 +527,7 @@ public void Destroy()
                 _rect = null;
                 _poly = null;
                 _level = null;
+                _stamp = null;
             }
         }
 

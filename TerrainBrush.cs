@@ -47,6 +47,12 @@ namespace TerrainForge
         private float _lastRedo = -999f;
         private bool _adjustMode;
 
+        // Stamp copy/paste
+        private bool _pastePreview;
+        private float _stampRotation;
+        private float _stampScale = 1f;
+        private Vector3 _stampPreviewCenter;
+
         internal static bool AdjustModeActive { get; private set; }
         private static bool s_clearMarks;
 
@@ -218,13 +224,6 @@ namespace TerrainForge
                 }
             }
 
-            TerrainOperation op = p.DefaultOperation.Value;
-            if (op != TerrainOperation.Ramp)
-            {
-                _rampHasA = false;
-                ClearRampPath();
-            }
-
             // Server authority: when the server runs the mod, its Server-section
             // values (synced to clients) decide whether this client may write
             // terrain. Servers without the mod leave the local values alone, so
@@ -233,6 +232,17 @@ namespace TerrainForge
             _wardOk = !equipped || WardAllows(p, groundCenter, EffectiveRadius(p), out _wardWhy);
             bool canEdit = _serverAllowed && _wardOk;
             string why = _serverAllowed ? _wardWhy : _serverWhy;
+
+            // Stamp copy/paste (work outside normal apply flow)
+            if (!blocked && equipped)
+            {
+                if (p.CopyStampKey.Value.IsDown())
+                    HandleCopyStamp(p, groundCenter);
+                if (p.PasteStampKey.Value.IsDown())
+                    HandlePasteStamp(p, groundCenter, canEdit, why);
+            }
+
+            TerrainOperation op = p.DefaultOperation.Value;
 
             if (!blocked && equipped && !Held(p.RadialKey.Value))
             {
@@ -315,42 +325,96 @@ namespace TerrainForge
                         polyPreview[k] = src[k];
                     polyPreview[src.Count] = groundCenter;
                 }
-                _preview.Update(new PreviewState
+
+                // Stamp paste preview overrides normal preview
+                if (_pastePreview)
                 {
-                    Center = groundCenter,
-                    PlayerPos = player.transform.position,
-                    Radius = effRadius,
-                    FullRadius = guides ? fullRadius : 0f,
-                    ReachRadius = guides ? p.RadiusMax.Value : 0f,
-                    AimReach = guides ? MaxAimDistance : 0f,
-                    Shape = p.Shape.Value,
-                    Color = BrushColor(p).WithAlpha(0.95f),
-                    IsRamp = isRamp,
-                    HasRampA = isRamp
-                        ? (p.RampMode.Value == RampMode.Path ? pathMarking : _rampHasA)
-                        : _lineHasA,
-                    RampA = isRamp
-                        ? (p.RampMode.Value == RampMode.Path && pathMarking ? _rampPath[_rampPath.Count - 1] : _rampA)
-                        : _lineA,
-                    // Non-circular shapes never show the round footprint: only the
-                    // marked outline (line corridor, rect, poly trail) is drawn.
-                    SuppressCircles = pathMarking ||
-                        (!isRamp && (p.Shape.Value == TerrainShape.Line ||
-                                     p.Shape.Value == TerrainShape.Rect ||
-                                     p.Shape.Value == TerrainShape.Poly)),
-                    HasRect = rectMarking,
-                    RectA = _rectA,
-                    RectB = groundCenter,
-                    PolyPreview = polyPreview,
-                    SlopeDeg = _slopeDeg,
-                    GuidesOn = guides,
-                    LevelY = guides ? _levelY : float.NaN,
-                    Blocked = equipped && !canEdit,
-                    WaterLevel = TerrainEngine.WaterLevel(),
-                });
+                    _stampPreviewCenter = groundCenter;
+                    // Rotation: Q/E or mouse wheel with Alt
+                    bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+                    float scroll = Input.mouseScrollDelta.y;
+                    if (Mathf.Abs(scroll) > 0.01f)
+                    {
+                        if (alt)
+                            _stampRotation += scroll * 15f;
+                        else if (Held(p.AimHeightModifierKey.Value))
+                            _stampScale = Mathf.Clamp(_stampScale + scroll * 0.1f, 0.25f, 4f);
+                    }
+                    if (Input.GetKeyDown(KeyCode.Q))
+                        _stampRotation -= 15f;
+                    if (Input.GetKeyDown(KeyCode.E))
+                        _stampRotation += 15f;
+                    if (Input.GetKeyDown(KeyCode.Escape))
+                    {
+                        _pastePreview = false;
+                        _preview.Update(new PreviewState { ShowStamp = false });
+                    }
+
+                    var stamp = TerrainEngine.GetStamp();
+                    var tilePositions = new List<Vector3>();
+                    if (stamp != null)
+                    {
+                        foreach (var tile in stamp.Tiles)
+                            tilePositions.Add(tile.TilePos);
+                    }
+
+                    _preview.Update(new PreviewState
+                    {
+                        ShowStamp = true,
+                        StampCenter = _stampPreviewCenter,
+                        StampRotation = _stampRotation,
+                        StampScale = _stampScale,
+                        StampTilePositions = tilePositions,
+                        Radius = effRadius,
+                        Color = BrushColor(p).WithAlpha(0.95f),
+                        Blocked = !canEdit,
+                        WaterLevel = TerrainEngine.WaterLevel(),
+                    });
+                }
+                else
+                {
+                    _preview.Update(new PreviewState
+                    {
+                        Center = groundCenter,
+                        PlayerPos = player.transform.position,
+                        Radius = effRadius,
+                        FullRadius = guides ? fullRadius : 0f,
+                        ReachRadius = guides ? p.RadiusMax.Value : 0f,
+                        AimReach = guides ? MaxAimDistance : 0f,
+                        Shape = p.Shape.Value,
+                        Color = BrushColor(p).WithAlpha(0.95f),
+                        IsRamp = isRamp,
+                        HasRampA = isRamp
+                            ? (p.RampMode.Value == RampMode.Path ? pathMarking : _rampHasA)
+                            : _lineHasA,
+                        RampA = isRamp
+                            ? (p.RampMode.Value == RampMode.Path && pathMarking ? _rampPath[_rampPath.Count - 1] : _rampA)
+                            : _lineA,
+                        // Non-circular shapes never show the round footprint: only the
+                        // marked outline (line corridor, rect, poly trail) is drawn.
+                        SuppressCircles = pathMarking ||
+                            (!isRamp && (p.Shape.Value == TerrainShape.Line ||
+                                         p.Shape.Value == TerrainShape.Rect ||
+                                         p.Shape.Value == TerrainShape.Poly)),
+                        HasRect = rectMarking,
+                        RectA = _rectA,
+                        RectB = groundCenter,
+                        PolyPreview = polyPreview,
+                        SlopeDeg = _slopeDeg,
+                        GuidesOn = guides,
+                        LevelY = guides ? _levelY : float.NaN,
+                        Blocked = equipped && !canEdit,
+                        WaterLevel = TerrainEngine.WaterLevel(),
+                    });
+                }
             }
             else
             {
+                if (_pastePreview)
+                {
+                    _pastePreview = false;
+                    _preview.Update(new PreviewState { ShowStamp = false });
+                }
                 _preview.Hide();
             }
         }
@@ -580,6 +644,104 @@ namespace TerrainForge
             {
                 TerrainKeybinds.CycleNextProfile();
             }
+        }
+
+        private void HandleCopyStamp(TerrainForgePlugin p, Vector3 center)
+        {
+            var stamp = TerrainEngine.CopyStamp(
+                center,
+                EffectiveRadius(p),
+                p.Shape.Value,
+                _rectHasA ? (Vector3?)_rectA : null,
+                _rectHasA ? (Vector3?)_rectA : null, // rectB will be current aim, but we need the marked rect
+                _polyPoints.Count >= 3 ? _polyPoints.ToArray() : null,
+                _lineHasA, _lineHasA ? (Vector3?)_lineA : null, _lineHasA ? (Vector3?)_aimPoint : null);
+
+            // For rect, we need both corners
+            if (p.Shape.Value == TerrainShape.Rect && _rectHasA)
+            {
+                stamp = TerrainEngine.CopyStamp(
+                    center,
+                    EffectiveRadius(p),
+                    p.Shape.Value,
+                    _rectA,
+                    _aimPoint,
+                    null,
+                    false, null, null);
+            }
+
+            if (stamp != null)
+            {
+                Flash(Loc.F("flash.stamp.copied", stamp.Tiles.Count));
+                TerrainForgePlugin.Message(stamp.Label);
+            }
+            else
+            {
+                Flash(Loc.T("flash.stamp.empty"));
+            }
+        }
+
+        private void HandlePasteStamp(TerrainForgePlugin p, Vector3 center, bool canEdit, string why)
+        {
+            if (_pastePreview)
+            {
+                // Confirm paste
+                if (canEdit)
+                {
+                    if (TerrainEngine.PasteStamp(_stampPreviewCenter, out string msg, _stampRotation, _stampScale))
+                    {
+                        Flash(Loc.T("flash.stamp.pasted"));
+                        TerrainForgePlugin.Message(msg);
+                        TerrainFx.Play(_stampPreviewCenter, true);
+                    }
+                    else
+                    {
+                        Flash(msg);
+                    }
+                }
+                else
+                {
+                    Flash(why);
+                }
+                _pastePreview = false;
+                _preview.Update(new PreviewState { ShowStamp = false });
+                return;
+            }
+
+            // Start preview
+            var stamp = TerrainEngine.GetStamp();
+            if (stamp == null || stamp.Tiles.Count == 0)
+            {
+                Flash(Loc.T("flash.stamp.empty"));
+                return;
+            }
+
+            _pastePreview = true;
+            _stampPreviewCenter = center;
+            _stampRotation = 0f;
+            _stampScale = 1f;
+
+            // Build tile positions for preview
+            var tilePositions = new List<Vector3>();
+            foreach (var tile in stamp.Tiles)
+            {
+                tilePositions.Add(tile.TilePos);
+            }
+
+            _preview.Update(new PreviewState
+            {
+                ShowStamp = true,
+                StampCenter = center,
+                StampRotation = 0f,
+                StampScale = 1f,
+                StampTilePositions = tilePositions,
+                Radius = EffectiveRadius(p),
+                Color = BrushColor(p).WithAlpha(0.95f),
+                Blocked = !canEdit,
+                WaterLevel = TerrainEngine.WaterLevel(),
+            });
+
+            Flash(Loc.T("flash.stamp.preview"));
         }
 
         /// <summary>

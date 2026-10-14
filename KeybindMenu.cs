@@ -279,6 +279,8 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.op.shore"), Bind = p.OpShoreKey });
             _entries.Add(new Entry { Label = Loc.T("key.op.snow"), Bind = p.OpSnowKey });
             _entries.Add(new Entry { Label = Loc.T("key.cycleProfile"), Bind = p.CycleProfileKey });
+            _entries.Add(new Entry { Label = Loc.T("key.copyStamp"), Bind = p.CopyStampKey });
+            _entries.Add(new Entry { Label = Loc.T("key.pasteStamp"), Bind = p.PasteStampKey });
             _langBuilt = p.Language != null ? p.Language.Value : ModLanguage.Español;
         }
 

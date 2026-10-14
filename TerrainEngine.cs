@@ -1319,6 +1319,301 @@ namespace TerrainForge
             return ZoneSystem.c_WaterLevel;
         }
 
+        // ---- terrain stamps (copy/paste in RAM) ------------------------------------
+
+        /// <summary>
+        /// One copied terrain area: a set of tiles with their full delta arrays.
+        /// Stored in memory only (not serialized to disk).
+        /// </summary>
+        public sealed class TerrainStamp
+        {
+            public List<StampTile> Tiles = new List<StampTile>();
+            public Vector3 Center;      // world center of the copied area
+            public float Radius;        // approximate radius
+            public string Label;        // e.g. "Copy: 5 tiles"
+            public DateTime Time;       // when it was copied
+        }
+
+        public sealed class StampTile
+        {
+            public Vector3 TilePos;     // tile world position (Heightmap transform)
+            public int Width;           // vertex grid size (width+1 per side)
+            public float[] Level;
+            public float[] Smooth;
+            public bool[] ModH;
+            public Color[] Paint;
+            public bool[] ModP;
+        }
+
+        private static TerrainStamp s_stamp; // single clipboard
+
+        /// <summary>
+        /// Copies the currently marked area (or the brush footprint at aim)
+        /// into the RAM stamp buffer. Returns the stamp or null on failure.
+        /// </summary>
+        public static TerrainStamp CopyStamp(Vector3 center, float radius, TerrainShape shape,
+                                             Vector3? rectA, Vector3? rectB,
+                                             Vector3[] polyPoints, bool hasLine, Vector3? lineA, Vector3? lineB)
+        {
+            Cache();
+            var stamp = new TerrainStamp { Center = center, Radius = radius, Time = DateTime.Now };
+
+            // Determine search area based on shape
+            Vector3 searchCenter = center;
+            float searchRadius = radius + 4f;
+            var hmaps = new List<Heightmap>();
+
+            if (hasLine && lineA.HasValue && lineB.HasValue)
+            {
+                searchCenter = (lineA.Value + lineB.Value) * 0.5f;
+                searchRadius = Vector3.Distance(lineA.Value, lineB.Value) * 0.5f + radius + 4f;
+            }
+            else if (rectA.HasValue && rectB.HasValue)
+            {
+                searchCenter = (rectA.Value + rectB.Value) * 0.5f;
+                float dx = Mathf.Abs(rectB.Value.x - rectA.Value.x);
+                float dz = Mathf.Abs(rectB.Value.z - rectA.Value.z);
+                searchRadius = Mathf.Sqrt(dx * dx + dz * dz) * 0.5f + radius + 4f;
+            }
+            else if (polyPoints != null && polyPoints.Length >= 3)
+            {
+                Vector3 c = Vector3.zero;
+                float maxD = 0f;
+                for (int k = 0; k < polyPoints.Length; k++)
+                    c += polyPoints[k];
+                c /= polyPoints.Length;
+                for (int k = 0; k < polyPoints.Length; k++)
+                    maxD = Mathf.Max(maxD, Vector3.Distance(c, polyPoints[k]));
+                searchCenter = c;
+                searchRadius = maxD + radius + 4f;
+            }
+
+            Heightmap.FindHeightmap(searchCenter, searchRadius, hmaps);
+            if (hmaps.Count == 0)
+                return null;
+
+            int copied = 0;
+            foreach (Heightmap hm in hmaps)
+            {
+                if (hm == null || hm.m_scale <= 0f)
+                    continue;
+                TerrainComp comp = hm.GetAndCreateTerrainCompiler();
+                if (comp == null)
+                    continue;
+
+                float[] level = LevelDelta(comp);
+                float[] smooth = SmoothDelta(comp);
+                bool[] modH = null;
+                Color[] paint = PaintMask(comp);
+                bool[] modP = ModifiedPaint(comp);
+                try { modH = (bool[])f_modifiedHeight.GetValue(comp); }
+                catch { modH = null; }
+                if (level == null || smooth == null || modH == null || paint == null || modP == null)
+                    continue;
+
+                int w = Width(comp);
+                int pitch = w + 1;
+                if (level.Length != pitch * pitch)
+                    continue;
+
+                // Clone the whole tile (simple, fast enough for copy)
+                var tile = new StampTile
+                {
+                    TilePos = hm.transform.position,
+                    Width = w,
+                    Level = (float[])level.Clone(),
+                    Smooth = (float[])smooth.Clone(),
+                    ModH = (bool[])modH.Clone(),
+                    Paint = (Color[])paint.Clone(),
+                    ModP = (bool[])modP.Clone()
+                };
+                stamp.Tiles.Add(tile);
+                copied++;
+            }
+
+            if (copied == 0)
+                return null;
+
+            stamp.Label = "Copy: " + copied + " tile" + (copied > 1 ? "s" : "");
+            s_stamp = stamp;
+            return stamp;
+        }
+
+        /// <summary>
+        /// Returns the current stamp in clipboard (null if empty).
+        /// </summary>
+        public static TerrainEngine.TerrainStamp GetStamp() => s_stamp;
+
+        /// <summary>
+        /// Clears the clipboard.
+        /// </summary>
+        public static void ClearStamp() => s_stamp = null;
+
+        /// <summary>
+        /// Pastes the stamp at the given world position with optional rotation (degrees)
+        /// and scale. Returns true if any tile was written.
+        /// </summary>
+        public static bool PasteStamp(Vector3 targetCenter, out string message,
+                                      float rotationDeg = 0f, float scale = 1f)
+        {
+            message = null;
+            TerrainStamp stamp = s_stamp;
+            if (stamp == null || stamp.Tiles.Count == 0)
+            {
+                message = "Stamp vacío: copiá algo primero (Ctrl+Shift+C).";
+                return false;
+            }
+
+            Cache();
+
+            // We'll write each source tile to a target tile computed by transforming
+            // the source tile position relative to the stamp center.
+            float cosR = Mathf.Cos(rotationDeg * Mathf.Deg2Rad);
+            float sinR = Mathf.Sin(rotationDeg * Mathf.Deg2Rad);
+            Vector3 stampCenter = stamp.Center;
+
+            var frame = new List<UndoEntry>();
+            int written = 0;
+            float minx = float.MaxValue, maxx = float.MinValue;
+            float minz = float.MaxValue, maxz = float.MinValue;
+
+            foreach (StampTile src in stamp.Tiles)
+            {
+                // Transform source tile position to target position
+                Vector3 rel = src.TilePos - stampCenter;
+                rel.x *= scale;
+                rel.z *= scale;
+                // Rotate around Y
+                float rx = rel.x * cosR - rel.z * sinR;
+                float rz = rel.x * sinR + rel.z * cosR;
+                Vector3 targetTilePos = targetCenter + new Vector3(rx, 0f, rz);
+
+                // Find or create the target heightmap tile
+                var found = new List<Heightmap>();
+                Heightmap.FindHeightmap(targetTilePos, 2f, found);
+                Heightmap hm = null;
+                TerrainComp comp = null;
+                foreach (Heightmap h in found)
+                {
+                    if (h == null || h.m_scale <= 0f)
+                        continue;
+                    TerrainComp c = h.GetAndCreateTerrainCompiler();
+                    if (c != null)
+                    {
+                        hm = h;
+                        comp = c;
+                        break;
+                    }
+                }
+                if (comp == null)
+                {
+                    // Try to get the heightmap at that position and create compiler
+                    foreach (Heightmap h in found)
+                    {
+                        if (h == null || h.m_scale <= 0f)
+                            continue;
+                        TerrainComp c = h.GetAndCreateTerrainCompiler();
+                        if (c != null)
+                        {
+                            hm = h;
+                            comp = c;
+                            break;
+                        }
+                    }
+                }
+                if (comp == null)
+                    continue;
+
+                if (!EnsureOwnership(comp))
+                    continue;
+
+                float[] level = LevelDelta(comp);
+                float[] smooth = SmoothDelta(comp);
+                bool[] modH = null;
+                Color[] paint = PaintMask(comp);
+                bool[] modP = ModifiedPaint(comp);
+                try { modH = (bool[])f_modifiedHeight.GetValue(comp); }
+                catch { modH = null; }
+                if (level == null || smooth == null || modH == null || paint == null || modP == null)
+                    continue;
+
+                int w = Width(comp);
+                int pitch = w + 1;
+                if (level.Length != pitch * pitch)
+                    continue;
+
+                // Source tile may have different resolution; we only paste if same size.
+                // (In practice all tiles in a world share the same resolution.)
+                if (src.Width != w)
+                    continue;
+
+                var rec = new Recorder(level, smooth, modH, paint, modP);
+                bool any = false;
+
+                for (int idx = 0; idx < src.Level.Length; idx++)
+                {
+                    if (level[idx] != src.Level[idx] || smooth[idx] != src.Smooth[idx] ||
+                        modH[idx] != src.ModH[idx] || paint[idx] != src.Paint[idx] || modP[idx] != src.ModP[idx])
+                    {
+                        rec.Add(idx);
+                        level[idx] = src.Level[idx];
+                        smooth[idx] = src.Smooth[idx];
+                        modH[idx] = src.ModH[idx];
+                        paint[idx] = src.Paint[idx];
+                        modP[idx] = src.ModP[idx];
+                        any = true;
+                    }
+                }
+
+                if (any && rec.Cells.Count > 0)
+                {
+                    frame.Add(new UndoEntry
+                    {
+                        Comp = comp,
+                        Hm = hm,
+                        WithSmooth = true,
+                        WithPaint = true,
+                        Before = rec.Cells
+                    });
+                    Save(comp);
+                    if (hm != null)
+                    {
+                        try { hm.Poke(0); }
+                        catch { }
+                    }
+                    written++;
+                    if (targetTilePos.x < minx) minx = targetTilePos.x;
+                    if (targetTilePos.x > maxx) maxx = targetTilePos.x;
+                    if (targetTilePos.z < minz) minz = targetTilePos.z;
+                    if (targetTilePos.z > maxz) maxz = targetTilePos.z;
+                }
+            }
+
+            if (written == 0)
+            {
+                message = "No se pudo pegar: tiles de destino no coinciden.";
+                return false;
+            }
+
+            Vector3 center = new Vector3((minx + maxx) * 0.5f, 0f, (minz + maxz) * 0.5f);
+            float radius = Mathf.Max(maxx - minx, maxz - minz) * 0.5f + 4f;
+            if (frame.Count > 0)
+            {
+                PushUndo(new UndoFrame
+                {
+                    Label = "Paste: " + stamp.Label,
+                    Center = center,
+                    Radius = radius,
+                    Entries = frame
+                });
+                if (ClutterSystem.instance != null)
+                    ClutterSystem.instance.ResetGrass(center, radius + 1f);
+            }
+
+            message = "Pegado: " + written + " tile" + (written > 1 ? "s" : "") + ".";
+            return true;
+        }
+
         // ---- terrain snapshots -------------------------------------------------
 
         private const string SnapMagic = "TFSS";

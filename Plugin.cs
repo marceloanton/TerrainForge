@@ -70,6 +70,8 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> OpShoreKey;
         public ConfigEntry<KeyboardShortcut> OpSnowKey;
         public ConfigEntry<KeyboardShortcut> CycleProfileKey;
+        public ConfigEntry<KeyboardShortcut> CopyStampKey;
+        public ConfigEntry<KeyboardShortcut> PasteStampKey;
         public ConfigEntry<bool> SeenTutorial;
         public ConfigEntry<string> PresetSlots;
         public ConfigEntry<ToolRequirement> RequiredTool;
@@ -209,6 +211,10 @@ namespace TerrainForge
                 "Direct key to select Snow operation.");
             CycleProfileKey = Config.Bind("Input", "CycleProfileKey", new KeyboardShortcut(KeyCode.None),
                 "Cycle to the next saved brush profile/preset.");
+            CopyStampKey = Config.Bind("Input", "CopyStampKey", new KeyboardShortcut(KeyCode.C, KeyCode.LeftControl, KeyCode.LeftShift),
+                "Copy the marked area or brush footprint to the stamp clipboard (RAM).");
+            PasteStampKey = Config.Bind("Input", "PasteStampKey", new KeyboardShortcut(KeyCode.V, KeyCode.LeftControl, KeyCode.LeftShift),
+                "Paste the stamp from clipboard at the aim position (shows ghost preview first).");
             SeenTutorial = Config.Bind("General", "SeenTutorial", false,
                 "Set once the first-time tutorial messages have been shown.");
             PresetSlots = Config.Bind("Presets", "Slots", "",
