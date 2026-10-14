@@ -27,6 +27,7 @@ namespace TerrainForge
         public bool GuidesOn;
         public float LevelY; // NaN = hide the target-level marker
         public bool Blocked; // server/ward deny: draw guides greyed out
+        public float WaterLevel; // for underwater preview: draw at water surface
     }
 
     /// <summary>
@@ -146,7 +147,12 @@ namespace TerrainForge
             if (_root == null)
                 return;
 
-            _root.transform.position = new Vector3(s.Center.x, s.Center.y + 0.05f, s.Center.z);
+            // If the aimed terrain is underwater, draw the preview at water surface
+            // so it's visible. Use a small offset above water to avoid z-fighting.
+            float waterY = s.WaterLevel > 0f ? s.WaterLevel + 0.1f : s.Center.y;
+            float centerY = Mathf.Max(s.Center.y, waterY);
+
+            _root.transform.position = new Vector3(s.Center.x, centerY + 0.05f, s.Center.z);
             _root.transform.rotation = Quaternion.identity;
             _root.transform.localScale = Vector3.one;
 
@@ -218,7 +224,7 @@ namespace TerrainForge
                     float a = (float)i / Segments * Mathf.PI * 2f;
                     float wx = s.PlayerPos.x + Mathf.Cos(a) * s.AimReach;
                     float wz = s.PlayerPos.z + Mathf.Sin(a) * s.AimReach;
-                    _aim.SetPosition(i, new Vector3(wx, GroundHeight(wx, wz) + 0.25f, wz));
+                    _aim.SetPosition(i, new Vector3(wx, DrawHeight(wx, wz, s) + 0.25f, wz));
                 }
                 _aim.SetPosition(Segments, _aim.GetPosition(0));
                 SetActive(_aim, true);
@@ -239,8 +245,10 @@ namespace TerrainForge
                 {
                     Vector3 perp = Vector3.Cross(dir.normalized, Vector3.up) * s.Radius;
 
-                    Vector3 a0 = new Vector3(a.x, a.y + 0.15f, a.z);
-                    Vector3 b0 = new Vector3(b.x, b.y + 0.15f, b.z);
+                    float aY = DrawHeight(a.x, a.z, s) + 0.15f;
+                    float bY = DrawHeight(b.x, b.z, s) + 0.15f;
+                    Vector3 a0 = new Vector3(a.x, aY, a.z);
+                    Vector3 b0 = new Vector3(b.x, bY, b.z);
 
                     _rampLine.positionCount = 2;
                     _rampLine.SetPosition(0, a0);
@@ -306,11 +314,11 @@ namespace TerrainForge
                 float z0 = Mathf.Min(s.RectA.z, s.RectB.z);
                 float z1 = Mathf.Max(s.RectA.z, s.RectB.z);
                 _rect.positionCount = 5;
-                _rect.SetPosition(0, new Vector3(x0, GroundHeight(x0, z0) + 0.15f, z0));
-                _rect.SetPosition(1, new Vector3(x0, GroundHeight(x0, z1) + 0.15f, z1));
-                _rect.SetPosition(2, new Vector3(x1, GroundHeight(x1, z1) + 0.15f, z1));
-                _rect.SetPosition(3, new Vector3(x1, GroundHeight(x1, z0) + 0.15f, z0));
-                _rect.SetPosition(4, new Vector3(x0, GroundHeight(x0, z0) + 0.15f, z0));
+                _rect.SetPosition(0, new Vector3(x0, DrawHeight(x0, z0, s) + 0.15f, z0));
+                _rect.SetPosition(1, new Vector3(x0, DrawHeight(x0, z1, s) + 0.15f, z1));
+                _rect.SetPosition(2, new Vector3(x1, DrawHeight(x1, z1, s) + 0.15f, z1));
+                _rect.SetPosition(3, new Vector3(x1, DrawHeight(x1, z0, s) + 0.15f, z0));
+                _rect.SetPosition(4, new Vector3(x0, DrawHeight(x0, z0, s) + 0.15f, z0));
                 SetWidth(_rect, w * 0.6f);
                 SetColor(_rect, c);
                 SetActive(_rect, true);
@@ -328,7 +336,7 @@ namespace TerrainForge
                 for (int k = 0; k < n; k++)
                 {
                     Vector3 pt = s.PolyPreview[k];
-                    _poly.SetPosition(k, new Vector3(pt.x, GroundHeight(pt.x, pt.z) + 0.15f, pt.z));
+                    _poly.SetPosition(k, new Vector3(pt.x, DrawHeight(pt.x, pt.z, s) + 0.15f, pt.z));
                 }
                 _poly.SetPosition(n, _poly.GetPosition(0));
                 SetWidth(_poly, w * 0.6f);
@@ -422,6 +430,13 @@ namespace TerrainForge
         private static Color Col(Color c, float a)
         {
             return new Color(c.r, c.g, c.b, c.a * a);
+        }
+
+        private static float DrawHeight(float x, float z, PreviewState s)
+        {
+            float ground = GroundHeight(x, z);
+            float water = s.WaterLevel > 0f ? s.WaterLevel + 0.1f : ground;
+            return Mathf.Max(ground, water);
         }
 
         private static float GroundHeight(float x, float z)

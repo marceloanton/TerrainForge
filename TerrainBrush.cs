@@ -346,6 +346,7 @@ namespace TerrainForge
                     GuidesOn = guides,
                     LevelY = guides ? _levelY : float.NaN,
                     Blocked = equipped && !canEdit,
+                    WaterLevel = TerrainEngine.WaterLevel(),
                 });
             }
             else
