@@ -295,6 +295,13 @@ namespace TerrainForge
 
             PauseMenuPatch.Ensure();
 
+            // Force cursor visible while menu is open (game may try to hide/lock it)
+            if (_open)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+
             if (_capturing >= 0)
             {
                 PollCapture();
