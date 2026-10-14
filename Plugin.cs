@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TerrainForge
 {
-    [BepInPlugin(Guid, "TerrainForge", "0.2.0")]
+    [BepInPlugin(Guid, "TerrainForge", "0.3.0")]
     [BepInDependency("com.jotunn.jotunn")]
     public class TerrainForgePlugin : BaseUnityPlugin
     {
