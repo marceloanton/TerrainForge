@@ -77,6 +77,7 @@ namespace TerrainForge
         public ConfigEntry<bool> SeenTutorial;
         public ConfigEntry<string> PresetSlots;
         public ConfigEntry<ToolRequirement> RequiredTool;
+        public ConfigEntry<StampToolMode> StampToolMode;
         public ConfigEntry<bool> AutoGiveTool;
 
         // Server / restrictions
@@ -228,6 +229,8 @@ namespace TerrainForge
                 "Format per preset: name|radius|softness|op|shape|paint|rampMode|slope|smooth|raiseDelta|paintStrength|falloff|shoreOffset; ...");
             RequiredTool = Config.Bind("Input", "RequiredTool", ToolRequirement.TerrainForgeTool,
                 "Which equipped item enables the brush: Any (no requirement), Pickaxe, or the mod's TerrainForgeTool.");
+            StampToolMode = Config.Bind("Input", "StampToolMode", TerrainForge.StampToolMode.MainTool,
+                "Which equipped item enables stamp copy/paste: MainTool (same as brush), Any, Pickaxe, or TerrainForgeTool.");
             AutoGiveTool = Config.Bind("Input", "AutoGiveTool", true,
                 "Automatically give yourself the TerrainForge tool once you enter a world (only if you don't already have it).");
 

@@ -56,6 +56,14 @@ namespace TerrainForge
         TerrainForgeTool
     }
 
+    public enum StampToolMode
+    {
+        MainTool,       // usa la misma RequiredTool que la brocha
+        Any,
+        Pickaxe,
+        TerrainForgeTool
+    }
+
     public enum TerrainPaint
     {
         Dirt,
@@ -155,6 +163,11 @@ namespace TerrainForge
                 { "set.stampload", new[] { "Cargar stamp:", "Load stamp:" } },
                 { "set.stamploadbtn", new[] { "Cargar al portapapeles", "Load to clipboard" } },
                 { "set.stampempty", new[] { "(sin stamps guardados)", "(no saved stamps)" } },
+                { "set.stamptool", new[] { "Herramienta stamp", "Stamp tool" } },
+                { "stamptool.main", new[] { "Igual a brocha", "Same as brush" } },
+                { "stamptool.any", new[] { "Cualquiera", "Any" } },
+                { "stamptool.pickaxe", new[] { "Pico", "Pickaxe" } },
+                { "stamptool.rod", new[] { "Varita TerrainForge", "TerrainForge Rod" } },
                 { "set.profileload", new[] { "Cargar", "Load" } },
                 { "set.profileempty", new[] { "(sin perfiles guardados)", "(no saved profiles)" } },
                 // Shape / mode / op short names
@@ -194,6 +207,8 @@ namespace TerrainForge
                 { "flash.stamp.preview", new[] { "Pegar stamp: click para confirmar, rueda=rotar, Shift+rueda=escalar, Esc=cancelar", "Paste stamp: click to confirm, wheel=rotate, Shift+wheel=scale, Esc=cancel" } },
                 { "flash.stamp.pasted", new[] { "Stamp pegado", "Stamp pasted" } },
                 { "flash.stamp.cycled", new[] { "Stamp historial: {0}", "Stamp history: {0}" } },
+                { "flash.stamp.noTool", new[] { "Herramienta stamp no equipada", "Stamp tool not equipped" } },
+                { "hud.stampReady", new[] { "STAMP LISTO", "STAMP READY" } },
                 { "hud.path.idle", new[] { "SENDA: marca puntos", "PATH: mark points" } },
                 { "hud.path.mark", new[] { "SENDA: {0} puntos (doble pulso cierra)", "PATH: {0} points (double-press closes)" } },
                 { "hud.path", new[] { "senda", "path" } },

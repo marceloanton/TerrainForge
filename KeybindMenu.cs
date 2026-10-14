@@ -760,6 +760,10 @@ namespace TerrainForge
             BoolToggle(Loc.T("set.allow"), p.AllowTerrainEdits);
             BoolToggle(Loc.T("set.adminonly"), p.AdminOnlyEdits);
             BoolToggle(Loc.T("set.respectwards"), p.RespectWards);
+            CycleRow(Loc.T("set.stamptool"), StampToolModeText(p.StampToolMode.Value), () =>
+            {
+                p.StampToolMode.Value = (StampToolMode)(((int)p.StampToolMode.Value + 1) % 4);
+            });
             FloatSlider(Loc.T("set.radiuscap"), p.RadiusCap, 0f, 100f, "0.#");
             FloatSlider(Loc.T("set.deltacap"), p.DeltaCap, 0f, 64f, "0.#");
             IntSlider(Loc.T("set.chunkcomps"), p.ChunkCompsPerFrame, 1, 32);
@@ -857,6 +861,17 @@ namespace TerrainForge
                 case FalloffMode.Smooth: return Loc.T("falloff.smooth");
                 case FalloffMode.Linear: return Loc.T("falloff.linear");
                 default: return Loc.T("falloff.pointy");
+            }
+        }
+
+        private static string StampToolModeText(StampToolMode m)
+        {
+            switch (m)
+            {
+                case StampToolMode.Any: return Loc.T("stamptool.any");
+                case StampToolMode.Pickaxe: return Loc.T("stamptool.pickaxe");
+                case StampToolMode.TerrainForgeTool: return Loc.T("stamptool.rod");
+                default: return Loc.T("stamptool.main");
             }
         }
 

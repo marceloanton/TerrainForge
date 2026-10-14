@@ -653,16 +653,25 @@ namespace TerrainForge
 
         private void HandleCopyStamp(TerrainForgePlugin p, Vector3 center)
         {
+            Player player = Player.m_localPlayer;
+            if (player == null)
+                return;
+            ItemDrop.ItemData weapon = GetHeldItem(player);
+            if (!IsStampToolEquipped(p, weapon))
+            {
+                Flash(Loc.T("flash.stamp.noTool"));
+                return;
+            }
+
             var stamp = TerrainEngine.CopyStamp(
                 center,
                 EffectiveRadius(p),
                 p.Shape.Value,
                 _rectHasA ? (Vector3?)_rectA : null,
-                _rectHasA ? (Vector3?)_rectA : null, // rectB will be current aim, but we need the marked rect
+                _rectHasA ? (Vector3?)_rectA : null,
                 _polyPoints.Count >= 3 ? _polyPoints.ToArray() : null,
                 _lineHasA, _lineHasA ? (Vector3?)_lineA : null, _lineHasA ? (Vector3?)_aimPoint : null);
 
-            // For rect, we need both corners
             if (p.Shape.Value == TerrainShape.Rect && _rectHasA)
             {
                 stamp = TerrainEngine.CopyStamp(
@@ -688,10 +697,16 @@ namespace TerrainForge
 
         private void HandlePasteStamp(TerrainForgePlugin p, Vector3 center, bool canEdit, string why)
         {
+            Player player = Player.m_localPlayer;
+            if (player == null)
+                return;
+            ItemDrop.ItemData weapon = GetHeldItem(player);
+            bool stampToolOk = IsStampToolEquipped(p, weapon);
+
             if (_pastePreview)
             {
                 // Confirm paste
-                if (canEdit)
+                if (canEdit && stampToolOk)
                 {
                     if (TerrainEngine.PasteStamp(_stampPreviewCenter, out string msg, _stampRotation, _stampScale))
                     {
@@ -706,7 +721,7 @@ namespace TerrainForge
                 }
                 else
                 {
-                    Flash(why);
+                    Flash(stampToolOk ? why : Loc.T("flash.stamp.noTool"));
                 }
                 _pastePreview = false;
                 _preview.Update(new PreviewState { ShowStamp = false });
@@ -718,6 +733,12 @@ namespace TerrainForge
             if (stamp == null || stamp.Tiles.Count == 0)
             {
                 Flash(Loc.T("flash.stamp.empty"));
+                return;
+            }
+
+            if (!stampToolOk)
+            {
+                Flash(Loc.T("flash.stamp.noTool"));
                 return;
             }
 
@@ -1328,6 +1349,37 @@ namespace TerrainForge
             }
         }
 
+        internal static bool IsStampToolEquipped(TerrainForgePlugin p, ItemDrop.ItemData weapon)
+        {
+            ToolRequirement req;
+            switch (p.StampToolMode.Value)
+            {
+                case StampToolMode.Any:
+                    return true;
+                case StampToolMode.Pickaxe:
+                    req = ToolRequirement.Pickaxe;
+                    break;
+                case StampToolMode.TerrainForgeTool:
+                    req = ToolRequirement.TerrainForgeTool;
+                    break;
+                case StampToolMode.MainTool:
+                default:
+                    req = p.RequiredTool.Value;
+                    break;
+            }
+            switch (req)
+            {
+                case ToolRequirement.Pickaxe:
+                    return IsPickaxe(weapon);
+                case ToolRequirement.TerrainForgeTool:
+                    if (!TerrainTool.Registered)
+                        return true;
+                    return TerrainTool.IsEquipped(weapon);
+                default:
+                    return true;
+            }
+        }
+
         private static bool IsPickaxe(ItemDrop.ItemData item)
         {
             if (item == null || item.m_shared == null)
@@ -1486,6 +1538,33 @@ namespace TerrainForge
             }
             status += string.Format("   |   {0} {1} / {2} {3}",
                 Loc.T("hud.undo"), TerrainEngine.UndoCount, Loc.T("hud.redo"), TerrainEngine.RedoCount);
+
+            // Stamp tool indicator
+            Player localPlayer = Player.m_localPlayer;
+            if (localPlayer != null)
+            {
+                ItemDrop.ItemData weapon = GetHeldItem(localPlayer);
+                bool stampToolOk = IsStampToolEquipped(p, weapon);
+                var clipboard = TerrainEngine.GetClipboard();
+                if (stampToolOk && clipboard.Count > 0)
+                {
+                    var current = TerrainEngine.GetStamp();
+                    if (current != null)
+                    {
+                        int idx = clipboard.Count - 1 - clipboard.ToList().IndexOf(current);
+                        status += string.Format("   |   {0} [{1}/{2}]", Loc.T("hud.stampReady"), idx + 1, clipboard.Count);
+                    }
+                    else
+                    {
+                        status += string.Format("   |   {0} [1/{1}]", Loc.T("hud.stampReady"), clipboard.Count);
+                    }
+                }
+                else if (!stampToolOk && clipboard.Count > 0)
+                {
+                    status += "   |   Stamp: herramienta no equipada";
+                }
+            }
+
             if (_adjustMode)
                 status += "   |   " + Loc.T("hud.adjust");
             if (!_serverAllowed)
