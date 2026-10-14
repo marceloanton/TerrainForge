@@ -308,10 +308,22 @@ namespace TerrainForge
 
         private void PollCapture()
         {
+            // Check mouse buttons first (they're not in AllKeys)
+            if (Input.GetMouseButtonDown(0)) { Capture(KeyCode.Mouse0); return; }
+            if (Input.GetMouseButtonDown(1)) { Capture(KeyCode.Mouse1); return; }
+            if (Input.GetMouseButtonDown(2)) { Capture(KeyCode.Mouse2); return; }
+
             for (int i = 0; i < AllKeys.Length; i++)
             {
                 KeyCode kc = AllKeys[i];
                 if (kc == KeyCode.None)
+                    continue;
+
+                // Ignore pure modifier keys as main key - they can only be modifiers
+                if (kc == KeyCode.LeftControl || kc == KeyCode.RightControl ||
+                    kc == KeyCode.LeftShift || kc == KeyCode.RightShift ||
+                    kc == KeyCode.LeftAlt || kc == KeyCode.RightAlt ||
+                    kc == KeyCode.LeftCommand || kc == KeyCode.RightCommand)
                     continue;
 
                 bool down;
