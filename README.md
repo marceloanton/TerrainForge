@@ -109,6 +109,11 @@ lugar.
   para ciclar.
 - Guardar stamp a disco (`.stamp` en `BepInEx/config/TerrainForge/stamps/`,
   tope 12), cargar al portapapeles, listar y borrar desde la UI.
+- **Herramienta stamp**: en AJUSTES → "Herramienta stamp" (4 opciones):
+  `Igual a brocha` (default), `Cualquiera`, `Pico`, `Varita TerrainForge`.
+  El HUD muestra `STAMP LISTO [2/5]` cuando la tool correcta está equipada y
+  hay stamps en el portapapeles; si no, avisa `Stamp: herramienta no equipada`.
+  `Ctrl+Shift+C/V` no funcionan sin la tool equipada.
 
 Las formas ciclan: `Círculo`, `Cuadrado`, `Línea`, `Rectángulo`, `Polígono`
 (tecla `.`). `Línea`/`Rectángulo` se marcan con dos pulsos de Aplicar (A y B;
@@ -140,6 +145,14 @@ cada operación. La pestaña **TECLAS** reasigna teclas: haz click en un
 atajo, pulsa la tecla o botón nuevo, y se guarda al config al instante.
 `Esc` cancela la captura.
 
+**Para asignar combinaciones (ej. `Ctrl+Shift+C`):**
+1. Click en el atajo en la pestaña TECLAS.
+2. Mantené `Ctrl` + `Shift` **y después** presioná `C`.
+3. Las teclas puras de modificación (Ctrl, Shift, Alt) **no se pueden** usar
+   como tecla principal — solo como modificadores.
+4. También funcionan botones del ratón: `Alt` + `Click derecho` → captura
+   `Mouse1` con modificador `LeftAlt`.
+
 Nota: F5 también abre la consola de desarrollador de Valheim, pero solo si
 lanzas el juego con `-console`. Si la usas, reasigna el menú a F7/F9.
 
@@ -165,6 +178,9 @@ Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
   **ciclar stamp**), más `HerramientaRequerida` (`Cualquiera`, `Pico`, o la
   `TerrainForgeTool` del mod — por defecto) y `DarToolAuto` (entrega la varita
   al entrar, por defecto `true`).
+- **Stamps**: `HerramientaStamp` (`Igual a brocha` / `Cualquiera` / `Pico` /
+  `Varita TerrainForge` — por defecto `Igual a brocha`), gestionada en
+  AJUSTES → "Herramienta stamp".
 - **Límites**: `DesbloquearLímiteDelta` (por defecto **true**),
   `DeltaMáxSubida`, `DeltaMáxBajada`. Subir esto permite edits más allá de
   ±8 m vanilla; mantenlos iguales en servidor y clientes.

@@ -42,9 +42,24 @@ el proyecto usa [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   tope 12), cargar uno al portapapeles, listar y borrar.
 - **Pestaña STAMPS en AJUSTES**: UI completa para guardar/cargar/borrar stamps
   guardados y ver el historial del portapapeles.
+- **Herramienta dedicada para Stamps**: config `Herramienta stamp` (AJUSTES) con
+  4 opciones: `Igual a brocha` (default), `Cualquiera`, `Pico`, `Varita TerrainForge`.
+  El HUD muestra `STAMP LISTO [2/5]` cuando la tool correcta está equipada y hay
+  stamps en el portapapeles; si no, avisa `Stamp: herramienta no equipada`.
+  `Ctrl+Shift+C/V` no funcionan sin la tool equipada.
 
 ### Corregido
 
+- **Captura de teclas**: ahora ignora teclas puras de modificación (Ctrl, Shift,
+  Alt) como tecla principal — solo pueden ser modificadores. Soporta botones
+  del ratón (Mouse0/1/2) como tecla principal. Para asignar `Ctrl+Shift+C`:
+  mantené `Ctrl+Shift` y después presioná `C`.
+- **Menú in-game con scroll global**: un único scroll view envuelve el contenido
+  de las 3 pestañas (TECLAS, AYUDA, AJUSTES). Scrolleás con rueda en cualquiera.
+  Botón "Cerrar" y botón Cafecito siempre visibles al final.
+- **Cursor visible al abrir menú**: fuerza `Cursor.visible = true` y
+  `CursorLockMode.None` cada frame mientras el menú está abierto, sin que el
+  juego lo oculte/bloquee.
 - Las formas Línea/Rectángulo/Polígono ya no muestran las guías circulares
   (borde, zona a plena fuerza, radio máx. y distancia de mira no tenían
   sentido ahí); solo se dibuja el contorno marcado (corredor, rectángulo,
