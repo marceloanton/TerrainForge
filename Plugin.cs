@@ -72,6 +72,8 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> CycleProfileKey;
         public ConfigEntry<KeyboardShortcut> CopyStampKey;
         public ConfigEntry<KeyboardShortcut> PasteStampKey;
+        public ConfigEntry<KeyboardShortcut> CycleStampKey;
+        public ConfigEntry<KeyboardShortcut> CycleStampBackKey;
         public ConfigEntry<bool> SeenTutorial;
         public ConfigEntry<string> PresetSlots;
         public ConfigEntry<ToolRequirement> RequiredTool;
@@ -215,6 +217,10 @@ namespace TerrainForge
                 "Copy the marked area or brush footprint to the stamp clipboard (RAM).");
             PasteStampKey = Config.Bind("Input", "PasteStampKey", new KeyboardShortcut(KeyCode.V, KeyCode.LeftControl, KeyCode.LeftShift),
                 "Paste the stamp from clipboard at the aim position (shows ghost preview first).");
+            CycleStampKey = Config.Bind("Input", "CycleStampKey", new KeyboardShortcut(KeyCode.None),
+                "Cycle to the next stamp in clipboard history.");
+            CycleStampBackKey = Config.Bind("Input", "CycleStampBackKey", new KeyboardShortcut(KeyCode.None),
+                "Cycle to the previous stamp in clipboard history.");
             SeenTutorial = Config.Bind("General", "SeenTutorial", false,
                 "Set once the first-time tutorial messages have been shown.");
             PresetSlots = Config.Bind("Presets", "Slots", "",

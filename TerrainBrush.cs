@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using BepInEx.Configuration;
 using UnityEngine;
 
@@ -240,6 +241,10 @@ namespace TerrainForge
                     HandleCopyStamp(p, groundCenter);
                 if (p.PasteStampKey.Value.IsDown())
                     HandlePasteStamp(p, groundCenter, canEdit, why);
+                if (p.CycleStampKey.Value.IsDown())
+                    HandleCycleStamp(p, 1);
+                if (p.CycleStampBackKey.Value.IsDown())
+                    HandleCycleStamp(p, -1);
             }
 
             TerrainOperation op = p.DefaultOperation.Value;
@@ -742,6 +747,36 @@ namespace TerrainForge
             });
 
             Flash(Loc.T("flash.stamp.preview"));
+        }
+
+        private void HandleCycleStamp(TerrainForgePlugin p, int delta)
+        {
+            var stamp = TerrainEngine.CycleClipboard(delta);
+            if (stamp != null)
+            {
+                var clipboard = TerrainEngine.GetClipboard();
+                int idx = clipboard.Count - 1 - clipboard.ToList().IndexOf(stamp);
+                Flash(Loc.F("flash.stamp.cycled", stamp.Label + " [" + (idx + 1) + "/" + clipboard.Count + "]"));
+                // Update preview if we're in paste preview mode
+                if (_pastePreview)
+                {
+                    var tilePositions = new List<Vector3>();
+                    foreach (var tile in stamp.Tiles)
+                        tilePositions.Add(tile.TilePos);
+                    _preview.Update(new PreviewState
+                    {
+                        ShowStamp = true,
+                        StampCenter = _stampPreviewCenter,
+                        StampRotation = _stampRotation,
+                        StampScale = _stampScale,
+                        StampTilePositions = tilePositions,
+                        Radius = EffectiveRadius(p),
+                        Color = BrushColor(p).WithAlpha(0.95f),
+                        Blocked = false,
+                        WaterLevel = TerrainEngine.WaterLevel(),
+                    });
+                }
+            }
         }
 
         /// <summary>

@@ -210,6 +210,8 @@ namespace TerrainForge
         private ModLanguage _langBuilt;
         private string _fixedHeightText;
         private string _snapshotName = "";
+        private string _stampName = "";
+        private string _stampLoadName = "";
 
         private GUIStyle _winStyle;
         private GUIStyle _headerStyle;
@@ -281,6 +283,8 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.cycleProfile"), Bind = p.CycleProfileKey });
             _entries.Add(new Entry { Label = Loc.T("key.copyStamp"), Bind = p.CopyStampKey });
             _entries.Add(new Entry { Label = Loc.T("key.pasteStamp"), Bind = p.PasteStampKey });
+            _entries.Add(new Entry { Label = Loc.T("key.cycleStamp"), Bind = p.CycleStampKey });
+            _entries.Add(new Entry { Label = Loc.T("key.cycleStampBack"), Bind = p.CycleStampBackKey });
             _langBuilt = p.Language != null ? p.Language.Value : ModLanguage.Español;
         }
 
@@ -578,6 +582,70 @@ namespace TerrainForge
             }
         }
 
+        private void DrawStamps(TerrainForgePlugin p)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("set.stampname"), _rowStyle, GUILayout.Width(90f), GUILayout.Height(26f));
+            _stampName = GUILayout.TextField(_stampName ?? "", GUILayout.Height(26f));
+            if (GUILayout.Button(Loc.T("set.stampsave"), _btnStyle, GUILayout.Width(130f), GUILayout.Height(26f)))
+            {
+                if (!string.IsNullOrEmpty((_stampName ?? "").Trim()))
+                {
+                    var stamp = TerrainEngine.GetStamp();
+                    if (stamp != null)
+                    {
+                        TerrainEngine.SaveStamp(_stampName.Trim(), stamp, out string msg);
+                        TerrainForgePlugin.Message(msg);
+                        _stampName = "";
+                    }
+                    else
+                    {
+                        TerrainForgePlugin.Message("No hay stamp en el portapapeles para guardar.");
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            // Load from disk to clipboard
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("set.stampload"), _rowStyle, GUILayout.Width(90f), GUILayout.Height(26f));
+            _stampLoadName = GUILayout.TextField(_stampLoadName ?? "", GUILayout.Height(26f));
+            if (GUILayout.Button(Loc.T("set.stamploadbtn"), _btnStyle, GUILayout.Width(130f), GUILayout.Height(26f)))
+            {
+                if (!string.IsNullOrEmpty((_stampLoadName ?? "").Trim()))
+                {
+                    TerrainEngine.LoadStampToClipboard(_stampLoadName.Trim(), out string msg);
+                    TerrainForgePlugin.Message(msg);
+                    _stampLoadName = "";
+                }
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            List<string> names = TerrainEngine.StampNames();
+            if (names.Count == 0)
+            {
+                GUILayout.Label(Loc.T("set.stampempty"), _hintStyle);
+                return;
+            }
+            for (int i = 0; i < names.Count; i++)
+            {
+                string nm = names[i];
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(nm, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+                if (GUILayout.Button(Loc.T("set.stamploadbtn"), _btnStyle, GUILayout.Width(120f), GUILayout.Height(26f)))
+                {
+                    TerrainEngine.LoadStampToClipboard(nm, out string msg);
+                    TerrainForgePlugin.Message(msg);
+                }
+                if (GUILayout.Button("X", _btnStyle, GUILayout.Width(60f), GUILayout.Height(26f)))
+                    TerrainEngine.DeleteStamp(nm);
+                GUILayout.EndHorizontal();
+                GUILayout.Space(3f);
+            }
+        }
+
         private void DrawHistorySection()
         {
             TerrainForgePlugin p = TerrainForgePlugin.Instance;
@@ -672,6 +740,9 @@ namespace TerrainForge
 
             SettingHeader(Loc.T("set.snapshots"));
             DrawSnapshots();
+
+            SettingHeader(Loc.T("set.stamps"));
+            DrawStamps(p);
 
             CycleRow(Loc.T("set.language"), p.Language.Value.ToString(), () =>
             {

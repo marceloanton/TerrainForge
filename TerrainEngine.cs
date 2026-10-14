@@ -1323,7 +1323,7 @@ namespace TerrainForge
 
         /// <summary>
         /// One copied terrain area: a set of tiles with their full delta arrays.
-        /// Stored in memory only (not serialized to disk).
+        /// Can be stored in memory (clipboard) or serialized to disk.
         /// </summary>
         public sealed class TerrainStamp
         {
@@ -1332,6 +1332,7 @@ namespace TerrainForge
             public float Radius;        // approximate radius
             public string Label;        // e.g. "Copy: 5 tiles"
             public DateTime Time;       // when it was copied
+            public string Name;         // user name for saved stamps (empty = clipboard)
         }
 
         public sealed class StampTile
@@ -1345,7 +1346,57 @@ namespace TerrainForge
             public bool[] ModP;
         }
 
-        private static TerrainStamp s_stamp; // single clipboard
+        private const int MaxClipboardStamps = 10; // RAM history
+        private static readonly List<TerrainStamp> s_clipboard = new List<TerrainStamp>();
+
+        /// <summary>Current clipboard index (0 = latest). -1 = none.</summary>
+        private static int s_clipboardIndex = -1;
+
+        /// <summary>
+        /// Gets the current clipboard stamp (latest), or null if empty.
+        /// </summary>
+        public static TerrainStamp GetStamp() => (s_clipboardIndex >= 0 && s_clipboardIndex < s_clipboard.Count)
+            ? s_clipboard[s_clipboardIndex] : null;
+
+        /// <summary>
+        /// Gets all clipboard stamps (newest first).
+        /// </summary>
+        public static IReadOnlyList<TerrainStamp> GetClipboard() => s_clipboard.AsReadOnly();
+
+        /// <summary>
+        /// Sets the active clipboard index (for cycling through history).
+        /// </summary>
+        public static bool SetClipboardIndex(int index)
+        {
+            if (index >= 0 && index < s_clipboard.Count)
+            {
+                s_clipboardIndex = index;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Cycles to the next stamp in clipboard history.
+        /// </summary>
+        public static TerrainStamp CycleClipboard(int delta)
+        {
+            if (s_clipboard.Count == 0) return null;
+            s_clipboardIndex = (s_clipboardIndex + delta) % s_clipboard.Count;
+            if (s_clipboardIndex < 0) s_clipboardIndex += s_clipboard.Count;
+            return s_clipboard[s_clipboardIndex];
+        }
+
+        /// <summary>
+        /// Adds a stamp to the clipboard (newest at index 0).
+        /// </summary>
+        private static void AddToClipboard(TerrainStamp stamp)
+        {
+            s_clipboard.Insert(0, stamp);
+            s_clipboardIndex = 0;
+            while (s_clipboard.Count > MaxClipboardStamps)
+                s_clipboard.RemoveAt(s_clipboard.Count - 1);
+        }
 
         /// <summary>
         /// Copies the currently marked area (or the brush footprint at aim)
@@ -1435,19 +1486,31 @@ namespace TerrainForge
                 return null;
 
             stamp.Label = "Copy: " + copied + " tile" + (copied > 1 ? "s" : "");
-            s_stamp = stamp;
+            AddToClipboard(stamp);
             return stamp;
         }
 
         /// <summary>
-        /// Returns the current stamp in clipboard (null if empty).
-        /// </summary>
-        public static TerrainEngine.TerrainStamp GetStamp() => s_stamp;
-
-        /// <summary>
         /// Clears the clipboard.
         /// </summary>
-        public static void ClearStamp() => s_stamp = null;
+        public static void ClearClipboard()
+        {
+            s_clipboard.Clear();
+            s_clipboardIndex = -1;
+        }
+
+        /// <summary>
+        /// Clears the current clipboard stamp (keeps history).
+        /// </summary>
+        public static void ClearCurrentStamp()
+        {
+            if (s_clipboardIndex >= 0 && s_clipboardIndex < s_clipboard.Count)
+            {
+                s_clipboard.RemoveAt(s_clipboardIndex);
+                if (s_clipboardIndex >= s_clipboard.Count)
+                    s_clipboardIndex = s_clipboard.Count - 1;
+            }
+        }
 
         /// <summary>
         /// Pastes the stamp at the given world position with optional rotation (degrees)
@@ -1457,7 +1520,7 @@ namespace TerrainForge
                                       float rotationDeg = 0f, float scale = 1f)
         {
             message = null;
-            TerrainStamp stamp = s_stamp;
+            TerrainStamp stamp = GetStamp();
             if (stamp == null || stamp.Tiles.Count == 0)
             {
                 message = "Stamp vacío: copiá algo primero (Ctrl+Shift+C).";
@@ -1612,6 +1675,225 @@ namespace TerrainForge
 
             message = "Pegado: " + written + " tile" + (written > 1 ? "s" : "") + ".";
             return true;
+        }
+
+        // ---- terrain stamps (disk persistence) -----------------------------------
+
+        private const string StampMagic = "TFST";
+        private const int StampVersion = 1;
+        private const int MaxSavedStamps = 12;
+
+        private static string StampDir()
+        {
+            string dir = System.IO.Path.Combine(BepInEx.Paths.ConfigPath, "TerrainForge", "stamps");
+            System.IO.Directory.CreateDirectory(dir);
+            return dir;
+        }
+
+        private static string SanitizeStampName(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+            char[] invalid = System.IO.Path.GetInvalidFileNameChars();
+            var sb = new System.Text.StringBuilder(name.Trim());
+            for (int i = 0; i < sb.Length; i++)
+            {
+                for (int k = 0; k < invalid.Length; k++)
+                {
+                    if (sb[i] == invalid[k])
+                    {
+                        sb[i] = '_';
+                        break;
+                    }
+                }
+            }
+            string clean = sb.ToString().Trim();
+            if (clean.Length == 0)
+                return null;
+            if (clean.Length > 60)
+                clean = clean.Substring(0, 60);
+            return clean;
+        }
+
+        public static List<string> StampNames()
+        {
+            var list = new List<string>();
+            try
+            {
+                string[] files = System.IO.Directory.GetFiles(StampDir(), "*.stamp");
+                System.Array.Sort(files);
+                for (int i = 0; i < files.Length; i++)
+                    list.Add(System.IO.Path.GetFileNameWithoutExtension(files[i]));
+            }
+            catch { }
+            return list;
+        }
+
+        public static bool DeleteStamp(string name)
+        {
+            try
+            {
+                name = SanitizeStampName(name);
+                if (string.IsNullOrEmpty(name))
+                    return false;
+                string path = System.IO.Path.Combine(StampDir(), name + ".stamp");
+                if (!System.IO.File.Exists(path))
+                    return false;
+                System.IO.File.Delete(path);
+                return true;
+            }
+            catch { return false; }
+        }
+
+        public static bool SaveStamp(string name, TerrainStamp stamp, out string message)
+        {
+            message = null;
+            name = SanitizeStampName(name);
+            if (string.IsNullOrEmpty(name) || stamp == null || stamp.Tiles.Count == 0)
+            {
+                message = "Nombre o stamp inválido.";
+                return false;
+            }
+
+            try
+            {
+                string dir = StampDir();
+                string path = System.IO.Path.Combine(dir, name + ".stamp");
+                if (!System.IO.File.Exists(path) &&
+                    System.IO.Directory.GetFiles(dir, "*.stamp").Length >= MaxSavedStamps)
+                {
+                    message = "Máximo de stamps guardados alcanzado, borra alguno.";
+                    return false;
+                }
+                using (var fs = new System.IO.FileStream(path, System.IO.FileMode.Create,
+                    System.IO.FileAccess.Write, System.IO.FileShare.None))
+                using (var w = new System.IO.BinaryWriter(fs))
+                {
+                    w.Write(StampMagic);
+                    w.Write(StampVersion);
+                    w.Write(stamp.Name ?? "");
+                    w.Write(stamp.Center.x);
+                    w.Write(stamp.Center.y);
+                    w.Write(stamp.Center.z);
+                    w.Write(stamp.Radius);
+                    w.Write(stamp.Time.ToBinary());
+                    w.Write(stamp.Tiles.Count);
+                    foreach (var tile in stamp.Tiles)
+                    {
+                        w.Write(tile.TilePos.x);
+                        w.Write(tile.TilePos.y);
+                        w.Write(tile.TilePos.z);
+                        w.Write(tile.Width);
+                        WriteFloats(w, tile.Level);
+                        WriteFloats(w, tile.Smooth);
+                        WriteBools(w, tile.ModH);
+                        WriteColors(w, tile.Paint);
+                        WriteBools(w, tile.ModP);
+                    }
+                }
+                stamp.Name = name;
+                message = "Stamp guardado: " + name + " (" + stamp.Tiles.Count + " tiles).";
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                message = "Error guardando stamp: " + e.Message;
+                return false;
+            }
+        }
+
+        public static bool LoadStamp(string name, out TerrainStamp stamp, out string message)
+        {
+            stamp = null;
+            message = null;
+            name = SanitizeStampName(name);
+            if (string.IsNullOrEmpty(name))
+            {
+                message = "Nombre inválido.";
+                return false;
+            }
+
+            try
+            {
+                string path = System.IO.Path.Combine(StampDir(), name + ".stamp");
+                using (var fs = new System.IO.FileStream(path, System.IO.FileMode.Open,
+                    System.IO.FileAccess.Read, System.IO.FileShare.Read))
+                using (var r = new System.IO.BinaryReader(fs))
+                {
+                    if (r.ReadString() != StampMagic)
+                    {
+                        message = "Archivo de stamp inválido (magic).";
+                        return false;
+                    }
+                    int version = r.ReadInt32();
+                    if (version != StampVersion)
+                    {
+                        message = "Versión de stamp incompatible.";
+                        return false;
+                    }
+                    string stampName = r.ReadString();
+                    Vector3 center = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
+                    float radius = r.ReadSingle();
+                    DateTime time = DateTime.FromBinary(r.ReadInt64());
+                    int tileCount = r.ReadInt32();
+                    if (tileCount <= 0 || tileCount > 512)
+                    {
+                        message = "Tile count inválido.";
+                        return false;
+                    }
+
+                    var tiles = new List<StampTile>();
+                    for (int i = 0; i < tileCount; i++)
+                    {
+                        var tile = new StampTile
+                        {
+                            TilePos = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle()),
+                            Width = r.ReadInt32()
+                        };
+                        int len = (tile.Width + 1) * (tile.Width + 1);
+                        tile.Level = ReadFloats(r, len);
+                        tile.Smooth = ReadFloats(r, len);
+                        tile.ModH = ReadBools(r, len);
+                        tile.Paint = ReadColors(r, len);
+                        tile.ModP = ReadBools(r, len);
+                        if (tile.Level == null || tile.Smooth == null || tile.ModH == null ||
+                            tile.Paint == null || tile.ModP == null)
+                        {
+                            message = "Datos de tile corruptos.";
+                            return false;
+                        }
+                        tiles.Add(tile);
+                    }
+
+                    stamp = new TerrainStamp
+                    {
+                        Name = stampName,
+                        Center = center,
+                        Radius = radius,
+                        Time = time,
+                        Tiles = tiles
+                    };
+                    message = "Stamp cargado: " + name + " (" + tiles.Count + " tiles).";
+                    return true;
+                }
+            }
+            catch (System.Exception e)
+            {
+                message = "Error cargando stamp: " + e.Message;
+                return false;
+            }
+        }
+
+        public static bool LoadStampToClipboard(string name, out string message)
+        {
+            message = null;
+            if (LoadStamp(name, out TerrainStamp stamp, out message))
+            {
+                AddToClipboard(stamp);
+                message = "Stamp cargado al portapapeles: " + name;
+                return true;
+            }
+            return false;
         }
 
         // ---- terrain snapshots -------------------------------------------------
