@@ -7,7 +7,8 @@ Una brocha de terraformado libre para Valheim.
 Aplana, sube, baja, suaviza, crea **rampas** (dos puntos, ángulo fijo y senda),
 **costa**, pinta y restaura terreno de cualquier tamaño, superando el límite
 vanilla de ±8 m, con deshacer/rehacer, cinco formas de brocha, menú radial,
-perfiles guardados y localización EN/ES.
+perfiles guardados, **stamps (copiar/pegar terreno)**, snapshots de terreno y
+localización EN/ES.
 
 El mod incluye su propia **Varita TerrainForge** (clon del martillo) como
 herramienta de brocha, te la entrega automáticamente al entrar y lo explica
@@ -66,18 +67,32 @@ el objetivo actual y la pendiente local en grados. Las guías se desactivan en
 | Menú radial de operaciones (mantener, soltar para confirmar) | `Q` |
 | Modo ajuste (rueda = radio, zoom congelado) | `V` |
 | Ajuste fino del radio (pasos de 0.1 m) | Mantener `Shift` + rueda / teclas de radio |
+| **Copiar terreno (Stamp)** | `Ctrl+Shift+C` |
+| **Pegar terreno (Stamp)** | `Ctrl+Shift+V` |
 | Obtener la Varita TerrainForge | `F8` |
 | Abrir menú de teclas + ayuda | `F5` |
+
+**Teclas extra (sin tecla por defecto, asignalas en TECLAS):**
+- Operación directa: Aplanar, Subir, Bajar, Suavizar, Pintar, Restaurar, Rampa, Costa, Nieve
+- Siguiente / anterior perfil
+- Siguiente / anterior stamp (historial)
 
 Las operaciones ciclan: `Aplanar`, `Subir`, `Bajar`, `Suavizar`, `Rampa`,
 `Pintar`, `Restaurar`, `Costa` (aplana hacia el nivel del agua + margen, para
 playas) y `Nieve` (pinta nieve como Pintar pero solo nieve; con `Shift` la
 quita y restaura el suelo original).
 
+**Modos de caída para Subir/Bajar** (cicla en AJUSTES → "Caída Raise/Lower"):
+- **Punta** (original, pico central, controlado por "Potencia caída")
+- **Plano** (disco uniforme, mismo peso en todo el radio)
+- **Suave** (campana coseno, transición suave)
+- **Lineal** (decrece en línea recta del centro al borde)
+
 Todo se edita en vivo en el menú in-game (`F5` → pestaña **AJUSTES**):
-operación / forma / pintura / modo rampa / modo suavizar, todos los tamaños
-con sliders, cada interruptor, idioma del menú/HUD (`Español`/`English`) y
-**perfiles de brocha** con nombre. Se guarda al cerrar el menú.
+operación / forma / pintura / modo rampa / modo suavizar / **modo caída**,
+todos los tamaños con sliders, cada interruptor, idioma del menú/HUD
+(`Español`/`English`), **perfiles de brocha** con nombre y **stamps**. Se
+guarda al cerrar el menú.
 
 **Snapshots de terreno** (copias de seguridad) viven en la misma pestaña:
 ponle un nombre para guardar todos los tiles editados en
@@ -85,6 +100,15 @@ ponle un nombre para guardar todos los tiles editados en
 (incluso en otra partida). La importación restaura con propiedad y es
 deshacible; tiles no cargados avisan limpiamente, así que importa cerca del
 lugar.
+
+**Stamps (Copiar/Pegar terreno)** — pestaña **STAMPS** en AJUSTES:
+- `Ctrl+Shift+C` copia el área marcada (forma actual) al portapapeles (RAM).
+- `Ctrl+Shift+V` muestra preview fantasma (wireframe) en la mira; `Q`/`E` rotan,
+  `Alt`+rueda rota continuo, `Shift`+rueda escala, click confirma.
+- Historial de 10 stamps en RAM: teclas "Siguiente stamp" / "Stamp anterior"
+  para ciclar.
+- Guardar stamp a disco (`.stamp` en `BepInEx/config/TerrainForge/stamps/`,
+  tope 12), cargar al portapapeles, listar y borrar desde la UI.
 
 Las formas ciclan: `Círculo`, `Cuadrado`, `Línea`, `Rectángulo`, `Polígono`
 (tecla `.`). `Línea`/`Rectángulo` se marcan con dos pulsos de Aplicar (A y B;
@@ -98,12 +122,15 @@ huellas con soporte de deshacer.
   nivelar a tus pies.
 - **Suavizar** promedia cada punto con sus vecinos (un blur real), alisando
   lomos, escalones y ruido. Mantenlo pulsado para suavizar progresivamente.
+  Modos: `Completo` (ambos sentidos), `SoloLomos` (solo baja), `SoloHoyos`
+  (solo rellena). Forma Línea + Suavizar = suavizado a lo largo de un camino.
 - **Rampa** tiene tres modos (`H`): **dos puntos** (marcas **A** y **B**,
   une ambas alturas con pendiente recta), **ángulo fijo** (**B** da dirección
   y largo, la altura sigue `Ángulo rampa`, ajustable con `Alt` + radio), y
   **senda** (marcas una curva **A→B→C…**, doble pulso cierra). El radio de la
   brocha pone el ancho de la rampa y la suavidad solo ablanda los bordes
-  laterales.
+  laterales. Vista previa: corredor relleno semitransparente + anillos de
+  altura en A y B.
 
 ### Ayuda in-game
 
@@ -129,11 +156,13 @@ Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
   `PotenciaCaída`, `MetrosSubirBajar`, `FuerzaPintura`,
   `OperaciónPorDefecto`, `Forma`, `Pintura`,
   `ModoRampa` (`DosPuntos` / `ÁnguloFijo` / `Senda`), `ÁnguloRampa` (5-60°),
-  `ModoSuavizar` (`Completo` / `SoloLomos` / `SoloHoyos`), `MargenCosta`,
+  `ModoSuavizar` (`Completo` / `SoloLomos` / `SoloHoyos`), `ModoCaída`
+  (`Punta` / `Plano` / `Suave` / `Lineal`), `MargenCosta`,
   `UsarAlturaFija` / `AlturaFija` (estado del cuentagotas).
 - **Entrada**: todos los atajos (`ApplyKey`, radio, ciclos, `AimHeightModifierKey`,
   `UndoKey`/`RedoKey`, `EyedropKey`, `RampModeKey`, `RadialKey`, `GiveToolKey`,
-  `RebindMenuKey`), más `HerramientaRequerida` (`Cualquiera`, `Pico`, o la
+  `RebindMenuKey`, **teclas directas por operación**, **ciclar perfil**,
+  **ciclar stamp**), más `HerramientaRequerida` (`Cualquiera`, `Pico`, o la
   `TerrainForgeTool` del mod — por defecto) y `DarToolAuto` (entrega la varita
   al entrar, por defecto `true`).
 - **Límites**: `DesbloquearLímiteDelta` (por defecto **true**),
@@ -150,6 +179,8 @@ Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
 - **Historial**: `ProfundidadDeshacer` (0-500, por defecto 50; 0 desactiva el
   historial).
 - **Perfiles**: `Slots` (setups de brocha nombrados, se gestionan in-game).
+- **Stamps**: guardados en `BepInEx/config/TerrainForge/stamps/` (tope 12,
+  se gestionan in-game en pestaña STAMPS).
 - **Rendimiento**: `TilesPorFrame` (1-32, por defecto 4 tiles/frame).
 - **Servidor** (autoritario cuando el servidor corre el mod — sus valores ganan
   por config sync): `PermitirEditsTerreno` (por defecto `true`; si `false`,

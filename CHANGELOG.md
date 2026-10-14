@@ -15,20 +15,33 @@ el proyecto usa [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Añadido
 
-- **Modo ajuste** (`V`, reasignable): la rueda cambia el radio de la brocha sin
-  mover la cámara — usos vanilla de la rueda (zoom, barra rápida, mapa,
-  rotación de piezas) se congelan mientras está activo, con etiqueta en el HUD.
-- **Deshacer/rehacer mantenidos**: manteniendo `Ctrl+Z` / `Ctrl+Y` se avanza
-  continuo (con límite de velocidad), sin volver a pulsar.
-- **Guías bloqueadas**: la vista previa se vuelve gris cuando el servidor o un
-  ward niegan la edición, para que se vea antes de intentar.
-- **Tutorial primera vez**: dos mensajes cortos al equipar la varita por
-  primera vez (`General > SeenTutorial`), luego nunca más.
-- **Etiqueta de radio topeado**: el HUD muestra `20 (tope)` cuando el límite
-  del servidor recorta tu radio.
-- **Auto-nombre de snapshots**: guardar sin nombre usa fecha y hora.
-- **Ajuste fino del radio**: `Shift` + rueda / teclas de radio mueven en
-  pasos de 0.1 m.
+- **Modos de caída para Subir/Bajar** (4 opciones, ciclables en AJUSTES):
+  *Punta* (original, pico central), *Plano* (disco uniforme),
+  *Suave* (campana coseno), *Lineal* (taper lineal). El slider
+  "Potencia caída" solo afecta al modo Punta.
+- **Teclas directas por operación** (9 nuevas, sin tecla por defecto):
+  Aplanar, Subir, Bajar, Suavizar, Pintar, Restaurar, Rampa, Costa, Nieve.
+  Asignalas en la pestaña TECLAS para saltar directo a una operación sin ciclar.
+- **Tecla para ciclar perfiles**: cambia al siguiente preset guardado con una pulsación.
+- **Vista previa de rampa mejorada**: corredor relleno semitransparente entre
+  los bordes laterales + marcadores de altura (anillos) en los puntos A y B.
+- **Vista previa visible bajo el agua**: cuando el terreno apuntado está sumergido,
+  el preview flota en la superficie del agua en vez de quedar en el fondo.
+- **Terrain Stamp (Copiar/Pegar terreno en RAM)**:
+  - `Ctrl+Shift+C` → copia el área marcada (forma actual: círculo, rect,
+    línea, polígono, rampa) al portapapeles. Muestra "Stamp copiado: X tiles".
+  - `Ctrl+Shift+V` → preview fantasma (wireframe semitransparente) centrado en
+    la mira. Controles: `Q`/`E` rotar ±15°, `Alt`+rueda rotar continuo,
+    `Shift`+rueda escalar 0.25×–4×, `Esc` cancelar, click (Aplicar) confirma.
+  - El pegado entero es **un solo paso de deshacer**.
+- **Historial de stamps (clipboard)**: hasta 10 stamps en memoria (el más nuevo
+  al tope). Teclas `Siguiente stamp` / `Stamp anterior` (reasignables) para
+  ciclar el historial; flash muestra "Stamp historial: Copy: 3 tiles [2/5]".
+- **Stamps persistentes en disco**: en AJUSTES → **Stamps** podés guardar el
+  stamp actual con nombre (`.stamp` en `BepInEx/config/TerrainForge/stamps/`,
+  tope 12), cargar uno al portapapeles, listar y borrar.
+- **Pestaña STAMPS en AJUSTES**: UI completa para guardar/cargar/borrar stamps
+  guardados y ver el historial del portapapeles.
 
 ### Corregido
 
@@ -36,9 +49,6 @@ el proyecto usa [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (borde, zona a plena fuerza, radio máx. y distancia de mira no tenían
   sentido ahí); solo se dibuja el contorno marcado (corredor, rectángulo,
   estela).
-
-### Corregido
-
 - **Suavizado sin costuras**: los vértices de borde ahora muestrean el tile
   vecino al otro lado del borde (mapeo exacto), así el suavizado funde ambos
   lados en lugar de abrir una grieta visible en la malla entre tiles. Aplica
