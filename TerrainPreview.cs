@@ -52,6 +52,9 @@ namespace TerrainForge
         private LineRenderer _rampLine;  // A -> cursor centre line (world)
         private LineRenderer _rampL;     // ramp corridor left edge (world)
         private LineRenderer _rampR;     // ramp corridor right edge (world)
+        private LineRenderer _rampFill;  // ramp corridor filled polygon (world)
+        private LineRenderer _rampMarkA; // height marker at A
+        private LineRenderer _rampMarkB; // height marker at B
         private LineRenderer _rect;      // rectangle footprint outline (world)
         private LineRenderer _poly;      // polygon footprint outline (world)
         private LineRenderer _level;     // target-level marker ring (world)
@@ -90,6 +93,13 @@ namespace TerrainForge
             _rampLine = MakeLine("ramp", 0, true);
             _rampL = MakeLine("rampL", 0, true);
             _rampR = MakeLine("rampR", 0, true);
+            _rampFill = MakeLine("rampFill", 0, true);
+            _rampFill.loop = true;
+            _rampFill.numCornerVertices = 2;
+            _rampMarkA = MakeLine("rampMarkA", 0, true);
+            _rampMarkA.loop = true;
+            _rampMarkB = MakeLine("rampMarkB", 0, true);
+            _rampMarkB.loop = true;
             _rect = MakeLine("rect", 0, true);
             _poly = MakeLine("poly", 0, true);
             _level = MakeLine("level", 2, true);
@@ -250,12 +260,32 @@ namespace TerrainForge
                     SetActive(_rampLine, true);
                     SetActive(_rampL, true);
                     SetActive(_rampR, true);
+
+                    // Filled corridor polygon (A-left, B-left, B-right, A-right)
+                    _rampFill.positionCount = 4;
+                    _rampFill.SetPosition(0, a0 + perp);
+                    _rampFill.SetPosition(1, b0 + perp);
+                    _rampFill.SetPosition(2, b0 - perp);
+                    _rampFill.SetPosition(3, a0 - perp);
+                    Color fillC = new Color(c.r, c.g, c.b, c.a * 0.18f);
+                    SetColor(_rampFill, fillC);
+                    SetWidth(_rampFill, w * 0.6f);
+                    SetActive(_rampFill, true);
+
+                    // Height markers at A and B (small rings at ground height)
+                    UpdateHeightMarker(_rampMarkA, a0, c);
+                    UpdateHeightMarker(_rampMarkB, b0, c);
+                    SetActive(_rampMarkA, true);
+                    SetActive(_rampMarkB, true);
                 }
                 else
                 {
                     SetActive(_rampLine, false);
                     SetActive(_rampL, false);
                     SetActive(_rampR, false);
+                    SetActive(_rampFill, false);
+                    SetActive(_rampMarkA, false);
+                    SetActive(_rampMarkB, false);
                 }
             }
             else
@@ -263,6 +293,9 @@ namespace TerrainForge
                 SetActive(_rampLine, false);
                 SetActive(_rampL, false);
                 SetActive(_rampR, false);
+                SetActive(_rampFill, false);
+                SetActive(_rampMarkA, false);
+                SetActive(_rampMarkB, false);
             }
 
             // Rectangle footprint outline (corner A -> cursor corner B).
@@ -398,7 +431,22 @@ namespace TerrainForge
             return 0f;
         }
 
-        public void Destroy()
+        private static void UpdateHeightMarker(LineRenderer lr, Vector3 pos, Color c)
+        {
+            const float ringR = 0.35f;
+            const int segs = 16;
+            lr.positionCount = segs + 1;
+            for (int i = 0; i < segs; i++)
+            {
+                float a = (float)i / segs * Mathf.PI * 2f;
+                lr.SetPosition(i, new Vector3(pos.x + Mathf.Cos(a) * ringR, pos.y + 0.08f, pos.z + Mathf.Sin(a) * ringR));
+            }
+            lr.SetPosition(segs, lr.GetPosition(0));
+            SetWidth(lr, 0.04f);
+            SetColor(lr, new Color(c.r, c.g, c.b, c.a * 0.6f));
+        }
+
+public void Destroy()
         {
             SafeDestroy(_lineMat);
             if (_root != null)
@@ -412,6 +460,9 @@ namespace TerrainForge
                 _rampLine = null;
                 _rampL = null;
                 _rampR = null;
+                _rampFill = null;
+                _rampMarkA = null;
+                _rampMarkB = null;
                 _rect = null;
                 _poly = null;
                 _level = null;
