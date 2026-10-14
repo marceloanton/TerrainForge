@@ -1,176 +1,202 @@
 # Changelog
 
-All notable changes to TerrainForge are documented here.
+Todos los cambios notables de TerrainForge se documentan aquí.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+El formato sigue [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) y
+el proyecto usa [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Added
+### Añadido
 
-- **Adjust mode** (`V`, rebindable): the mouse wheel changes the brush radius
-  without moving the camera — vanilla scroll uses (camera zoom, hotbar, map,
-  piece rotation) are frozen while active, with a HUD tag. Patched defensively:
-  if the input API ever changes, only the freeze is lost (logged).
-- **Held undo/redo**: keeping `Ctrl+Z` / `Ctrl+Y` held steps back/forward
-  continuously (throttled), no need to re-press.
-- **Blocked guides**: the whole preview renders grey when the server or a ward
-  denies editing, so it reads before trying.
-- **First-time tutorial**: two short messages on first equip
-  (`General > SeenTutorial`), then never again.
-- **Capped radius tag**: the HUD shows `20 (tope/capped)` when the server cap
-  clamps your radius.
-- **Snapshot auto-naming**: saving without a name uses date and time.
-- **Fine radius adjust**: `Shift` + wheel / radius keys move in 0.1 m steps.
+- **Donaciones Cafecito**: badge en el README (se ve en Thunderstore),
+  `website_url` en el manifest y botón discreto al final del menú in-game
+  que abre `https://cafecito.app/byrka`.
 
-### Fixed
+### Añadido
 
-- Line/Rect/Poly shapes never show the round guides (edge, full-strength, max
-  radius and aim-distance rings were meaningless there); only the marked
-  outline (corridor, rectangle, trail) is drawn.
+- **Modo ajuste** (`V`, reasignable): la rueda cambia el radio de la brocha sin
+  mover la cámara — usos vanilla de la rueda (zoom, barra rápida, mapa,
+  rotación de piezas) se congelan mientras está activo, con etiqueta en el HUD.
+- **Deshacer/rehacer mantenidos**: manteniendo `Ctrl+Z` / `Ctrl+Y` se avanza
+  continuo (con límite de velocidad), sin volver a pulsar.
+- **Guías bloqueadas**: la vista previa se vuelve gris cuando el servidor o un
+  ward niegan la edición, para que se vea antes de intentar.
+- **Tutorial primera vez**: dos mensajes cortos al equipar la varita por
+  primera vez (`General > SeenTutorial`), luego nunca más.
+- **Etiqueta de radio topeado**: el HUD muestra `20 (tope)` cuando el límite
+  del servidor recorta tu radio.
+- **Auto-nombre de snapshots**: guardar sin nombre usa fecha y hora.
+- **Ajuste fino del radio**: `Shift` + rueda / teclas de radio mueven en
+  pasos de 0.1 m.
 
-### Fixed
+### Corregido
 
-- **Seamless Smooth**: border vertices now sample the neighbouring tile across
-  the edge (exact vertex mapping), so smoothing blends both sides instead of
-  opening a visible seam/crack in the mesh between tiles. Applies to every
-  footprint; other operations were already continuous by construction.
+- Las formas Línea/Rectángulo/Polígono ya no muestran las guías circulares
+  (borde, zona a plena fuerza, radio máx. y distancia de mira no tenían
+  sentido ahí); solo se dibuja el contorno marcado (corredor, rectángulo,
+  estela).
 
-### Added
+### Corregido
 
-- **Snow operation**: paint-only snow brush (same mask as the game's snow);
-  hold `Shift` to erase it back to the original ground. Preview turns grey in
-  erase mode, HUD shows the mode, works over every footprint with undo support.
-- **Pause menu button**: the `ESC` pause menu now has a `TerrainForge` entry
-  (cloned from the settings button, same styling) that opens the mod menu.
-  `F5` keeps working as before.
+- **Suavizado sin costuras**: los vértices de borde ahora muestrean el tile
+  vecino al otro lado del borde (mapeo exacto), así el suavizado funde ambos
+  lados en lugar de abrir una grieta visible en la malla entre tiles. Aplica
+  a toda huella; las demás operaciones ya eran continuas por construcción.
 
-### Fixed
+### Añadido
 
-- Guides much more visible (thicker lines, stronger alphas) plus a startup log
-  line with the preview shader to diagnose invisible previews via `LogOutput.log`.
-- Status HUD moved to the **bottom-right** with the default IMGUI typeface
-  instead of the game's Averia font.
+- **Operación Nieve**: brocha de solo nieve (misma máscara que la nieve del
+  juego); con `Shift` la borra y restaura el suelo original. La vista previa
+  se vuelve gris en modo borrar, el HUD muestra el modo, funciona sobre toda
+  huella con soporte de deshacer.
+- **Botón en menú de pausa**: el menú `ESC` ahora tiene una entrada
+  `TerrainForge` (clonada del botón de ajustes, mismo estilo) que abre el menú
+  del mod. `F5` sigue funcionando igual.
+
+### Corregido
+
+- Guías mucho más visibles (líneas más gruesas, alfas más fuertes) más una
+  línea de log al arranque con el shader de la vista previa para diagnosticar
+  previews invisibles vía `LogOutput.log`.
+- HUD de estado movido a la **esquina inferior derecha** con la fuente IMGUI
+  por defecto en vez de la Averia del juego.
 
 ## [0.2.0] - 2026-10-13
 
-### Added
+### Añadido
 
-- **Undo / redo** of brush applications (`Ctrl+Z` / `Ctrl+Y`, rebindable): every
-  application (including ramps, paint and restore) records the old values of
-  exactly the vertices it overwrites, so one step back restores them. Configurable
-  history depth (`History > UndoDepth`, 0-500, 0 disables) with a slider + exact
-  textbox in the in-game menu (TECLAS tab), live undo/redo counts and flash
-  messages in the status HUD. History is cleared when leaving the world.
-- **Live HUD data**: a second status line shows the aimed ground height, the
-  current target (Flatten height / Raise-Lower step / paint / ramp A→B heights)
-  and the local slope in degrees, updated every frame while aiming.
-- **Eyedropper**: `EyedropKey` (default `G`) fixes the Flatten target at the aimed
-  height until released (wins over the Shift modifier); HUD shows it as `fija`.
-- **Fixed-angle ramps**: `RampMode` (`TwoPoint` / `FixedAngle`, toggled with
-  `RampModeKey`, default `H`). In fixed-angle mode B only sets direction and
-  length while heights follow `SlopeAngle` (up or down depending on the aim);
-  adjust the angle in-game with `Alt` + radius keys/wheel.
-- **New brush shapes**: `Line` (two-press capsule with the brush radius as
-  half-width, reuses the corridor preview), `Rect` (two opposite corners, soft
-  edges from radius + softness) and `Poly` (one point per press, double-press
-  with 3+ points closes and applies). All area operations work over them, with
-  undo support and HUD + preview state.
-- **In-game AJUSTES tab** (F5 menu): everything is now editable live without
-  touching the config file — operation / shape / paint / ramp-mode / smooth-mode
-  cyclers, sliders (radius, softness, ramp angle, raise-lower meters, paint
-  strength, falloff, shore offset) and all toggles (preview, guides, effects,
-  no-cost, protected zones, delta limit, server authority). Saved on menu close.
-- **Smooth modes**: `Full` blurs both ways, `Bumps` only lowers bumps, `Dips`
-  only fills dips (AJUSTES cycler). Line shape + Smooth = smoothing along a path.
-- **Shore operation**: flattens toward the water level plus an offset (beaches /
-  coastlines), with softness blending like Flatten.
-- **Preview upgrades**: footprint edge tints toward red on steep ground (slope
-  shading) and Flatten/Shore show a target-level marker ring that reads as a
-  contour on slopes.
-- **Feedback effects**: the tool's own terrain-hit effect (dust + thud) plays on
-  every application (throttled while holding, always on ramps/shapes); toggle
-  with `General > PlayEffects`.
-- **EN/ES localization**: `General > Language` switches the whole menu, HUD,
-  messages and help between Español and English (key labels rebuild on open).
-- **Radial menu**: hold `RadialKey` (default `Q`) to pick any of the 8 operations
-  with the mouse; release confirms, `Esc` cancels. Suppresses brush application
-  while open.
-- **Named presets**: save / load / delete up to 12 full brush setups from the
-  AJUSTES tab (stored in `Presets > Slots`, culture-invariant format).
-- **Live measurements**: while marking, the HUD shows line/ramp length, rise and
-  angle, rectangle W×D + area, polygon perimeter + area; final numbers are also
-  appended to the confirmation messages.
-- **Path ramps**: `RampMode.Path` marks a curve A→B→C… (double-press with 3+
-  points closes) and builds a smooth Catmull-Rom ramp along it, width = radius;
-  next-segment corridor + trail preview, live length, undo support.
-- **Typed target height**: the eyedropper is now config-backed (`Brush >
-  UseFixedHeight` / `FixedHeight`) with a textbox + Fix/Release row in AJUSTES;
-  `G` captures into the same state, which persists and drives HUD + level ring.
-- **Terrain snapshots**: save the edited tiles to a versioned binary file and
-  restore them later (`BepInEx/config/TerrainForge/snapshots/`, AJUSTES UI with
-  save/load/delete, 12-file cap); importing resolves tiles, restores arrays
-  with ownership and is itself undoable; missing tiles report cleanly.
-- **Wards + server caps**: `RespectWards` blocks edits inside foreign wards via
-  the game's own check; `RadiusCap`/`DeltaCap` let the server clamp radius and
-  delta, visibly (HUD + preview use the effective values). HUD `WARD` tag and
-  AJUSTES rows included.
-- **Chunked application**: big strokes process a few heightmap tiles per frame
-  (`Performance > ChunkCompsPerFrame`, AJUSTES slider) instead of hitching;
-  terrain appears progressively, one undo step per completed stroke, auto-
-  continues if the key is released, FIFO order kept.
-- **Server authority**: new `Server` section (`AllowTerrainEdits`, `AdminOnlyEdits`).
-  When the server runs the mod, its values win through config sync and clients
-  cannot apply, undo or redo against them (HUD shows `SERVER: BLOQUEADO` with the
-  reason). Servers without the mod ignore these, so the client tool keeps working
-  there for testing.
+- **Deshacer / rehacer** de trazos de brocha (`Ctrl+Z` / `Ctrl+Y`,
+  reasignables): cada aplicación (incluyendo rampas, pintura y restaurar)
+  guarda los valores anteriores de exactamente los vértices que toca, así un
+  paso atrás los restaura. Profundidad configurable
+  (`Historial > ProfundidadDeshacer`, 0-500, 0 desactiva) con slider + caja
+  exacta en el menú in-game (pestaña TECLAS), contadores en vivo de
+  deshacer/rehacer y mensajes flash en el HUD. El historial se limpia al
+  salir del mundo.
+- **Datos en vivo en el HUD**: una segunda línea muestra la altura del suelo
+  apuntada, el objetivo actual (altura de Aplanar / paso de Subir-Bajar /
+  pintura / alturas A→B de Rampa) y la pendiente local en grados, actualizado
+  cada frame mientras apuntas.
+- **Cuentagotas**: tecla `EyedropKey` (por defecto `G`) fija el objetivo de
+  Aplanar en la altura apuntada hasta soltarla (gana al modificador `Shift`);
+  el HUD la muestra como `fija`.
+- **Rampas de ángulo fijo**: `ModoRampa` (`DosPuntos` / `ÁnguloFijo`, con
+  `RampModeKey`, por defecto `H`). En ángulo fijo B solo da dirección y
+  largo; la altura sigue `ÁnguloRampa` (sube o baja según dónde apuntes);
+  ajustas el ángulo in-game con `Alt` + teclas de radio/rueda.
+- **Nuevas formas de brocha**: `Línea` (cápsula de dos pulsos con el radio
+  como semiancho, reusa la vista previa de corredor), `Rectángulo` (dos
+  esquinas opuestas, bordes suaves de radio + suavidad) y `Polígono` (un
+  punto por pulso, doble pulso con 3+ puntos cierra y aplica). Todas las
+  operaciones de área funcionan sobre ellas, con soporte de deshacer y
+  estado en HUD + vista previa.
+- **Pestaña AJUSTES in-game** (menú F5): todo editable en vivo sin tocar el
+  config — cicladores de operación / forma / pintura / modo rampa / modo
+  suavizar, sliders (radio, suavidad, ángulo rampa, metros subir-bajar,
+  fuerza pintura, caída, margen costa) y todos los interruptores (vista
+  previa, guías, efectos, sin costo, zonas protegidas, límite delta,
+  autoridad servidor). Se guarda al cerrar el menú.
+- **Modos de suavizado**: `Completo` blureea ambos sentidos, `SoloLomos`
+  solo baja lomos, `SoloHoyos` solo rellena hoyos (cicla en AJUSTES). Forma
+  Línea + Suavizar = suavizado a lo largo de un camino.
+- **Operación Costa**: aplana hacia el nivel del agua más un margen (playas /
+  costas), con suavidad mezclando como Aplanar.
+- **Mejoras en vista previa**: el borde del footprint se tiñe hacia rojo en
+  terreno empinado (sombreado de pendiente) y Aplanar/Costa muestran un
+  anillo marcador del nivel objetivo que se lee como curva de nivel en
+  pendientes.
+- **Efectos de feedback**: el efecto propio de golpe de terreno del juego
+  (polvo + golpe) suena en cada aplicación (limitado al mantener, siempre en
+  rampas/formas); se apaga con `General > PlayEffects`.
+- **Localización EN/ES**: `General > Language` cambia todo el menú, HUD,
+  mensajes y ayuda entre Español e Inglés (etiquetas de teclas se reconstruyen
+  al abrir).
+- **Menú radial**: mantén `RadialKey` (por defecto `Q`) para elegir cualquiera
+  de las 8 operaciones con el ratón; soltar confirma, `Esc` cancela. Suprime
+  la aplicación de brocha mientras está abierto.
+- **Perfiles nombrados**: guarda / carga / borra hasta 12 setups completos de
+  brocha desde la pestaña AJUSTES (guardados en `Perfiles > Slots`, formato
+  invariante de cultura).
+- **Medidas en vivo**: mientras marcas, el HUD muestra largo/subida/ángulo de
+  línea/rampa, ancho×fondo + área de rectángulo, perímetro + área de
+  polígono; los números finales también se añaden a los mensajes de
+  confirmación.
+- **Rampas senda**: `ModoRampa.Senda` marca una curva A→B→C… (doble pulso con
+  3+ puntos cierra) y construye una rampa Catmull-Rom suave a lo largo,
+  ancho = radio; vista previa de corredor del siguiente tramo + estela, largo
+  en vivo, soporte de deshacer.
+- **Altura objetivo por texto**: el cuentagotas ahora vive en el config
+  (`Brocha > UsarAlturaFija` / `AlturaFija`) con caja de texto + fila
+  Fijar/Liberar en AJUSTES; `G` captura en el mismo estado, que persiste y
+  mueve HUD + anillo de nivel.
+- **Snapshots de terreno**: guarda los tiles editados en un archivo binario
+  versionado y restáuralos luego (`BepInEx/config/TerrainForge/snapshots/`,
+  UI en AJUSTES con guardar/cargar/borrar, tope 12 archivos); la importación
+  resuelve tiles, restaura arrays con propiedad y es ella misma deshacible;
+  tiles faltantes avisan limpiamente.
+- **Wards + topes de servidor**: `RespetarWards` bloquea edits dentro de
+  wards ajenos usando la comprobación del juego; `TopeRadio`/`TopeDelta`
+  dejan al servidor recortar radio y delta, visible (HUD + vista previa usan
+  los valores efectivos). Etiqueta `WARD` en HUD y filas en AJUSTES.
+- **Aplicación por chunks**: trazos grandes procesan unos pocos tiles de
+  heightmap por frame (`Rendimiento > TilesPorFrame`, slider en AJUSTES) en
+  lugar de trabar; el terreno aparece progresivamente, un paso de deshacer
+  por trazo completado, auto-continúa si sueltas la tecla, orden FIFO.
+- **Autoridad de servidor**: nueva sección `Servidor` (`PermitirEditsTerreno`,
+  `SoloAdmins`). Cuando el servidor corre el mod, sus valores mandan por
+  config sync y los clientes no pueden aplicar/deshacer/rehacer contra ellos
+  (HUD muestra `SERVER: BLOQUEADO` con la razón). Servidores sin el mod
+  ignoran esto, así que la herramienta sigue sirviendo para probar.
 
 ## [0.1.0] - 2026-10-12
 
-Initial release.
+### Añadido
 
-### Added
+- Brocha de terreno libre: operaciones **Aplanar**, **Subir**, **Bajar**,
+  **Suavizar**, **Rampa**, **Pintar** y **Restaurar**, aplicadas bajo la mira
+  mientras mantienes la tecla de aplicar. Aplanar sigue la altura del suelo
+  apuntado por defecto (mantén el modificador para nivelar a tus pies);
+  Suavizar promedia cada punto con sus vecinos para un suavizado real.
+- **Varita TerrainForge** (clon del martillo) como objeto herramienta que
+  maneja la brocha, con entrega y equipado automático al entrar al mundo,
+  más tecla de dar (`F8` por defecto). El registro del objeto usa Jotunn.
+- **Operación Rampa** (dos puntos): pulsa *aplicar* para marcar punto A, luego
+  apunta y pulsa *aplicar* otra vez para marcar punto B, y una pendiente
+  recta une ambas alturas a lo largo del corredor A-B (el radio de la brocha
+  pone el ancho de la rampa). El corredor es plano a lo ancho con borde
+  suave (la suavidad solo controla la mezcla lateral), así la rampa coincide
+  exactamente con la vista previa.
+- Radio de brocha configurable (hasta 60 m), **forma** (círculo / cuadrado) y
+  **tipo de pintura**, ciclables in-game.
+- **Vista previa en vivo** al apuntar: anillo sólido marca el área real que
+  se genera, y guías tenues del color de la operación muestran la **zona a
+  plena fuerza**, el **radio máximo** y la **distancia máxima de mira** alrededor
+  del jugador. En Rampa se dibuja el **corredor A-B real** (ambos bordes del
+  ancho) mientras marcas. Guías desactivables con `Vista previa > MostrarGuías`.
+  Más HUD superior izquierdo (operación, radio, forma, pintura).
+- **Menú de atajos in-game** (`F5`, configurable) con skin propio, más
+  **pestaña de ayuda in-game** documentando la herramienta y cada operación.
+- Eliminación del clamp hardcodeado vanilla de **±8 m** de delta de terreno
+  (`DesbloquearLímiteDelta`), así edits grandes sobreviven a la regeneración
+  del terreno. Debe estar activado también en el servidor.
+- Ajustes opcionales de herramientas vanilla: radio escalado de azadón/
+  cultivador, **sin costo de construcción**, y edits en **zonas protegidas**
+  (no-construcción / ward).
+- Mira que funciona sobre agua raymarcheando contra el heightmap cuando no
+  hay collider.
+- **Herramienta requerida** configurable (`Cualquiera`, `Pico`, o la
+  `TerrainForgeTool` del mod).
 
-- Free-form terrain brush: **Flatten**, **Raise**, **Lower**, **Smooth**,
-  **Ramp**, **Paint** and **Restore** operations, applied under the crosshair while
-  the apply key is held. Flatten follows the aimed ground height by default (hold
-  the modifier to level to your own feet); Smooth blurs each point with its
-  neighbours for a real smoothing effect.
-- **TerrainForge Rod** tool item (a clone of the Hammer) used to drive the brush,
-  with automatic hand-out and equip on entering a world, plus a give key (default
-  `F8`). Registering the item uses Jotunn.
-- **Ramp** operation (two-point): press *apply* to mark point A, then aim and press
-  *apply* again to mark point B, and a straight slope joins the two heights along
-  the A-B corridor (the brush radius sets the ramp width). The corridor is flat
-  across its full width with a soft edge (softness controls only the side blend),
-  so the ramp matches the previewed size exactly.
-- Configurable brush **radius** (up to 60 m), **shape** (circle / square) and
-  **paint** type, cycleable in-game.
-- Live footprint **preview** while aiming: a solid ring marks the real generated
-  area, and thin, faint guides in the operation colour show the **full-strength
-  zone**, the **maximum brush radius** and the **maximum aim distance** around the
-  player. In the Ramp operation the real **A-B corridor** (both width edges) is
-  drawn while marking. Guides can be disabled with `Preview > ShowGuides`. Plus a
-  top-left status **HUD** (operation, radius, shape, paint).
-- **In-game key binding menu** (`F5`, configurable) with a custom skin, plus an
-  **in-game help tab** documenting the tool and every operation.
-- Removal of the vanilla hard-coded **+/-8 m** terrain delta clamp
-  (`UnlockDeltaLimit`), so large edits survive terrain regeneration. Must also be
-  enabled on the server.
-- Optional vanilla-tool tweaks: scaled hoe / cultivator radius, **no build cost**,
-  and edits inside **protected zones** (no-build / ward).
-- Aim that works over water by raymarching against the terrain heightmap when no
-  collider is hit.
-- Configurable **required tool** (`Any`, `Pickaxe`, or the mod's `TerrainForgeTool`).
+### Notas
 
-### Notes
+- Los edits de terreno persisten vía el ZDO del `TerrainComp` y los replica
+  el servidor, así que TerrainForge debe ir en **cliente y servidor**.
+- Principio de diseño: dependencias externas al mínimo. La herramienta
+  personalizada usa Jotunn ahora; una futura versión registrará el prefab
+  via Harmony para no necesitar Jotunn.
 
-- Terrain edits persist via the `TerrainComp` ZDO and are replicated by the
-  server, so TerrainForge must be installed on **both client and server**.
-- Design principle: keep external dependencies to a minimum. The custom tool item
-  currently relies on Jotunn; a future release aims to register the prefab via a
-  Harmony patch so Jotunn is not required.
+---
 
 [Unreleased]: https://example.com/terrainforge/compare/0.1.0...HEAD
 [0.1.0]: https://example.com/terrainforge/releases/tag/0.1.0

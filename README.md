@@ -1,183 +1,189 @@
 # TerrainForge
 
-A free-form terrain brush for Valheim.
+[![Invitame un café en cafecito.app](https://cdn.cafecito.app/imgs/buttons/button_5.svg)](https://cafecito.app/byrka)
 
-Flatten, raise, lower, smooth, **ramp** (two-point, fixed-angle and path),
-**shore**, paint and restore terrain of any size, beyond the vanilla +/-8 m
-limit, with undo/redo, five brush shapes, a radial menu, named presets and
-EN/ES localization.
+Una brocha de terraformado libre para Valheim.
 
-The mod ships its own **TerrainForge Rod** (a clone of the Hammer) as the brush
-tool, hands it to you automatically and documents everything in an **in-game help
-tab** (press the rebind key, default `F5`).
+Aplana, sube, baja, suaviza, crea **rampas** (dos puntos, ángulo fijo y senda),
+**costa**, pinta y restaura terreno de cualquier tamaño, superando el límite
+vanilla de ±8 m, con deshacer/rehacer, cinco formas de brocha, menú radial,
+perfiles guardados y localización EN/ES.
 
-## Why client AND server
+El mod incluye su propia **Varita TerrainForge** (clon del martillo) como
+herramienta de brocha, te la entrega automáticamente al entrar y lo explica
+todo en una pestaña de **ayuda in-game** (tecla de menú, por defecto `F5`).
 
-Terrain edits are written into the game's `TerrainComp` delta arrays and persisted
-to the owning ZDO, so the **server stores and replicates them** to every client.
+## Por qué cliente Y servidor
 
-Because the vanilla `TerrainComp.ApplyToHeightmap` clamps every vertex to
-`baseHeight +/- 8 m`, **TerrainForge must also be installed on the server**
-(otherwise the server regenerates a clamped terrain while modded clients show the
-full edit, causing desync). Install it on the server and on every client.
+Los cambios de terreno se guardan en el mundo y el servidor los replica a todos
+los jugadores. Como el juego recorta los edits a ±8 m, **TerrainForge debe
+instalarse también en el servidor**; si no, el servidor regenera el terreno
+recortado mientras los clientes ven el edit completo → desincronización.
 
-## Requirements
+## Requisitos
 
-- BepInEx 5 (x64, Mono) on client and server. Thunderstore Mod Manager users already have it.
-- **Jotunn** (`ValheimModding-Jotunn`) — used to register the custom tool item.
-  Listed as a dependency in `manifest.json`; Thunderstore installs it automatically.
+- BepInEx 5 (x64, Mono) en cliente y servidor. Usuarios de Thunderstore ya lo
+  tienen.
+- **Jotunn** (`ValheimModding-Jotunn`) — registra la herramienta personalizada.
+  Está en `manifest.json`; Thunderstore lo instala solo.
 
-## Installation
+## Instalación
 
-1. Build (see below) or copy `TerrainForge.dll`.
-2. Drop it in:
-   - Client: `...\BepInEx\plugins\TerrainForge\TerrainForge.dll`
-   - Server: `<server>\BepInEx\plugins\TerrainForge\TerrainForge.dll`
-3. Restart the game / server.
+1. Compila (ver abajo) o copia `TerrainForge.dll`.
+2. Ponla en:
+   - Cliente: `...\BepInEx\plugins\TerrainForge\TerrainForge.dll`
+   - Servidor: `<servidor>\BepInEx\plugins\TerrainForge\TerrainForge.dll`
+3. Reinicia el juego / servidor.
 
-## Usage
+## Uso
 
-Equip the **TerrainForge Rod** (given automatically on entering a world; get it
-again with the *give tool* key, default `F8`), aim at the ground and hold the
-**apply** key (default **right mouse button**) to edit terrain under the crosshair.
+Equipa la **Varita TerrainForge** (te la dan al entrar al mundo; vuelve a
+conseguirla con la tecla *dar herramienta*, `F8` por defecto), apunta al suelo
+y mantén **aplicar** (clic derecho por defecto) para esculpir bajo la mira.
 
-While aiming, a solid ring marks the real generated area, with thin, faint guides
-in the operation colour around it (full-strength zone, maximum brush radius and
-maximum aim distance). In the Ramp operation the real A-B corridor is drawn while
-marking. The status HUD (bottom-right, default IMGUI typeface) shows the current operation, radius, shape and
-paint, plus undo/redo counts; a second line shows the aimed height, the current
-target and the local slope in degrees. Guides can be turned off with
-`Preview > ShowGuides`.
+Mientras apuntas, un anillo sólido marca el área real que se genera, con guías
+tenues del color de la operación (zona a plena fuerza, radio máximo y distancia
+máxima de mira). En Rampa se dibuja el corredor A-B real mientras marcas.
+El HUD (abajo a la derecha) muestra operación, radio, forma, pintura y
+contadores de deshacer/rehacer; una segunda línea muestra la altura apuntada,
+el objetivo actual y la pendiente local en grados. Las guías se desactivan en
+`Vista previa > Mostrar guías`.
 
-| Action | Default key |
-| --- | --- |
-| Apply brush | Hold `Mouse1` (right mouse) |
-| Increase radius | `=` (also `Ctrl` + mouse wheel) |
-| Decrease radius | `-` (also `Ctrl` + mouse wheel) |
-| Cycle operation | `,` |
-| Cycle shape (circle/square/line/rect/poly) | `.` |
-| Cycle paint type | `/` |
-| Use aimed height (instead of your own) for Flatten | Hold `Left Shift` |
-| Undo last brush application | `Ctrl+Z` |
-| Redo an undone application | `Ctrl+Y` |
-| Fix / release Flatten height at aim (eyedropper) | `G` |
-| Toggle ramp mode (two-point / fixed angle / path) | `H` |
-| Adjust fixed ramp angle (Ramp selected) | Hold `Alt` + radius keys / wheel |
-| Operation radial menu (hold, release to confirm) | `Q` |
-| Toggle adjust mode (wheel = radius, camera zoom frozen) | `V` |
-| Fine radius adjust (0.1 m steps) | Hold `Shift` + wheel / radius keys |
-| Give yourself the TerrainForge Rod | `F8` |
-| Open the key binding + help menu | `F5` |
+| Acción | Tecla por defecto |
+|--------|-------------------|
+| Aplicar brocha | Mantener `Mouse1` (clic derecho) |
+| Subir radio | `=` (también `Ctrl` + rueda) |
+| Bajar radio | `-` (también `Ctrl` + rueda) |
+| Cambiar operación | `,` |
+| Cambiar forma (círculo/cuadrado/línea/rect/poli) | `.` |
+| Cambiar tipo de pintura | `/` |
+| Usar altura apuntada (en vez de tus pies) para Aplanar | Mantener `Shift` izq. |
+| Deshacer último trazo | `Ctrl+Z` |
+| Rehacer trazo deshecho | `Ctrl+Y` |
+| Fijar / liberar altura de Aplanar (cuentagotas) | `G` |
+| Cambiar modo de rampa (dos puntos / ángulo fijo / senda) | `H` |
+| Ajustar ángulo de rampa fija (con Rampa seleccionada) | Mantener `Alt` + teclas de radio / rueda |
+| Menú radial de operaciones (mantener, soltar para confirmar) | `Q` |
+| Modo ajuste (rueda = radio, zoom congelado) | `V` |
+| Ajuste fino del radio (pasos de 0.1 m) | Mantener `Shift` + rueda / teclas de radio |
+| Obtener la Varita TerrainForge | `F8` |
+| Abrir menú de teclas + ayuda | `F5` |
 
-Operations cycle through: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`,
-`Restore`, `Shore` (flattens toward water level + offset, for beaches) and
-`Snow` (paints snow like Paint but snow-only; hold `Shift` to remove it and
-restore the original ground).
+Las operaciones ciclan: `Aplanar`, `Subir`, `Bajar`, `Suavizar`, `Rampa`,
+`Pintar`, `Restaurar`, `Costa` (aplana hacia el nivel del agua + margen, para
+playas) y `Nieve` (pinta nieve como Pintar pero solo nieve; con `Shift` la
+quita y restaura el suelo original).
 
-Everything is editable live in the in-game menu (`F5` → **AJUSTES** tab):
-operation / shape / paint / ramp-mode / smooth-mode, all sizes via sliders,
-every toggle, menu/HUD language (`Español`/`English`) and named brush
-**presets**. Saved when the menu closes.
+Todo se edita en vivo en el menú in-game (`F5` → pestaña **AJUSTES**):
+operación / forma / pintura / modo rampa / modo suavizar, todos los tamaños
+con sliders, cada interruptor, idioma del menú/HUD (`Español`/`English`) y
+**perfiles de brocha** con nombre. Se guarda al cerrar el menú.
 
-**Terrain snapshots** (backups) live in the same tab: name a snapshot to save
-every edited tile to `BepInEx/config/TerrainForge/snapshots/<name>.dat`, then
-load it back later (even in another session). Importing restores the arrays
-with ownership and is itself undoable; tiles that are not loaded report
-cleanly, so import near the place.
+**Snapshots de terreno** (copias de seguridad) viven en la misma pestaña:
+ponle un nombre para guardar todos los tiles editados en
+`BepInEx/config/TerrainForge/snapshots/<nombre>.dat`, luego cárgalo después
+(incluso en otra partida). La importación restaura con propiedad y es
+deshacible; tiles no cargados avisan limpiamente, así que importa cerca del
+lugar.
 
-Shapes cycle through: `Circle`, `Square`, `Line`, `Rect`, `Poly` (`.` key).
-`Line`/`Rect` are marked with two `Apply` presses (A then B; line half-width =
-brush radius, rect corners define the area with soft edges). `Poly` adds one
-vertex per press and closes on a double-press with 3+ vertices. All area
-operations apply over these footprints with undo support.
+Las formas ciclan: `Círculo`, `Cuadrado`, `Línea`, `Rectángulo`, `Polígono`
+(tecla `.`). `Línea`/`Rectángulo` se marcan con dos pulsos de Aplicar (A y B;
+el semiancho de la línea = radio de la brocha, las esquinas definen el área
+con bordes suaves). `Polígono` suma un vértice por pulso y cierra con doble
+pulso (3+ vértices). Todas las operaciones de área aplican sobre estas
+huellas con soporte de deshacer.
 
-- **Flatten** follows the ground **under the crosshair** by default, so it conforms
-  to whatever you aim at (e.g. a ramp). Hold the modifier (`Left Shift`) to level to
-  your own feet instead.
-- **Smooth** averages each point with its neighbours (a real blur), smoothing bumps,
-  steps and noise. Hold it down to smooth progressively.
-- **Ramp** has three modes (`H`): **two-point** (mark **A** then **B**, a straight
-  slope joins both heights), **fixed-angle** (**B** sets direction/length, height
-  follows `SlopeAngle`, adjustable with `Alt` + radius keys), and **path** (mark
-  a curve **A→B→C…**, double-press to close). The brush radius sets the ramp
-  width and softness softens only the side edges.
+- **Aplanar** sigue el suelo **bajo la mira** por defecto, así se adapta a lo
+  que apuntes (p.ej. una rampa). Mantén el modificador (`Shift` izq.) para
+  nivelar a tus pies.
+- **Suavizar** promedia cada punto con sus vecinos (un blur real), alisando
+  lomos, escalones y ruido. Mantenlo pulsado para suavizar progresivamente.
+- **Rampa** tiene tres modos (`H`): **dos puntos** (marcas **A** y **B**,
+  une ambas alturas con pendiente recta), **ángulo fijo** (**B** da dirección
+  y largo, la altura sigue `Ángulo rampa`, ajustable con `Alt` + radio), y
+  **senda** (marcas una curva **A→B→C…**, doble pulso cierra). El radio de la
+  brocha pone el ancho de la rampa y la suavidad solo ablanda los bordes
+  laterales.
 
-### In-game help
+### Ayuda in-game
 
-Press **F5** (configurable) — or the **TerrainForge** button in the `ESC` pause
-menu — and open the **AYUDA** tab for an in-game description
-of the tool and every operation. The **TECLAS** tab rebinds keys: click a binding,
-press the new key or mouse button, and it is saved to the config immediately.
-`Esc` cancels a capture.
+Pulsa **F5** (configurable) — o el botón **TerrainForge** en el menú de pausa
+`ESC` — y abre la pestaña **AYUDA** para una descripción de la herramienta y
+cada operación. La pestaña **TECLAS** reasigna teclas: haz click en un
+atajo, pulsa la tecla o botón nuevo, y se guarda al config al instante.
+`Esc` cancela la captura.
 
-Note: F5 is also Valheim's developer console key, but only when the game is
-launched with `-console`. If your console is enabled, rebind this to e.g. F7/F9.
+Nota: F5 también abre la consola de desarrollador de Valheim, pero solo si
+lanzas el juego con `-console`. Si la usas, reasigna el menú a F7/F9.
 
-All hotkeys are also editable directly in `BepInEx/config/com.terrainforge.valheim.cfg`.
+Todos los atajos también se editan directo en
+`BepInEx/config/com.terrainforge.valheim.cfg`.
 
-## Configuration
+## Configuración
 
-Config file: `BepInEx/config/com.terrainforge.valheim.cfg`
+Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
 
-- **General**: `Enabled`, `PlayEffects` (dust + thud on apply), `Language`
-  (`Español` / `English`).
-- **Brush**: `Radius`, `RadiusMin/Max`, `RadiusStep`, `Softness`, `FalloffPower`,
-  `RaiseLowerMeters`, `PaintStrength`, `DefaultOperation`, `Shape`, `Paint`,
-  `RampMode` (`TwoPoint` / `FixedAngle` / `Path`), `SlopeAngle` (5-60°),
-  `SmoothMode` (`Full` / `Bumps` / `Dips`), `ShoreOffset`,
-  `UseFixedHeight` / `FixedHeight` (eyedropper state).
-- **Input**: all hotkeys (`ApplyKey`, radius, cycles, `AimHeightModifierKey`,
+- **General**: `Enabled`, `PlayEffects` (polvo + golpe al aplicar),
+  `Language` (`Español` / `English`).
+- **Brocha**: `Radio`, `RadioMin/Máx`, `PasoRadio`, `Suavidad`,
+  `PotenciaCaída`, `MetrosSubirBajar`, `FuerzaPintura`,
+  `OperaciónPorDefecto`, `Forma`, `Pintura`,
+  `ModoRampa` (`DosPuntos` / `ÁnguloFijo` / `Senda`), `ÁnguloRampa` (5-60°),
+  `ModoSuavizar` (`Completo` / `SoloLomos` / `SoloHoyos`), `MargenCosta`,
+  `UsarAlturaFija` / `AlturaFija` (estado del cuentagotas).
+- **Entrada**: todos los atajos (`ApplyKey`, radio, ciclos, `AimHeightModifierKey`,
   `UndoKey`/`RedoKey`, `EyedropKey`, `RampModeKey`, `RadialKey`, `GiveToolKey`,
-  `RebindMenuKey`), plus `RequiredTool` (`Any`, `Pickaxe`, or the mod's
-  `TerrainForgeTool` — default) and `AutoGiveTool` (hand out the rod on entering
-  a world, default `true`).
-- **Limits**: `UnlockDeltaLimit` (default **true**), `MaxUpDelta`, `MaxDownDelta`.
-  Raising these allows terrain edits past the vanilla +/-8 m; keep them equal on
-  server and clients.
-- **VanillaTools** (best effort / optional):
-  - `ScaleVanillaToolRadius` – enlarge the vanilla hoe / cultivator radius.
-    This only affects the client that applies the op and may not stay consistent
-    across clients, so it is **off by default**.
-  - `NoBuildCost` – remove material / workstation requirements.
-  - `AllowInProtectedZones` – ignore no-build and ward zones (bypasses protection).
-- **Preview**: `ShowPreview`, `ShowGuides` (reach guides, slope tint, level ring).
-- **History**: `UndoDepth` (0-500, default 50; 0 disables undo history).
-- **Presets**: `Slots` (named brush setups, managed in-game).
-- **Performance**: `ChunkCompsPerFrame` (1-32, default 4 tiles per frame).
-- **Server** (authoritative when the server runs the mod — its values win through
-  config sync): `AllowTerrainEdits` (default `true`; when `false`, clients cannot
-  apply, undo or redo) and `AdminOnlyEdits` (default `false`; only admins / host
-  may edit). `RespectWards` (default `true`) blocks edits inside foreign wards.
-  `RadiusCap` / `DeltaCap` (`0` = off) clamp brush radius and delta, visibly in
-  HUD and preview. Servers *without* the mod ignore this section, so the client tool
-  keeps working there for testing.
+  `RebindMenuKey`), más `HerramientaRequerida` (`Cualquiera`, `Pico`, o la
+  `TerrainForgeTool` del mod — por defecto) y `DarToolAuto` (entrega la varita
+  al entrar, por defecto `true`).
+- **Límites**: `DesbloquearLímiteDelta` (por defecto **true**),
+  `DeltaMáxSubida`, `DeltaMáxBajada`. Subir esto permite edits más allá de
+  ±8 m vanilla; mantenlos iguales en servidor y clientes.
+- **HerramientasVanilla** (opcional / best effort):
+  - `EscalarRadioToolVanilla` — agranda el radio del azadón/cultivador vanilla.
+    Solo afecta al cliente que lo usa y puede desincronizar a otros; **apagado
+    por defecto**.
+  - `SinCostoConstrucción` — quita requisitos de mesa y materiales.
+  - `PermitirEnZonasProtegidas` — ignora zonas no-construcción y wards.
+- **Vista previa**: `MostrarVista`, `MostrarGuías` (guías de alcance, tinte de
+  pendiente, anillo de nivel).
+- **Historial**: `ProfundidadDeshacer` (0-500, por defecto 50; 0 desactiva el
+  historial).
+- **Perfiles**: `Slots` (setups de brocha nombrados, se gestionan in-game).
+- **Rendimiento**: `TilesPorFrame` (1-32, por defecto 4 tiles/frame).
+- **Servidor** (autoritario cuando el servidor corre el mod — sus valores ganan
+  por config sync): `PermitirEditsTerreno` (por defecto `true`; si `false`,
+  clientes no pueden aplicar/deshacer/rehacer) y `SoloAdmins` (por defecto
+  `false`; solo admins/host pueden editar). `RespetarWards` (por defecto
+  `true`) bloquea edits dentro de wards ajenos. `TopeRadio` / `TopeDelta`
+  (`0` = off) recortan radio y delta visiblemente (HUD + vista previa). Servidores
+  **sin** el mod ignoran esta sección, así que la herramienta sigue sirviendo
+  para probar.
 
-## Building
+## Compilar
 
-Requires the .NET SDK and the reference DLLs (Valheim `Managed` folder + BepInEx
-`core` folder). Defaults point at the Thunderstore profile; override with:
+Requiere .NET SDK y las DLLs de referencia (carpeta `Managed` de Valheim +
+carpeta `core` de BepInEx). Los defaults apuntan al perfil de Thunderstore;
+sobrescribe con:
 
 ```
 dotnet build -c Release -p:ValheimDir="D:\Steam\...\Valheim"
 ```
 
-Deploy straight into the profile plugins folder:
+Despliegue directo a la carpeta de plugins del perfil:
 
 ```
 dotnet build -c Release -p:Deploy=true
 ```
 
-## Notes / limitations
+## Notas / limitaciones
 
-- **Design principle: keep external dependencies to a minimum.** Prefer vanilla
-  game APIs + Harmony over third-party mod frameworks when a feature can be done
-  either way. (The custom tool item currently uses Jotunn; the goal is to
-  eventually register the prefab ourselves via a Harmony patch so Jotunn is not
-  required.)
-- Larger vanilla-tool radius is best-effort and may desync other clients; the
-  custom brush is the reliable path for big edits.
-- Keep `MaxUpDelta` / `MaxDownDelta` consistent between server and clients.
+- Radio de herramienta vanilla grande es best-effort y puede desincronizar
+  otros clientes; la brocha personalizada es el camino fiable para edits
+  grandes.
+- Mantén `DeltaMáxSubida` / `DeltaMáxBajada` consistentes entre servidor y
+  clientes.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md).
+Ver [CHANGELOG.md](CHANGELOG.md).
