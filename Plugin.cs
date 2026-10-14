@@ -38,6 +38,7 @@ namespace TerrainForge
         public ConfigEntry<bool> UseFixedHeight;
         public ConfigEntry<float> FixedHeight;
         public ConfigEntry<SmoothMode> SmoothMode;
+        public ConfigEntry<FalloffMode> FalloffMode;
         public ConfigEntry<float> ShoreOffset;
 
         // Limits
@@ -59,6 +60,16 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> RampModeKey;
         public ConfigEntry<KeyboardShortcut> RadialKey;
         public ConfigEntry<KeyboardShortcut> AdjustModeKey;
+        public ConfigEntry<KeyboardShortcut> OpFlattenKey;
+        public ConfigEntry<KeyboardShortcut> OpRaiseKey;
+        public ConfigEntry<KeyboardShortcut> OpLowerKey;
+        public ConfigEntry<KeyboardShortcut> OpSmoothKey;
+        public ConfigEntry<KeyboardShortcut> OpPaintKey;
+        public ConfigEntry<KeyboardShortcut> OpRestoreKey;
+        public ConfigEntry<KeyboardShortcut> OpRampKey;
+        public ConfigEntry<KeyboardShortcut> OpShoreKey;
+        public ConfigEntry<KeyboardShortcut> OpSnowKey;
+        public ConfigEntry<KeyboardShortcut> CycleProfileKey;
         public ConfigEntry<bool> SeenTutorial;
         public ConfigEntry<string> PresetSlots;
         public ConfigEntry<ToolRequirement> RequiredTool;
@@ -137,6 +148,8 @@ namespace TerrainForge
                     new AcceptableValueRange<float>(-10f, 150f)));
             SmoothMode = Config.Bind("Brush", "SmoothMode", global::TerrainForge.SmoothMode.Full,
                 "Smooth behavior: Full blurs both ways, Bumps only lowers bumps, Dips only fills dips.");
+            FalloffMode = Config.Bind("Brush", "FalloffMode", global::TerrainForge.FalloffMode.Pointy,
+                "Raise/Lower brush falloff: Pointy (sharp center), Flat (uniform disk), Smooth (cosine), Linear (taper).");
             ShoreOffset = Config.Bind("Brush", "ShoreOffset", 0.5f,
                 new ConfigDescription("Height above the water level targeted by the Shore operation (meters).",
                     new AcceptableValueRange<float>(-2f, 5f)));
@@ -176,6 +189,26 @@ namespace TerrainForge
             AdjustModeKey = Config.Bind("Input", "AdjustModeKey", new KeyboardShortcut(KeyCode.V),
                 "Toggle adjust mode: the mouse wheel changes the brush radius and vanilla " +
                 "scroll uses (camera zoom, hotbar, map) are frozen while active.");
+            OpFlattenKey = Config.Bind("Input", "OpFlattenKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Flatten operation.");
+            OpRaiseKey = Config.Bind("Input", "OpRaiseKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Raise operation.");
+            OpLowerKey = Config.Bind("Input", "OpLowerKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Lower operation.");
+            OpSmoothKey = Config.Bind("Input", "OpSmoothKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Smooth operation.");
+            OpPaintKey = Config.Bind("Input", "OpPaintKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Paint operation.");
+            OpRestoreKey = Config.Bind("Input", "OpRestoreKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Restore operation.");
+            OpRampKey = Config.Bind("Input", "OpRampKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Ramp operation.");
+            OpShoreKey = Config.Bind("Input", "OpShoreKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Shore operation.");
+            OpSnowKey = Config.Bind("Input", "OpSnowKey", new KeyboardShortcut(KeyCode.None),
+                "Direct key to select Snow operation.");
+            CycleProfileKey = Config.Bind("Input", "CycleProfileKey", new KeyboardShortcut(KeyCode.None),
+                "Cycle to the next saved brush profile/preset.");
             SeenTutorial = Config.Bind("General", "SeenTutorial", false,
                 "Set once the first-time tutorial messages have been shown.");
             PresetSlots = Config.Bind("Presets", "Slots", "",

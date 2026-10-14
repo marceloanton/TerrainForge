@@ -169,6 +169,8 @@ namespace TerrainForge
                     ClearShapeMarks();
                     ClearRampPath();
                 }
+                HandleDirectOperationKeys(p);
+                HandleCycleProfile(p);
                 if (p.CycleShapeKey.Value.IsDown())
                 {
                     CycleShape(p);
@@ -527,6 +529,7 @@ namespace TerrainForge
                 MaxUp = EffectiveMaxUp(p),
                 MaxDown = EffectiveMaxDown(p),
                 SmoothMode = p.SmoothMode.Value,
+                Falloff = p.FalloffMode.Value,
                 ShoreTarget = TerrainEngine.WaterLevel() + p.ShoreOffset.Value
             };
         }
@@ -543,6 +546,39 @@ namespace TerrainForge
             if (ok)
                 TerrainFx.Play(center, false);
             return ok;
+        }
+
+        private void HandleDirectOperationKeys(TerrainForgePlugin p)
+        {
+            if (p.OpFlattenKey.Value.IsDown()) SetOp(p, TerrainOperation.Flatten);
+            else if (p.OpRaiseKey.Value.IsDown()) SetOp(p, TerrainOperation.Raise);
+            else if (p.OpLowerKey.Value.IsDown()) SetOp(p, TerrainOperation.Lower);
+            else if (p.OpSmoothKey.Value.IsDown()) SetOp(p, TerrainOperation.Smooth);
+            else if (p.OpPaintKey.Value.IsDown()) SetOp(p, TerrainOperation.Paint);
+            else if (p.OpRestoreKey.Value.IsDown()) SetOp(p, TerrainOperation.Restore);
+            else if (p.OpRampKey.Value.IsDown()) SetOp(p, TerrainOperation.Ramp);
+            else if (p.OpShoreKey.Value.IsDown()) SetOp(p, TerrainOperation.Shore);
+            else if (p.OpSnowKey.Value.IsDown()) SetOp(p, TerrainOperation.Snow);
+        }
+
+        private void SetOp(TerrainForgePlugin p, TerrainOperation op)
+        {
+            if (p.DefaultOperation.Value != op)
+            {
+                p.DefaultOperation.Value = op;
+                _rampHasA = false;
+                ClearShapeMarks();
+                ClearRampPath();
+                Flash(Loc.F("hud.flash.falloff", Loc.OpName(op)));
+            }
+        }
+
+        private void HandleCycleProfile(TerrainForgePlugin p)
+        {
+            if (p.CycleProfileKey.Value.IsDown())
+            {
+                TerrainKeybinds.CycleNextProfile();
+            }
         }
 
         /// <summary>

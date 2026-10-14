@@ -27,6 +27,7 @@ namespace TerrainForge
             public float RaiseDelta = 2f;
             public float PaintStrength = 1f;
             public float FalloffPower = 3f;
+            public FalloffMode FalloffMode = FalloffMode.Pointy;
             public float ShoreOffset = 0.5f;
         }
 
@@ -89,6 +90,7 @@ namespace TerrainForge
             p.RaiseDelta.Value = Mathf.Clamp(s.RaiseDelta, 0.5f, 10f);
             p.PaintStrength.Value = Mathf.Clamp(s.PaintStrength, 0f, 1f);
             p.FalloffPower.Value = Mathf.Clamp(s.FalloffPower, 1f, 5f);
+            p.FalloffMode.Value = s.FalloffMode;
             p.ShoreOffset.Value = Mathf.Clamp(s.ShoreOffset, -2f, 5f);
         }
 
@@ -108,6 +110,7 @@ namespace TerrainForge
                 RaiseDelta = p.RaiseDelta.Value,
                 PaintStrength = p.PaintStrength.Value,
                 FalloffPower = p.FalloffPower.Value,
+                FalloffMode = p.FalloffMode.Value,
                 ShoreOffset = p.ShoreOffset.Value
             };
         }
@@ -129,7 +132,7 @@ namespace TerrainForge
                     ((int)s.Operation).ToString(inv), ((int)s.Shape).ToString(inv), ((int)s.Paint).ToString(inv),
                     ((int)s.RampMode).ToString(inv), s.SlopeAngle.ToString("0.##", inv), ((int)s.SmoothMode).ToString(inv),
                     s.RaiseDelta.ToString("0.##", inv), s.PaintStrength.ToString("0.##", inv),
-                    s.FalloffPower.ToString("0.##", inv), s.ShoreOffset.ToString("0.##", inv)
+                    s.FalloffPower.ToString("0.##", inv), ((int)s.FalloffMode).ToString(inv), s.ShoreOffset.ToString("0.##", inv)
                 }));
             }
             p.PresetSlots.Value = string.Join(";", parts.ToArray());
@@ -140,7 +143,7 @@ namespace TerrainForge
             if (string.IsNullOrEmpty(entry))
                 return null;
             string[] f = entry.Split('|');
-            if (f.Length != 13)
+            if (f.Length != 14)
                 return null;
             try
             {
@@ -159,12 +162,14 @@ namespace TerrainForge
                 s.RaiseDelta = float.Parse(f[9], inv);
                 s.PaintStrength = float.Parse(f[10], inv);
                 s.FalloffPower = float.Parse(f[11], inv);
-                s.ShoreOffset = float.Parse(f[12], inv);
+                s.FalloffMode = (FalloffMode)int.Parse(f[12], inv);
+                s.ShoreOffset = float.Parse(f[13], inv);
                 if (!System.Enum.IsDefined(typeof(TerrainOperation), s.Operation)) return null;
                 if (!System.Enum.IsDefined(typeof(TerrainShape), s.Shape)) return null;
                 if (!System.Enum.IsDefined(typeof(TerrainPaint), s.Paint)) return null;
                 if (!System.Enum.IsDefined(typeof(RampMode), s.RampMode)) return null;
                 if (!System.Enum.IsDefined(typeof(SmoothMode), s.SmoothMode)) return null;
+                if (!System.Enum.IsDefined(typeof(FalloffMode), s.FalloffMode)) return null;
                 return s;
             }
             catch
@@ -264,6 +269,16 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.adjust"), Bind = p.AdjustModeKey });
             _entries.Add(new Entry { Label = Loc.T("key.give"), Bind = p.GiveToolKey });
             _entries.Add(new Entry { Label = Loc.T("key.menu"), Bind = p.RebindMenuKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.flatten"), Bind = p.OpFlattenKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.raise"), Bind = p.OpRaiseKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.lower"), Bind = p.OpLowerKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.smooth"), Bind = p.OpSmoothKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.paint"), Bind = p.OpPaintKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.restore"), Bind = p.OpRestoreKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.ramp"), Bind = p.OpRampKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.shore"), Bind = p.OpShoreKey });
+            _entries.Add(new Entry { Label = Loc.T("key.op.snow"), Bind = p.OpSnowKey });
+            _entries.Add(new Entry { Label = Loc.T("key.cycleProfile"), Bind = p.CycleProfileKey });
             _langBuilt = p.Language != null ? p.Language.Value : ModLanguage.Español;
         }
 
@@ -403,6 +418,12 @@ namespace TerrainForge
                 DrawHelpTab();
             else
                 DrawSettingsTab();
+
+            GUILayout.Space(6f);
+            if (GUILayout.Button("Invitame un café en Cafecito", _btnStyle, GUILayout.Height(22f)))
+            {
+                try { Application.OpenURL("https://cafecito.app/byrka"); } catch { }
+            }
 
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0f, 0f, 10000f, 34f));
@@ -628,6 +649,10 @@ namespace TerrainForge
             {
                 p.SmoothMode.Value = (SmoothMode)(((int)p.SmoothMode.Value + 1) % 3);
             });
+            CycleRow(Loc.T("set.falloff"), FalloffModeText(p.FalloffMode.Value), () =>
+            {
+                p.FalloffMode.Value = (FalloffMode)(((int)p.FalloffMode.Value + 1) % 4);
+            });
 
             SettingHeader(Loc.T("set.sizes"));
             FloatSlider(Loc.T("set.radius"), p.Radius, 1f, 100f, "0.#");
@@ -748,6 +773,17 @@ namespace TerrainForge
                 case SmoothMode.Bumps: return Loc.T("smooth.bumps");
                 case SmoothMode.Dips: return Loc.T("smooth.dips");
                 default: return Loc.T("smooth.full");
+            }
+        }
+
+        private static string FalloffModeText(FalloffMode m)
+        {
+            switch (m)
+            {
+                case FalloffMode.Flat: return Loc.T("falloff.flat");
+                case FalloffMode.Smooth: return Loc.T("falloff.smooth");
+                case FalloffMode.Linear: return Loc.T("falloff.linear");
+                default: return Loc.T("falloff.pointy");
             }
         }
 
@@ -949,6 +985,38 @@ namespace TerrainForge
                         return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Cycles to the next saved brush profile/preset.
+        /// </summary>
+        internal static void CycleNextProfile()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+            var presets = TerrainPresets.Load();
+            if (presets.Count == 0)
+                return;
+
+            int idx = presets.FindIndex(x =>
+                x.Radius == p.Radius.Value &&
+                x.Softness == p.Softness.Value &&
+                x.Operation == p.DefaultOperation.Value &&
+                x.Shape == p.Shape.Value &&
+                x.Paint == p.Paint.Value &&
+                x.RampMode == p.RampMode.Value &&
+                x.SlopeAngle == p.SlopeAngle.Value &&
+                x.SmoothMode == p.SmoothMode.Value &&
+                x.RaiseDelta == p.RaiseDelta.Value &&
+                x.PaintStrength == p.PaintStrength.Value &&
+                x.FalloffPower == p.FalloffPower.Value &&
+                x.ShoreOffset == p.ShoreOffset.Value);
+
+            int next = (idx + 1) % presets.Count;
+            TerrainPresets.ApplyPreset(presets[next]);
+            TerrainBrush.RequestClearMarks();
+            TerrainForgePlugin.Message("Perfil: " + presets[next].Name);
         }
     }
 }

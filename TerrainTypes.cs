@@ -38,6 +38,14 @@ namespace TerrainForge
         Path
     }
 
+    public enum FalloffMode
+    {
+        Pointy,
+        Flat,
+        Smooth,
+        Linear
+    }
+
     /// <summary>
     /// Which equipped item enables the brush.
     /// </summary>
@@ -157,6 +165,21 @@ namespace TerrainForge
                 { "rampmode.fixed", new[] { "Ángulo fijo", "Fixed angle" } },
                 { "rampmode.path", new[] { "Senda", "Path" } },
                 { "flash.rampmode.path", new[] { "Modo de rampa: senda", "Ramp mode: path" } },
+                { "falloff.pointy", new[] { "Punta", "Pointy" } },
+                { "falloff.flat", new[] { "Plano", "Flat" } },
+                { "falloff.smooth", new[] { "Suave", "Smooth" } },
+                { "falloff.linear", new[] { "Lineal", "Linear" } },
+                { "hud.flash.falloff", new[] { "Caída: {0}", "Falloff: {0}" } },
+                { "key.op.flatten", new[] { "Operación: Aplanar", "Op: Flatten" } },
+                { "key.op.raise", new[] { "Operación: Subir", "Op: Raise" } },
+                { "key.op.lower", new[] { "Operación: Bajar", "Op: Lower" } },
+                { "key.op.smooth", new[] { "Operación: Suavizar", "Op: Smooth" } },
+                { "key.op.paint", new[] { "Operación: Pintar", "Op: Paint" } },
+                { "key.op.restore", new[] { "Operación: Restaurar", "Op: Restore" } },
+                { "key.op.ramp", new[] { "Operación: Rampa", "Op: Ramp" } },
+                { "key.op.shore", new[] { "Operación: Costa", "Op: Shore" } },
+                { "key.op.snow", new[] { "Operación: Nieve", "Op: Snow" } },
+                { "key.cycleProfile", new[] { "Siguiente perfil", "Next profile" } },
                 { "hud.path.idle", new[] { "SENDA: marca puntos", "PATH: mark points" } },
                 { "hud.path.mark", new[] { "SENDA: {0} puntos (doble pulso cierra)", "PATH: {0} points (double-press closes)" } },
                 { "hud.path", new[] { "senda", "path" } },
@@ -338,6 +361,7 @@ namespace TerrainForge
         public float MaxUp;          // clamp on levelDelta above base
         public float MaxDown;        // clamp on levelDelta below base (positive number)
         public SmoothMode SmoothMode;// Full = blur both ways, Bumps = only lower, Dips = only raise
+        public FalloffMode Falloff;   // Raise/Lower brush falloff shape
         public float ShoreTarget;    // world Y used by the Shore operation
         public bool SnowClear;       // Snow op erases paint instead of painting it
 

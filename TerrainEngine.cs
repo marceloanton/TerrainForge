@@ -1233,9 +1233,24 @@ namespace TerrainForge
                 case TerrainOperation.Lower:
                 {
                     float t = 1f - Mathf.Clamp01(d / radiusIdx);
-                    if (spec.Power > 0f && spec.Power != 1f)
-                        t = Mathf.Pow(t, spec.Power);
-                    return Mathf.Clamp01(t);
+                    switch (spec.Falloff)
+                    {
+                        case FalloffMode.Flat:
+                            // Uniform disk: constant weight inside radius
+                            return 1f;
+                        case FalloffMode.Smooth:
+                            // Cosine falloff: smooth bell curve
+                            return Mathf.Clamp01(Mathf.Cos(t * Mathf.PI * 0.5f));
+                        case FalloffMode.Linear:
+                            // Linear taper from center to edge
+                            return Mathf.Clamp01(t);
+                        case FalloffMode.Pointy:
+                        default:
+                            // Original: power falloff (sharp center peak)
+                            if (spec.Power > 0f && spec.Power != 1f)
+                                t = Mathf.Pow(t, spec.Power);
+                            return Mathf.Clamp01(t);
+                    }
                 }
                 default:
                 {
