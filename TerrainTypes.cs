@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace TerrainForge
@@ -76,8 +78,21 @@ namespace TerrainForge
 
     public enum ModLanguage
     {
+        Auto,           // detecta el idioma del juego
+        English,        // default fallback
         Español,
-        English
+        Français,
+        Deutsch,
+        Русский,
+        中文,           // Simplified Chinese
+        繁體中文,       // Traditional Chinese
+        日本語,
+        한국어,
+        Polski,
+        Português,
+        Türkçe,
+        Українська,
+        Italiano
     }
 
     /// <summary>
@@ -331,14 +346,75 @@ namespace TerrainForge
                 { "hud.ramp.fixed.mark", new[] { "{0}°: A → B", "{0}°: A → B" } },
             };
 
+        private static Type s_localizationType;
+        private static PropertyInfo s_instanceProp;
+        private static MethodInfo s_getSelectedLanguage;
+
+        private static void EnsureLocalizationReflection()
+        {
+            if (s_localizationType != null)
+                return;
+            try
+            {
+                s_localizationType = Type.GetType("Localization, assembly_valheim");
+                if (s_localizationType == null)
+                {
+                    // Try without assembly name
+                    s_localizationType = Type.GetType("Localization");
+                }
+                if (s_localizationType != null)
+                {
+                    s_instanceProp = s_localizationType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
+                    s_getSelectedLanguage = s_localizationType.GetMethod("GetSelectedLanguage", BindingFlags.Public | BindingFlags.Instance);
+                }
+            }
+            catch { }
+        }
+
+        private static string GetGameLanguage()
+        {
+            EnsureLocalizationReflection();
+            if (s_instanceProp == null || s_getSelectedLanguage == null)
+                return "English";
+            try
+            {
+                object instance = s_instanceProp.GetValue(null);
+                if (instance != null)
+                {
+                    return s_getSelectedLanguage.Invoke(instance, null) as string ?? "English";
+                }
+            }
+            catch { }
+            return "English";
+        }
+
         public static string T(string key)
         {
             int lang = 0;
             try
             {
                 TerrainForgePlugin p = TerrainForgePlugin.Instance;
-                if (p != null && p.Language != null && p.Language.Value == ModLanguage.English)
-                    lang = 1;
+                if (p != null && p.Language != null)
+                {
+                    ModLanguage cfg = p.Language.Value;
+                    if (cfg == ModLanguage.Auto)
+                    {
+                        // Auto-detect from game's localization (Spanish/English for now)
+                        string gameLang = GetGameLanguage();
+                        if (gameLang == "Spanish")
+                            lang = 0;
+                        else
+                            lang = 1; // English fallback
+                    }
+                    else if (cfg == ModLanguage.Español)
+                    {
+                        lang = 0;
+                    }
+                    else
+                    {
+                        lang = 1; // English default
+                    }
+                }
             }
             catch { }
             string[] a;

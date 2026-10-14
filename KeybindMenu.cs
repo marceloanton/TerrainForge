@@ -776,7 +776,26 @@ namespace TerrainForge
 
             CycleRow(Loc.T("set.language"), p.Language.Value.ToString(), () =>
             {
-                p.Language.Value = p.Language.Value == ModLanguage.English ? ModLanguage.Español : ModLanguage.English;
+                var langs = new[]
+                {
+                    ModLanguage.Auto,
+                    ModLanguage.English,
+                    ModLanguage.Español,
+                    ModLanguage.Français,
+                    ModLanguage.Deutsch,
+                    ModLanguage.Русский,
+                    ModLanguage.中文,
+                    ModLanguage.繁體中文,
+                    ModLanguage.日本語,
+                    ModLanguage.한국어,
+                    ModLanguage.Polski,
+                    ModLanguage.Português,
+                    ModLanguage.Türkçe,
+                    ModLanguage.Українська,
+                    ModLanguage.Italiano
+                };
+                int idx = System.Array.IndexOf(langs, p.Language.Value);
+                p.Language.Value = langs[(idx + 1) % langs.Length];
             });
 
             SettingHeader(Loc.T("set.switches"));

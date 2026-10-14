@@ -115,8 +115,8 @@ namespace TerrainForge
                 "Master switch for TerrainForge.");
             PlayEffects = Config.Bind("General", "PlayEffects", true,
                 "Play the tool's terrain-hit effect (dust + thud) when the brush applies.");
-            Language = Config.Bind("General", "Language", ModLanguage.Español,
-                "Menu / HUD language: Español or English.");
+            Language = Config.Bind("General", "Language", ModLanguage.Auto,
+                "Menu / HUD language: Auto (detect from game), Español, English, or other supported languages.");
 
             Radius = Config.Bind("Brush", "Radius", 8f,
                 new ConfigDescription("Brush radius in meters.", new AcceptableValueRange<float>(1f, 100f)));
