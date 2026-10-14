@@ -199,13 +199,12 @@ namespace TerrainForge
         private bool _open;
         private int _capturing = -1;
         private int _tab;
-        private Vector2 _helpScroll;
+        private Vector2 _mainScroll;
         private Rect _window = new Rect(40f, 60f, 520f, 0f);
 
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
         private string _undoDepthText;
-        private Vector2 _settingsScroll;
         private string _presetName = "";
         private ModLanguage _langBuilt;
         private string _fixedHeightText;
@@ -430,12 +429,17 @@ namespace TerrainForge
 
             GUILayout.Space(10f);
 
+            // Main scroll view for all tab content
+            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _boxStyle);
+
             if (_tab == 0)
                 DrawKeysTab();
             else if (_tab == 1)
-                DrawHelpTab();
+                DrawHelpTabContent();
             else
-                DrawSettingsTab();
+                DrawSettingsTabContent();
+
+            GUILayout.EndScrollView();
 
             GUILayout.Space(6f);
             if (GUILayout.Button("Invitame un café en Cafecito", _btnStyle, GUILayout.Height(22f)))
@@ -701,11 +705,18 @@ namespace TerrainForge
 
         private void DrawSettingsTab()
         {
+            DrawSettingsTabContent();
+
+            GUILayout.Space(8f);
+            if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
+                Toggle(false);
+        }
+
+        private void DrawSettingsTabContent()
+        {
             TerrainForgePlugin p = TerrainForgePlugin.Instance;
             if (p == null)
                 return;
-
-            _settingsScroll = GUILayout.BeginScrollView(_settingsScroll, _boxStyle, GUILayout.Height(400f));
 
             SettingHeader(Loc.T("set.brush"));
             CycleRow(Loc.T("set.operation"), p.DefaultOperation.Value.ToString(), () =>
@@ -779,12 +790,6 @@ namespace TerrainForge
             FloatSlider(Loc.T("set.radiuscap"), p.RadiusCap, 0f, 100f, "0.#");
             FloatSlider(Loc.T("set.deltacap"), p.DeltaCap, 0f, 64f, "0.#");
             IntSlider(Loc.T("set.chunkcomps"), p.ChunkCompsPerFrame, 1, 32);
-
-            GUILayout.EndScrollView();
-
-            GUILayout.Space(8f);
-            if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
-                Toggle(false);
         }
 
         private void SettingHeader(string text)
@@ -887,10 +892,16 @@ namespace TerrainForge
             }
         }
 
-        private void DrawHelpTab()
+private void DrawHelpTab()
         {
-            _helpScroll = GUILayout.BeginScrollView(_helpScroll, _boxStyle, GUILayout.Height(400f));
+            DrawHelpTabContent();
+            GUILayout.Space(8f);
+            if (GUILayout.Button("Cerrar", _btnStyle, GUILayout.Height(28f)))
+                Toggle(false);
+        }
 
+        private void DrawHelpTabContent()
+        {
             Topic(Loc.T("help.what.t"));
             Body(Loc.T("help.what.b"));
 
@@ -909,14 +920,8 @@ namespace TerrainForge
             Topic(Loc.T("help.mp.t"));
             Body(Loc.T("help.mp.b"));
 
-             Topic(Loc.T("help.save.t"));
-             Body(Loc.T("help.save.b"));
-
-            GUILayout.EndScrollView();
-
-            GUILayout.Space(8f);
-            if (GUILayout.Button("Cerrar", _btnStyle, GUILayout.Height(28f)))
-                Toggle(false);
+            Topic(Loc.T("help.save.t"));
+            Body(Loc.T("help.save.b"));
         }
 
         private void Topic(string text)
