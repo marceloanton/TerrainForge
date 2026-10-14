@@ -162,18 +162,31 @@ Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ## Compilar
 
-Requiere .NET SDK y las DLLs de referencia (carpeta `Managed` de Valheim +
-carpeta `core` de BepInEx). Los defaults apuntan al perfil de Thunderstore;
-sobrescribe con:
+Requiere .NET SDK 8+ y las DLLs de referencia del juego + BepInEx.
 
-```
-dotnet build -c Release -p:ValheimDir="D:\Steam\...\Valheim"
+Las rutas por defecto en el `.csproj` apuntan a **esta máquina** (Steam default +
+perfil Thunderstore `Valheim` del usuario actual). En otra máquina **no
+funcionarán** tal cual; sobrescribe **todas** las que necesites:
+
+```bash
+dotnet build -c Release \
+  -p:ValheimDir="D:\Steam\steamapps\common\Valheim" \
+  -p:BepInExCoreDir="%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\TuPerfil\BepInEx\core" \
+  -p:JotunnDir="%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\TuPerfil\BepInEx\plugins\ValheimModding-Jotunn" \
+  -p:Deploy=true
 ```
 
-Despliegue directo a la carpeta de plugins del perfil:
+- `ValheimDir`: carpeta raíz de Valheim (donde está `valheim_Data/Managed`).
+- `BepInExCoreDir`: carpeta `core` de BepInEx del perfil que uses.
+- `JotunnDir`: carpeta del plugin Jotunn instalado en ese perfil.
+- `Deploy=true`: copia el `.dll` a `PluginsDir` (por defecto
+  `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\TuPerfil\BepInEx\plugins\TerrainForge`).
+  También podés sobrescribir `PluginsDir` si querés otra carpeta de destino.
 
-```
-dotnet build -c Release -p:Deploy=true
+Si solo querés compilar sin deployar (p.ej. para revisar errores):
+
+```bash
+dotnet build -c Release -p:ValheimDir="..." -p:BepInExCoreDir="..." -p:JotunnDir="..."
 ```
 
 ## Notas / limitaciones
