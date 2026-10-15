@@ -10,7 +10,11 @@ el proyecto usa [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [0.3.3] - 2026-10-14
+
+### Added / Añadido
+
+- **Professional Bilingual Documentation (ES/EN) / Documentación Bilingüe Profesional (ES/EN)**: Complete rewrite of README, CHANGELOG, and WIKI in both Spanish and English with professional formatting, tables, and comprehensive coverage of all features.
 
 ### Added / Añadido
 
