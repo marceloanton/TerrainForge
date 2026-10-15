@@ -289,6 +289,8 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.pasteStamp"), Bind = p.PasteStampKey });
             _entries.Add(new Entry { Label = Loc.T("key.cycleStamp"), Bind = p.CycleStampKey });
             _entries.Add(new Entry { Label = Loc.T("key.cycleStampBack"), Bind = p.CycleStampBackKey });
+            _entries.Add(new Entry { Label = Loc.T("key.slopeHeatmap"), Bind = p.SlopeHeatmapKey });
+            _entries.Add(new Entry { Label = Loc.T("key.heightHeatmap"), Bind = p.HeightHeatmapKey });
             _langBuilt = p.Language != null ? p.Language.Value : ModLanguage.Español;
         }
 
@@ -810,6 +812,8 @@ namespace TerrainForge
             SettingHeader(Loc.T("set.switches"));
             BoolToggle(Loc.T("set.preview"), p.ShowPreview);
             BoolToggle(Loc.T("set.guides"), p.ShowGuides);
+            BoolToggle(Loc.T("set.slopeheatmap"), p.ShowSlopeHeatmap);
+            BoolToggle(Loc.T("set.heightheatmap"), p.ShowHeightHeatmap);
             BoolToggle(Loc.T("set.effects"), p.PlayEffects);
             BoolToggle(Loc.T("set.autogive"), p.AutoGiveTool);
             BoolToggle(Loc.T("set.nocost"), p.NoBuildCost);

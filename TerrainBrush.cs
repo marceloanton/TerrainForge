@@ -245,6 +245,16 @@ namespace TerrainForge
                     HandleCycleStamp(p, 1);
                 if (p.CycleStampBackKey.Value.IsDown())
                     HandleCycleStamp(p, -1);
+                if (p.SlopeHeatmapKey.Value.IsDown())
+                {
+                    p.ShowSlopeHeatmap.Value = !p.ShowSlopeHeatmap.Value;
+                    Flash(p.ShowSlopeHeatmap.Value ? "Mapa de pendiente: ON" : "Mapa de pendiente: OFF");
+                }
+                if (p.HeightHeatmapKey.Value.IsDown())
+                {
+                    p.ShowHeightHeatmap.Value = !p.ShowHeightHeatmap.Value;
+                    Flash(p.ShowHeightHeatmap.Value ? "Mapa de altura: ON" : "Mapa de altura: OFF");
+                }
             }
 
             TerrainOperation op = p.DefaultOperation.Value;
@@ -1142,7 +1152,7 @@ namespace TerrainForge
             }
         }
 
-        private static float SlopeDeg(Vector3 c)
+        public static float SlopeDeg(Vector3 c)
         {
             const float e = 1f;
             float hx = GroundHeight(c + new Vector3(e, 0f, 0f)) - GroundHeight(c - new Vector3(e, 0f, 0f));

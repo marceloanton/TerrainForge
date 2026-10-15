@@ -34,6 +34,8 @@ namespace TerrainForge
         public float StampRotation;      // rotation in degrees
         public float StampScale;         // scale factor
         public List<Vector3> StampTilePositions; // tile positions for wireframe
+        public bool ShowSlopeHeatmap;    // show slope heatmap overlay
+        public bool ShowHeightHeatmap;   // show height heatmap overlay
     }
 
     /// <summary>
@@ -66,6 +68,8 @@ namespace TerrainForge
         private LineRenderer _poly;      // polygon footprint outline (world)
         private LineRenderer _level;     // target-level marker ring (world)
         private LineRenderer _stamp;     // stamp paste preview wireframe (world)
+        private LineRenderer _slopeHeatmap;  // slope heatmap overlay (world)
+        private LineRenderer _heightHeatmap; // height heatmap overlay (world)
 
         private Vector3[] _unitRing;
 
@@ -113,6 +117,14 @@ namespace TerrainForge
             _level = MakeLine("level", 2, true);
             _stamp = MakeLine("stamp", 0, true);
             _stamp.loop = false;
+
+            _slopeHeatmap = MakeLine("slopeHeatmap", 0, true);
+            _slopeHeatmap.loop = true;
+            _slopeHeatmap.numCornerVertices = 2;
+
+            _heightHeatmap = MakeLine("heightHeatmap", 0, true);
+            _heightHeatmap.loop = true;
+            _heightHeatmap.numCornerVertices = 2;
 
             BuildRing();
             _root.SetActive(false);
@@ -396,8 +408,156 @@ namespace TerrainForge
 
             DrawStampPreview(s);
 
+            // Draw heatmap overlays
+            DrawSlopeHeatmap(s);
+            DrawHeightHeatmap(s);
+
             if (!_root.activeSelf)
                 _root.SetActive(true);
+        }
+
+        private void DrawSlopeHeatmap(PreviewState s)
+        {
+            if (!s.ShowSlopeHeatmap)
+            {
+                SetActive(_slopeHeatmap, false);
+                return;
+            }
+
+            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
+            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
+
+            // Draw a grid of slope indicators
+            const int gridSize = 16;
+            const int segments = 8;
+            float spacing = s.Radius * 2f / gridSize;
+            float startX = s.Center.x - s.Radius;
+            float startZ = s.Center.z - s.Radius;
+
+            int totalPoints = gridSize * gridSize * (segments + 1);
+            _slopeHeatmap.positionCount = totalPoints;
+            int idx = 0;
+
+            for (int gx = 0; gx < gridSize; gx++)
+            {
+                for (int gz = 0; gz < gridSize; gz++)
+                {
+                    float wx = startX + gx * spacing + spacing * 0.5f;
+                    float wz = startZ + gz * spacing + spacing * 0.5f;
+                    float slope = TerrainBrush.SlopeDeg(new Vector3(wx, 0, wz));
+                    Color heatColor = GetSlopeColor(slope, c.a);
+
+                    for (int seg = 0; seg <= segments; seg++)
+                    {
+                        float angle = (float)seg / segments * Mathf.PI * 2f;
+                        float r = s.Radius / gridSize * 0.4f;
+                        float wx_pos = wx + Mathf.Cos(angle) * r;
+                        float wz_pos = wz + Mathf.Sin(angle) * r;
+                        float y = DrawHeight(wx_pos, wz_pos, s) + 0.1f;
+                        _slopeHeatmap.SetPosition(idx++, new Vector3(wx_pos, y, wz_pos));
+                    }
+                    // Close the loop
+                    _slopeHeatmap.SetPosition(idx - 1, _slopeHeatmap.GetPosition(idx - segments - 1));
+                }
+            }
+
+            SetWidth(_slopeHeatmap, 0.02f);
+            SetColor(_slopeHeatmap, c);
+            SetActive(_slopeHeatmap, true);
+        }
+
+        private Color GetSlopeColor(float slopeDeg, float alpha)
+        {
+            // Green (0-15°) -> Yellow (15-30°) -> Orange (30-45°) -> Red (45°+)
+            if (slopeDeg < 15f)
+                return new Color(0.2f, 0.8f, 0.2f, alpha);
+            else if (slopeDeg < 30f)
+                return new Color(1f, 0.9f, 0.1f, alpha);
+            else if (slopeDeg < 45f)
+                return new Color(1f, 0.5f, 0.1f, alpha);
+            else
+                return new Color(1f, 0.2f, 0.1f, alpha);
+        }
+
+        private void DrawHeightHeatmap(PreviewState s)
+        {
+            if (!s.ShowHeightHeatmap)
+            {
+                SetActive(_heightHeatmap, false);
+                return;
+            }
+
+            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
+            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
+
+            // Draw a grid of height indicators
+            const int gridSize = 16;
+            const int segments = 8;
+            float spacing = s.Radius * 2f / gridSize;
+            float startX = s.Center.x - s.Radius;
+            float startZ = s.Center.z - s.Radius;
+
+            int totalPoints = gridSize * gridSize * (segments + 1);
+            _heightHeatmap.positionCount = gridSize * gridSize * (segments + 1);
+            int idx = 0;
+
+            // Get min/max height in the area for normalization
+            float minH = float.MaxValue, maxH = float.MinValue;
+            float[,] heights = new float[16, 16];
+            for (int gx = 0; gx < 16; gx++)
+            {
+                for (int gz = 0; gz < 16; gz++)
+                {
+                    float wx = s.Center.x - s.Radius + (gx + 0.5f) * (s.Radius * 2f / 16f);
+                    float wz = s.Center.z - s.Radius + (gz + 0.5f) * (s.Radius * 2f / 16f);
+                    float h = GroundHeight(wx, wz);
+                    heights[gx, gz] = h;
+                    minH = Mathf.Min(minH, h);
+                    maxH = Mathf.Max(maxH, h);
+                }
+            }
+
+            for (int gx = 0; gx < gridSize; gx++)
+            {
+                for (int gz = 0; gz < gridSize; gz++)
+                {
+                    float wx = s.Center.x - s.Radius + (gx + 0.5f) * (s.Radius * 2f / gridSize);
+                    float wz = s.Center.z - s.Radius + (gz + 0.5f) * (s.Radius * 2f / gridSize);
+                    float h = GroundHeight(wx, wz);
+                    float t = maxH > minH ? Mathf.InverseLerp(minH, maxH, h) : 0.5f;
+                    Color heatColor = GetHeightColor(t, s.Color.a);
+
+                    for (int seg = 0; seg <= 8; seg++)
+                    {
+                        float angle = (float)seg / 8f * Mathf.PI * 2f;
+                        float r = s.Radius / 16f * 0.4f;
+                        float wx_pos = (s.Center.x - s.Radius) + (gx + 0.5f) * (s.Radius * 2f / 16f) + Mathf.Cos(angle) * (s.Radius / 16f * 0.4f);
+                        float wz_pos = (s.Center.z - s.Radius) + (gz + 0.5f) * (s.Radius * 2f / 16f) + Mathf.Sin(angle) * (s.Radius / 16f * 0.4f);
+                        float y = DrawHeight(wx_pos, wz_pos, s) + 0.1f;
+                        _heightHeatmap.SetPosition(idx++, new Vector3(wx_pos, y, wz_pos));
+                    }
+                    _heightHeatmap.SetPosition(idx - 1, _heightHeatmap.GetPosition(idx - 9));
+                }
+            }
+
+            SetWidth(_heightHeatmap, 0.02f);
+            SetColor(_heightHeatmap, s.Color);
+            SetActive(_heightHeatmap, true);
+        }
+
+        private Color GetHeightColor(float t, float alpha)
+        {
+            // Blue (low) -> Cyan -> Green -> Yellow -> Red (high)
+            if (t < 0.25f)
+                return new Color(0.1f, 0.3f, 1f, alpha);      // Deep blue
+            else if (t < 0.5f)
+                return new Color(0.1f, 0.7f, 1f, alpha);      // Cyan
+            else if (t < 0.75f)
+                return new Color(0.2f, 0.9f, 0.2f, alpha);    // Green
+            else if (t < 0.9f)
+                return new Color(1f, 0.9f, 0.1f, alpha);      // Yellow
+            else
+                return new Color(1f, 0.2f, 0.1f, alpha);      // Red
         }
 
         private void DrawStampPreview(PreviewState s)

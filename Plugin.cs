@@ -89,6 +89,10 @@ namespace TerrainForge
         // Preview
         public ConfigEntry<bool> ShowPreview;
         public ConfigEntry<bool> ShowGuides;
+        public ConfigEntry<bool> ShowSlopeHeatmap;
+        public ConfigEntry<KeyboardShortcut> SlopeHeatmapKey;
+        public ConfigEntry<bool> ShowHeightHeatmap;
+        public ConfigEntry<KeyboardShortcut> HeightHeatmapKey;
 
         // History
         public ConfigEntry<int> UndoDepth;
@@ -244,11 +248,21 @@ namespace TerrainForge
             AllowInProtectedZones = Config.Bind("VanillaTools", "AllowInProtectedZones", false,
                 "Allow placement inside no-build zones and ward zones. Bypasses protection.");
 
-            ShowPreview = Config.Bind("Preview", "ShowPreview", true,
+ShowPreview = Config.Bind("Preview", "ShowPreview", true,
                 "Draw the brush footprint while aiming.");
-
+            
             ShowGuides = Config.Bind("Preview", "ShowGuides", true,
                 "Draw the faint reach guides: full-strength zone, maximum radius, maximum aim distance and the ramp corridor.");
+
+            ShowSlopeHeatmap = Config.Bind("Preview", "ShowSlopeHeatmap", false,
+                "Toggle slope heatmap overlay (green=flat, yellow=moderate, red=steep). Toggle with keybind.");
+            SlopeHeatmapKey = Config.Bind("Input", "SlopeHeatmapKey", new KeyboardShortcut(KeyCode.H),
+                "Toggle slope heatmap overlay (green=flat 0-15°, yellow=15-30°, orange=30-45°, red=45°+).");
+
+            ShowHeightHeatmap = Config.Bind("Preview", "ShowHeightHeatmap", false,
+                "Toggle height heatmap overlay (blue=low, green=mid, yellow=high, red=peak). Toggle with keybind.");
+            HeightHeatmapKey = Config.Bind("Input", "HeightHeatmapKey", new KeyboardShortcut(KeyCode.J),
+                "Toggle height heatmap overlay (blue=sea level, green=lowland, yellow=highland, red=mountain).");
 
             UndoDepth = Config.Bind("History", "UndoDepth", 50,
                 new ConfigDescription("How many brush applications Ctrl+Z can step back through (0 disables history).",
