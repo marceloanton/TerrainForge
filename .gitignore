@@ -1,16 +1,28 @@
-# Build output
+# Build outputs
 bin/
 obj/
+*.dll
+*.pdb
+*.zip
+
+# Local config / user-specific
 *.user
 *.suo
 .vs/
+.idea/
+*.csproj.user
 
-# Local builds / packages
-dist/
-packages/
-*.nupkg
+# Thunderstore / local deploy
+TerrainForge-*.zip
+icon.png
 
 # OS
-Thumbs.db
-desktop.ini
 .DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+*.swp

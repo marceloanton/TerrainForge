@@ -400,7 +400,8 @@ namespace TerrainForge
                         SuppressCircles = pathMarking ||
                             (!isRamp && (p.Shape.Value == TerrainShape.Line ||
                                          p.Shape.Value == TerrainShape.Rect ||
-                                         p.Shape.Value == TerrainShape.Poly)),
+                                         p.Shape.Value == TerrainShape.Poly)) ||
+                            _lineHasA || _rectHasA,
                         HasRect = rectMarking,
                         RectA = _rectA,
                         RectB = groundCenter,
@@ -1729,6 +1730,14 @@ namespace TerrainForge
                 _cancel = true;
 
             _sel = HoverFromMouse();
+
+            // Mouse wheel rotates selection (like Valheim's native radial menus)
+            float scroll = ZInput.GetMouseScrollWheel();
+            if (Mathf.Abs(scroll) > 0.01f)
+            {
+                int dir = scroll > 0f ? -1 : 1; // up = previous, down = next (like Valheim)
+                _sel = (_sel + dir + s_ops.Length) % s_ops.Length;
+            }
 
             if (Input.GetMouseButtonDown(0) && !_cancel && _sel >= 0)
             {

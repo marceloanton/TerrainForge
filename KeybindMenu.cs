@@ -200,7 +200,7 @@ namespace TerrainForge
         private int _capturing = -1;
         private int _tab;
         private Vector2 _mainScroll;
-        private Rect _window = new Rect(40f, 60f, 520f, 0f);
+        private Rect _window = new Rect(40f, 60f, 560f, 600f);
 
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
@@ -408,6 +408,10 @@ namespace TerrainForge
             if (!_open)
                 return;
 
+            // Force cursor visible and unlocked for this menu (game may try to hide/lock it)
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+
             EnsureSkin();
             _window = GUILayout.Window(WindowId, _window, DrawWindow, GUIContent.none, _winStyle);
         }
@@ -437,7 +441,7 @@ namespace TerrainForge
             GUILayout.Space(10f);
 
             // Main scroll view for all tab content
-            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _boxStyle);
+            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _boxStyle, GUILayout.MinHeight(400f), GUILayout.ExpandHeight(true));
 
             if (_tab == 0)
                 DrawKeysTab();
@@ -985,7 +989,9 @@ private void DrawHelpTab()
                 onFocused = { background = _texPanel },
                 padding = new RectOffset(12, 12, 12, 12),
                 font = font,
-                border = new RectOffset(0, 0, 0, 0)
+                border = new RectOffset(0, 0, 0, 0),
+                stretchWidth = true,
+                stretchHeight = true
             };
 
             _boxStyle = new GUIStyle
