@@ -48,6 +48,14 @@ namespace TerrainForge
         Linear
     }
 
+    public enum ShoreFalloffMode
+    {
+        Linear,
+        Smooth,
+        Flat,
+        Pointy
+    }
+
     /// <summary>
     /// Which equipped item enables the brush.
     /// </summary>
@@ -206,6 +214,10 @@ namespace TerrainForge
                 { "falloff.flat", new[] { "Plano", "Flat" } },
                 { "falloff.smooth", new[] { "Suave", "Smooth" } },
                 { "falloff.linear", new[] { "Lineal", "Linear" } },
+                { "shorefalloff.linear", new[] { "Lineal", "Linear" } },
+                { "shorefalloff.smooth", new[] { "Suave", "Smooth" } },
+                { "shorefalloff.flat", new[] { "Plano", "Flat" } },
+                { "shorefalloff.pointy", new[] { "Punta", "Pointy" } },
                 { "hud.flash.falloff", new[] { "Caída: {0}", "Falloff: {0}" } },
                 { "key.op.flatten", new[] { "Operación: Aplanar", "Op: Flatten" } },
                 { "key.op.raise", new[] { "Operación: Subir", "Op: Raise" } },
@@ -473,6 +485,7 @@ namespace TerrainForge
         public float MaxDown;        // clamp on levelDelta below base (positive number)
         public SmoothMode SmoothMode;// Full = blur both ways, Bumps = only lower, Dips = only raise
         public FalloffMode Falloff;   // Raise/Lower brush falloff shape
+        public ShoreFalloffMode ShoreFalloff; // Shore brush falloff shape
         public float ShoreTarget;    // world Y used by the Shore operation
         public bool SnowClear;       // Snow op erases paint instead of painting it
 

@@ -773,6 +773,10 @@ namespace TerrainForge
             FloatSlider(Loc.T("set.paintstrength"), p.PaintStrength, 0f, 1f, "0.00");
             FloatSlider(Loc.T("set.falloff"), p.FalloffPower, 1f, 5f, "0.#");
             FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
+            CycleRow(Loc.T("set.shorefalloff"), ShoreFalloffModeText(p.ShoreFalloffMode.Value), () =>
+            {
+                p.ShoreFalloffMode.Value = (ShoreFalloffMode)(((int)p.ShoreFalloffMode.Value + 1) % 4);
+            });
 
             DrawFixedHeight(p);
 
@@ -917,6 +921,17 @@ namespace TerrainForge
                 case FalloffMode.Smooth: return Loc.T("falloff.smooth");
                 case FalloffMode.Linear: return Loc.T("falloff.linear");
                 default: return Loc.T("falloff.pointy");
+            }
+        }
+
+        private static string ShoreFalloffModeText(ShoreFalloffMode m)
+        {
+            switch (m)
+            {
+                case ShoreFalloffMode.Linear: return Loc.T("shorefalloff.linear");
+                case ShoreFalloffMode.Smooth: return Loc.T("shorefalloff.smooth");
+                case ShoreFalloffMode.Flat: return Loc.T("shorefalloff.flat");
+                default: return Loc.T("shorefalloff.pointy");
             }
         }
 

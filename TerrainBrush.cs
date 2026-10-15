@@ -623,6 +623,7 @@ namespace TerrainForge
                 MaxDown = EffectiveMaxDown(p),
                 SmoothMode = p.SmoothMode.Value,
                 Falloff = p.FalloffMode.Value,
+                ShoreFalloff = p.ShoreFalloffMode.Value,
                 ShoreTarget = TerrainEngine.WaterLevel() + p.ShoreOffset.Value
             };
         }

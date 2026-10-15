@@ -1254,6 +1254,25 @@ namespace TerrainForge
                 }
                 default:
                 {
+                    if (spec.Operation == TerrainOperation.Shore)
+                    {
+                        // Shore-specific falloff using ShoreFalloffMode
+                        float t = 1f - Mathf.Clamp01(d / radiusIdx);
+                        switch (spec.ShoreFalloff)
+                        {
+                            case ShoreFalloffMode.Linear:
+                                return Mathf.Clamp01(t);
+                            case ShoreFalloffMode.Smooth:
+                                return Mathf.Clamp01(Mathf.Cos(t * Mathf.PI * 0.5f));
+                            case ShoreFalloffMode.Flat:
+                                return 1f;
+                            case ShoreFalloffMode.Pointy:
+                            default:
+                                if (spec.Power > 0f && spec.Power != 1f)
+                                    t = Mathf.Pow(t, spec.Power);
+                                return Mathf.Clamp01(t);
+                        }
+                    }
                     if (blendIdx <= 0.0001f)
                         return 1f;
                     float w = Mathf.Clamp01((radiusIdx - d) / blendIdx);

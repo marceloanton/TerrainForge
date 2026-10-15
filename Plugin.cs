@@ -39,6 +39,7 @@ namespace TerrainForge
         public ConfigEntry<float> FixedHeight;
         public ConfigEntry<SmoothMode> SmoothMode;
         public ConfigEntry<FalloffMode> FalloffMode;
+        public ConfigEntry<ShoreFalloffMode> ShoreFalloffMode;
         public ConfigEntry<float> ShoreOffset;
 
         // Limits
@@ -159,6 +160,8 @@ namespace TerrainForge
                 "Smooth behavior: Full blurs both ways, Bumps only lowers bumps, Dips only fills dips.");
             FalloffMode = Config.Bind("Brush", "FalloffMode", global::TerrainForge.FalloffMode.Pointy,
                 "Raise/Lower brush falloff: Pointy (sharp center), Flat (uniform disk), Smooth (cosine), Linear (taper).");
+            ShoreFalloffMode = Config.Bind("Brush", "ShoreFalloffMode", global::TerrainForge.ShoreFalloffMode.Linear,
+                "Shore brush falloff: Linear (recommended for shore), Smooth (cosine), Flat (uniform), Pointy (sharp center).");
             ShoreOffset = Config.Bind("Brush", "ShoreOffset", 0.5f,
                 new ConfigDescription("Height above the water level targeted by the Shore operation (meters).",
                     new AcceptableValueRange<float>(-2f, 5f)));

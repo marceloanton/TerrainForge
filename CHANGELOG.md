@@ -12,6 +12,7 @@
 - **Heatmap Pendiente (H)**: Overlay de pendiente: 🟢 0-15° → 🟡 15-30° → 🟠 30-45° → 🔴 45°+.
 - **Heatmap Altura (J)**: Overlay de altura: 🔵 bajo → 🟢 medio → 🟡 alto → 🔴 pico.
 - **Stamp Preview Pro**: Contour lines (curvas de nivel) en preview de stamps — muestra curvas cada 1m en zona del stamp con color oro Valheim.
+- **Operación Costa (Shore) mejorada**: Nuevo modo de caída específico para Costa (`ShoreFalloffMode`: Lineal, Suave, Plano, Punta), default Lineal para playas más naturales; falloff lineal por defecto para llegar al nivel de agua de forma más fiable; configurable en AJUSTES → "Caída Costa".
 
 ### Corregido / Fixed
 
