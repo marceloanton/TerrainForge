@@ -1682,6 +1682,14 @@ namespace TerrainForge
     /// </summary>
     internal sealed class TerrainRadial : MonoBehaviour
     {
+        private static Texture2D MakeTex(Color c)
+        {
+            var t = new Texture2D(1, 1) { hideFlags = HideFlags.HideAndDontSave };
+            t.SetPixel(0, 0, c);
+            t.Apply();
+            return t;
+        }
+
         public static bool Open { get; private set; }
 
         private static readonly TerrainOperation[] s_ops =
@@ -1690,8 +1698,18 @@ namespace TerrainForge
         private int _sel = -1;
         private bool _cancel;
         private GUIStyle _style;
+        private GUIStyle _centerStyle;
+        private GUIStyle _wedgeStyle;
+        private GUIStyle _centerLabelStyle;
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
+
+        // Valheim radial textures
+        private Texture2D _radialPanel;
+        private Texture2D _radialWedge;
+        private Texture2D _radialWedgeHover;
+        private Texture2D _radialWedgeActive;
+        private Texture2D _radialCenter;
 
         private void Update()
         {
@@ -1833,24 +1851,68 @@ namespace TerrainForge
                     GUI.backgroundColor = new Color(Mathf.Min(1f, c.r + 0.3f), Mathf.Min(1f, c.g + 0.3f), Mathf.Min(1f, c.b + 0.3f), 0.97f);
                 else
                     GUI.backgroundColor = new Color(c.r * 0.35f, c.g * 0.35f, c.b * 0.35f, 0.92f);
-                GUI.Button(new Rect(bx, by, 116f, 32f), Loc.OpName(s_ops[i]), _style);
+                GUI.Button(new Rect(bx, by, 116f, 32f), Loc.OpName(s_ops[i]), _wedgeStyle);
             }
             GUI.backgroundColor = prevBg;
 
             string center = _sel >= 0 ? Loc.OpName(s_ops[_sel]) : Loc.OpName(p.DefaultOperation.Value);
-            GUI.Box(new Rect(cx - 70f, cy - 16f, 140f, 32f), center, _style);
+            GUI.Box(new Rect(cx - 70f, cy - 16f, 140f, 32f), center, _centerStyle);
+            GUI.Label(new Rect(cx - 70f, cy - 16f, 140f, 32f), center, _centerLabelStyle);
         }
 
         private void EnsureStyle()
         {
             if (_style != null)
                 return;
-            _style = new GUIStyle(GUI.skin.button)
+
+            Font font = TerrainBrush.GameFont();
+
+            // Valheim radial color palette
+            Color valheimWedge = new Color(0.16f, 0.16f, 0.18f, 1f);
+            Color valheimWedgeHover = new Color(0.22f, 0.22f, 0.25f, 1f);
+            Color valheimWedgeActive = new Color(0.75f, 0.60f, 0.15f, 1f);
+            Color valheimCenter = new Color(0.10f, 0.10f, 0.12f, 1f);
+            Color valheimGold = new Color(0.92f, 0.78f, 0.18f, 1f);
+            Color valheimGoldBright = new Color(1f, 0.88f, 0.25f, 1f);
+            Color valheimTextWhite = new Color(0.92f, 0.90f, 0.85f, 1f);
+
+            _radialWedge = MakeTex(new Color(0.16f, 0.16f, 0.18f, 1f));
+            _radialWedgeHover = MakeTex(new Color(0.22f, 0.22f, 0.25f, 1f));
+            _radialWedgeActive = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f));
+            _radialCenter = MakeTex(new Color(0.10f, 0.10f, 0.12f, 1f));
+
+            _wedgeStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 13,
+                alignment = TextAnchor.MiddleCenter,
+                font = TerrainBrush.GameFont(),
+                normal = { background = _radialWedge, textColor = new Color(0.78f, 0.80f, 0.84f) },
+                hover = { background = MakeTex(new Color(0.22f, 0.22f, 0.25f, 1f)), textColor = Color.white },
+                active = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
+                onNormal = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
+                onHover = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
+                onActive = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
+                padding = new RectOffset(8, 8, 4, 4),
+                stretchWidth = true,
+                fixedHeight = 32
+            };
+
+            _centerStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = MakeTex(new Color(0.10f, 0.10f, 0.12f, 1f)) },
+                padding = new RectOffset(8, 8, 4, 4),
+                font = TerrainBrush.GameFont(),
+                alignment = TextAnchor.MiddleCenter
+            };
+
+            _centerLabelStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 14,
+                fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
                 font = TerrainBrush.GameFont()
             };
+            _centerLabelStyle.normal.textColor = new Color(0.95f, 0.88f, 0.25f, 1f);
         }
     }
 
