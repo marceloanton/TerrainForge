@@ -220,13 +220,18 @@ namespace TerrainForge
         private GUIStyle _btnStyle;
         private GUIStyle _closeStyle;
         private GUIStyle _capturingStyle;
+        private GUIStyle _capturingBtnStyle;
         private GUIStyle _tabStyle;
         private GUIStyle _bodyStyle;
         private GUIStyle _topicStyle;
         private GUIStyle _boxStyle;
+        private GUIStyle _scrollStyle;
+        private GUIStyle _scrollBarStyle;
+        private GUIStyle _scrollBarThumbStyle;
 
         private Texture2D _texPanel;
         private Texture2D _texHeader;
+        private Texture2D _texPanelBg;
         private Texture2D _texBtn;
         private Texture2D _texBtnHover;
         private Texture2D _texBtnActive;
@@ -430,18 +435,18 @@ namespace TerrainForge
             GUILayout.Space(8f);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_tab == 0, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(28f)))
+            if (GUILayout.Toggle(_tab == 0, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(30f)))
                 _tab = 0;
-            if (GUILayout.Toggle(_tab == 1, Loc.T("tab.help"), _tabStyle, GUILayout.Height(28f)))
+            if (GUILayout.Toggle(_tab == 1, Loc.T("tab.help"), _tabStyle, GUILayout.Height(30f)))
                 _tab = 1;
-            if (GUILayout.Toggle(_tab == 2, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(28f)))
+            if (GUILayout.Toggle(_tab == 2, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(30f)))
                 _tab = 2;
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10f);
 
             // Main scroll view for all tab content
-            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _boxStyle, GUILayout.MinHeight(400f), GUILayout.ExpandHeight(true));
+            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _scrollStyle, GUILayout.MinHeight(400f), GUILayout.ExpandHeight(true));
 
             if (_tab == 0)
                 DrawKeysTab();
@@ -478,7 +483,7 @@ namespace TerrainForge
                 GUI.color = prev;
 
                 string text = _capturing == i ? Loc.T("keys.press") : _entries[i].Bind.Value.ToString();
-                if (GUILayout.Button(text, _capturing == i ? _capturingStyle : _btnStyle, GUILayout.Width(205f), GUILayout.Height(26f)))
+                if (GUILayout.Button(text, _capturing == i ? _capturingBtnStyle : _btnStyle, GUILayout.Width(205f), GUILayout.Height(26f)))
                     _capturing = i;
 
                 GUILayout.EndHorizontal();
@@ -974,12 +979,27 @@ private void DrawHelpTab()
 
             Font font = TerrainBrush.GameFont();
 
-            _texPanel = MakeTex(new Color(0.09f, 0.10f, 0.12f, 0.96f));
-            _texHeader = MakeTex(new Color(0.15f, 0.16f, 0.20f, 1f));
-            _texBtn = MakeTex(new Color(0.20f, 0.21f, 0.25f, 1f));
-            _texBtnHover = MakeTex(new Color(0.30f, 0.32f, 0.38f, 1f));
-            _texBtnActive = MakeTex(new Color(0.62f, 0.48f, 0.20f, 1f));
-            _texCapture = MakeTex(new Color(0.42f, 0.34f, 0.14f, 1f));
+            // Valheim color palette
+            Color valheimDark = new Color(0.07f, 0.07f, 0.08f, 0.97f);      // Dark panel bg
+            Color valheimHeader = new Color(0.10f, 0.10f, 0.12f, 1f);        // Header bg
+            Color valheimGold = new Color(0.92f, 0.78f, 0.18f, 1f);          // Valheim gold
+            Color valheimGoldBright = new Color(1f, 0.88f, 0.25f, 1f);       // Bright gold
+            Color valheimPanel = new Color(0.12f, 0.12f, 0.14f, 0.98f);      // Panel bg
+            Color valheimBtn = new Color(0.16f, 0.16f, 0.18f, 1f);           // Button normal
+            Color valheimBtnHover = new Color(0.22f, 0.22f, 0.25f, 1f);      // Button hover
+            Color valheimBtnActive = new Color(0.75f, 0.60f, 0.15f, 1f);     // Button active (gold)
+            Color valheimTextGold = new Color(0.95f, 0.82f, 0.25f, 1f);      // Gold text
+            Color valheimTextWhite = new Color(0.92f, 0.90f, 0.85f, 1f);     // Warm white
+            Color valheimTextDim = new Color(0.65f, 0.62f, 0.55f, 1f);       // Dim text
+            Color valheimTextBright = new Color(1f, 0.92f, 0.65f, 1f);       // Bright gold text
+
+            _texPanel = MakeTex(valheimDark);
+            _texHeader = MakeTex(valheimHeader);
+            _texPanelBg = MakeTex(valheimPanel);
+            _texBtn = MakeTex(valheimBtn);
+            _texBtnHover = MakeTex(valheimBtnHover);
+            _texBtnActive = MakeTex(valheimBtnActive);
+            _texCapture = MakeTex(valheimBtnActive);
 
             _winStyle = new GUIStyle(GUI.skin.window)
             {
@@ -987,90 +1007,120 @@ private void DrawHelpTab()
                 focused = { background = _texPanel },
                 onNormal = { background = _texPanel },
                 onFocused = { background = _texPanel },
-                padding = new RectOffset(12, 12, 12, 12),
+                padding = new RectOffset(16, 16, 16, 16),
                 font = font,
-                border = new RectOffset(0, 0, 0, 0),
+                border = new RectOffset(4, 4, 4, 4),
                 stretchWidth = true,
                 stretchHeight = true
             };
 
             _boxStyle = new GUIStyle
             {
-                normal = { background = _texPanel },
-                padding = new RectOffset(8, 8, 8, 8)
+                normal = { background = _texPanelBg },
+                padding = new RectOffset(10, 10, 10, 10),
+                margin = new RectOffset(4, 4, 4, 4),
+                stretchWidth = true
             };
 
-            _headerStyle = new GUIStyle { normal = { background = _texHeader }, padding = new RectOffset(10, 6, 6, 6) };
+            _headerStyle = new GUIStyle { normal = { background = _texHeader }, padding = new RectOffset(12, 12, 8, 8) };
 
             _titleStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 16,
+                fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleLeft,
                 font = font
             };
-            _titleStyle.normal.textColor = new Color(0.92f, 0.80f, 0.46f);
+            _titleStyle.normal.textColor = valheimGoldBright;
 
             _hintStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 13,
+                fontSize = 12,
                 alignment = TextAnchor.MiddleLeft,
                 wordWrap = true,
                 font = font
             };
-            _hintStyle.normal.textColor = new Color(0.72f, 0.74f, 0.78f);
+            _hintStyle.normal.textColor = valheimTextDim;
 
             _capturingStyle = new GUIStyle(_hintStyle);
-            _capturingStyle.normal.textColor = new Color(1f, 0.85f, 0.45f);
+            _capturingStyle.normal.textColor = valheimGoldBright;
             _capturingStyle.fontStyle = FontStyle.Bold;
 
             _rowStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 14,
+                fontSize = 13,
                 alignment = TextAnchor.MiddleLeft,
-                padding = new RectOffset(6, 6, 0, 0),
+                padding = new RectOffset(8, 8, 2, 2),
                 font = font
             };
-            _rowStyle.normal.textColor = new Color(0.88f, 0.89f, 0.92f);
+            _rowStyle.normal.textColor = valheimTextWhite;
 
-            _btnStyle = MakeButtonStyle(font, _texBtn, _texBtnHover, _texBtnActive, new Color(0.92f, 0.93f, 0.95f));
-            _closeStyle = MakeButtonStyle(font, _texBtn, _texBtnHover, _texBtnActive, new Color(0.95f, 0.6f, 0.55f));
-            _closeStyle.fontSize = 16;
+            _capturingBtnStyle = MakeButtonStyle(font, _texCapture, _texCapture, _texCapture, valheimGoldBright);
+            _capturingBtnStyle.fontStyle = FontStyle.Bold;
+            _capturingBtnStyle.fontSize = 13;
+
+            _btnStyle = MakeButtonStyle(font, _texBtn, _texBtnHover, _texBtnActive, valheimTextWhite);
+            _closeStyle = MakeButtonStyle(font, _texBtn, _texBtnHover, _texBtnActive, new Color(1f, 0.5f, 0.4f, 1f));
+            _closeStyle.fontSize = 14;
             _closeStyle.fontStyle = FontStyle.Bold;
 
             _tabStyle = new GUIStyle(GUI.skin.button)
             {
-                fontSize = 14,
+                fontSize = 13,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                padding = new RectOffset(10, 10, 4, 4),
+                padding = new RectOffset(12, 12, 6, 6),
                 font = font,
-                normal = { background = _texBtn, textColor = new Color(0.78f, 0.80f, 0.84f) },
-                hover = { background = _texBtnHover, textColor = Color.white },
-                active = { background = _texBtnActive, textColor = Color.white },
-                onNormal = { background = _texBtnActive, textColor = Color.white },
-                onHover = { background = _texBtnActive, textColor = Color.white },
-                onActive = { background = _texBtnActive, textColor = Color.white }
+                normal = { background = _texBtn, textColor = valheimTextDim },
+                hover = { background = _texBtnHover, textColor = valheimGold },
+                active = { background = _texBtnActive, textColor = valheimGoldBright },
+                onNormal = { background = _texBtnActive, textColor = valheimGoldBright },
+                onHover = { background = _texBtnActive, textColor = valheimGoldBright },
+                onActive = { background = _texBtnActive, textColor = valheimGoldBright },
+                stretchWidth = true,
+                fixedHeight = 30
             };
 
             _topicStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 15,
+                fontSize = 14,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleLeft,
                 font = font
             };
-            _topicStyle.normal.textColor = new Color(0.92f, 0.80f, 0.46f);
+            _topicStyle.normal.textColor = valheimGold;
 
             _bodyStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 13,
+                fontSize = 12,
                 alignment = TextAnchor.UpperLeft,
                 wordWrap = true,
                 richText = true,
                 font = font
             };
-            _bodyStyle.normal.textColor = new Color(0.82f, 0.84f, 0.88f);
+            _bodyStyle.normal.textColor = valheimTextWhite;
+
+            _scrollStyle = new GUIStyle(GUI.skin.scrollView)
+            {
+                normal = { background = _texPanelBg },
+                padding = new RectOffset(0, 12, 0, 0)
+            };
+            _scrollBarStyle = new GUIStyle(GUI.skin.verticalScrollbar)
+            {
+                normal = { background = MakeTex(new Color(0.1f, 0.1f, 0.12f, 0.5f)) },
+                fixedWidth = 14,
+                stretchWidth = false
+            };
+            _scrollBarThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb)
+            {
+                normal = { background = MakeTex(new Color(0.3f, 0.3f, 0.35f, 0.8f)) },
+                hover = { background = MakeTex(new Color(0.4f, 0.4f, 0.45f, 0.9f)) },
+                active = { background = MakeTex(new Color(0.5f, 0.5f, 0.55f, 1f)) },
+                fixedWidth = 12,
+                stretchWidth = false,
+                padding = new RectOffset(1, 1, 4, 4),
+                margin = new RectOffset(0, 0, 4, 4)
+            };
         }
 
         private static GUIStyle MakeButtonStyle(Font font, Texture2D normal, Texture2D hover, Texture2D active, Color text)

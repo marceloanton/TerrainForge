@@ -4,115 +4,112 @@
 
 ---
 
-## 📋 Descripción / Description
+## 📋 Descripción
 
-**ES:** Una brocha de terraformado libre para Valheim. Aplana, sube, baja, suaviza, crea **rampas** (dos puntos, ángulo fijo y senda), **costa**, pinta y restaura terreno de cualquier tamaño, superando el límite vanilla de ±8 m, con deshacer/rehacer, cinco formas de brocha, menú radial, perfiles guardados, **stamps (copiar/pegar terreno)**, snapshots de terreno y **14 idiomas + auto-detect** (detecta el idioma del juego automáticamente).
+Una brocha de terraformado libre para Valheim. Aplana, sube, baja, suaviza, crea **rampas** (dos puntos, ángulo fijo y senda), **costa**, pinta y restaura terreno de cualquier tamaño, superando el límite vanilla de ±8 m, con deshacer/rehacer, cinco formas de brocha, menú radial, perfiles guardados, **stamps (copiar/pegar terreno)**, snapshots de terreno y **14 idiomas + auto-detect** (detecta el idioma del juego automáticamente).
 
-**EN:** A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, create **ramps** (two-point, fixed-angle, and path), **shore**, paint and restore terrain of any size, surpassing the vanilla ±8 m limit, with undo/redo, five brush shapes, radial menu, saved presets, **stamps (copy/paste terrain)**, terrain snapshots, and **14 languages + auto-detect** (automatically detects the game's language).
-
----
-
-## 🎯 ¿Por qué cliente Y servidor? / Why Client AND Server?
-
-**ES:** Los cambios de terreno se guardan en el mundo y el servidor los replica a todos los jugadores. Como el juego recorta los edits a ±8 m, **TerrainForge debe instalarse también en el servidor**; si no, el servidor regenera el terreno recortado mientras los clientes ven el edit completo → desincronización.
-
-**EN:** Terrain changes are saved in the world and replicated by the server to all players. Since the game clamps edits to ±8 m, **TerrainForge must also be installed on the server**; otherwise, the server regenerates clamped terrain while clients see the full edit → desync.
+El mod incluye su propia **Varita TerrainForge** (clon del martillo) como herramienta de brocha, te la entrega automáticamente al entrar y lo explica todo en una pestaña de **ayuda in-game** (tecla de menú, por defecto `F5`).
 
 ---
 
-## 📦 Requisitos / Requirements
+## 🎯 Por qué cliente Y servidor
+
+Los cambios de terreno se guardan en el mundo y el servidor los replica a todos los jugadores. Como el juego recorta los edits a ±8 m, **TerrainForge debe instalarse también en el servidor**; si no, el servidor regenera el terreno recortado mientras los clientes ven el edit completo → desincronización.
+
+---
+
+## 📦 Requisitos
 
 - **BepInEx 5** (x64, Mono) en cliente y servidor. Usuarios de Thunderstore ya lo tienen.
-- **Jotunn** (`ValheimModding-Jotunn`) — registra la herramienta personalizada. Está en `manifest.json`; Thunderstore lo instala automáticamente.
+- **Jotunn** (`ValheimModding-Jotunn`) — registra la herramienta personalizada. Está en `manifest.json`; Thunderstore lo instala solo.
 
 ---
 
-## 📥 Instalación / Installation
+## 📥 Instalación
 
-1. Compila (ver abajo) o copia `TerrainForge.dll`.
+1. Descarga la última versión desde Thunderstore o GitHub Releases.
 2. Colócala en:
    - **Cliente:** `...\BepInEx\plugins\TerrainForge\TerrainForge.dll`
    - **Servidor:** `<servidor>\BepInEx\plugins\TerrainForge\TerrainForge.dll`
 3. Reinicia el juego / servidor.
 
----
-
-## 🎮 Uso / Usage
-
-Equipa la **Varita TerrainForge** (te la dan al entrar al mundo; vuelve a conseguirla con la tecla *dar herramienta*, `F8` por defecto), apunta al suelo y mantén **aplicar** (clic derecho por defecto) para esculpir bajo la mira.
-
-While aiming, a solid ring marks the real generated area, with faint guides in the operation color (full-strength zone, max brush radius, max aim distance). In Ramp mode the real A-B corridor is drawn while marking. The HUD (bottom right) shows operation, radius, shape, paint, and undo/redo counts; a second line shows aimed height, current target, and local slope in degrees. Guides can be toggled in `Preview > Show Guides`.
+> ⚠️ **Debe estar en ambos** (cliente y servidor) para edits >±8m y replicación correcta.
 
 ---
 
-## ⌨️ Controles / Controls
+## 🎮 Uso
 
-| Acción / Action | Tecla por defecto / Default Key |
-|----------------|--------------------------------|
-| Aplicar brocha / Apply Brush | Mantener `Mouse1` (clic derecho) |
-| Subir radio / Increase Radius | `=` (también `Ctrl` + rueda) |
-| Bajar radio / Decrease Radius | `-` (también `Ctrl` + rueda) |
-| Cambiar operación / Cycle Operation | `,` |
-| Cambiar forma / Cycle Shape | `.` |
-| Cambiar pintura / Cycle Paint | `/` |
-| Usar altura apuntada / Use Aimed Height | Mantener `Shift` izq. |
-| Deshacer / Undo | `Ctrl+Z` |
-| Rehacer / Redo | `Ctrl+Y` |
-| Cuentagotas / Eyedropper | `G` |
-| Modo rampa / Ramp Mode | `H` |
-| Ángulo rampa fija / Fixed Ramp Angle | Mantener `Alt` + teclas de radio / rueda |
-| Menú radial / Radial Menu | `Q` (mantener) |
-| Modo ajuste / Adjust Mode | `V` |
-| Ajuste fino (0.1 m) / Fine Adjust | Mantener `Shift` + rueda / teclas de radio |
-| **Copiar Stamp** | `Ctrl+Shift+C` |
-| **Pegar Stamp** | `Ctrl+Shift+V` |
-| Obtener Varita / Get Wand | `F8` |
-| Menú principal / Open Menu | `F5` |
+Equipa la **Varita TerrainForge** (te la dan al entrar al mundo; vuelve a conseguirla con `F8`), apunta al suelo y mantén **clic derecho** para esculpir.
 
-**Teclas extra (sin default, asígnalas en TECLAS):**
+Mientras apuntas, un anillo sólido marca el área real que se genera, con guías tenues del color de la operación (zona a plena fuerza, radio máximo, distancia máxima de mira). En Rampa se dibuja el corredor A-B real mientras marcas. El HUD (abajo a la derecha) muestra operación, radio, forma, pintura y contadores de deshacer/rehacer; una segunda línea muestra la altura apuntada, el objetivo actual y la pendiente local en grados. Las guías se desactivan en `Vista previa > Mostrar guías`.
+
+---
+
+## ⌨️ Controles
+
+| Acción | Tecla por defecto |
+|--------|-------------------|
+| Aplicar brocha | Mantener `Mouse1` (clic derecho) |
+| Subir radio | `=` (también `Ctrl` + rueda) |
+| Bajar radio | `-` (también `Ctrl` + rueda) |
+| Cambiar operación | `,` |
+| Cambiar forma | `.` |
+| Cambiar pintura | `/` |
+| Usar altura apuntada (en vez de tus pies) para Aplanar | Mantener `Shift` izq. |
+| Deshacer último trazo | `Ctrl+Z` |
+| Rehacer trazo deshecho | `Ctrl+Y` |
+| Fijar / liberar altura de Aplanar (cuentagotas) | `G` |
+| Cambiar modo de rampa (dos puntos / ángulo fijo / senda) | `H` |
+| Ajustar ángulo de rampa fija (con Rampa seleccionada) | Mantener `Alt` + teclas de radio / rueda |
+| Menú radial de operaciones (mantener, soltar para confirmar) | `Q` |
+| Modo ajuste (rueda = radio, zoom congelado) | `V` |
+| Ajuste fino del radio (pasos de 0.1 m) | Mantener `Shift` + rueda / teclas de radio |
+| **Copiar terreno (Stamp)** | `Ctrl+Shift+C` |
+| **Pegar terreno (Stamp)** | `Ctrl+Shift+V` |
+| Obtener la Varita TerrainForge | `F8` |
+| Abrir menú de teclas + ayuda | `F5` |
+
+**Teclas extra (sin tecla por defecto, asígnalas en TECLAS):**
 - Operación directa: Aplanar, Subir, Bajar, Suavizar, Pintar, Restaurar, Rampa, Costa, Nieve
 - Siguiente / anterior perfil
 - Siguiente / anterior stamp (historial)
 
 ---
 
-## 🔄 Operaciones / Operations
+## 🔄 Operaciones
 
 Las operaciones ciclan: `Aplanar`, `Subir`, `Bajar`, `Suavizar`, `Rampa`, `Pintar`, `Restaurar`, `Costa` (aplana hacia el nivel del agua + margen, para playas) y `Nieve` (pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suelo original).
 
-Operations cycle: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`, `Restore`, `Shore` (flattens toward water level + margin, for beaches) and `Snow` (paints snow like Paint but snow-only; hold `Shift` to remove and restore original ground).
-
 ---
 
-## 📐 Formas / Shapes
+## 📐 Formas
 
-`Círculo`, `Cuadrado`, `Línea`, `Rectángulo`, `Polígono` (tecla `.`).  
-`Circle`, `Square`, `Line`, `Rectangle`, `Polygon` (key `.`).
+`Círculo`, `Cuadrado`, `Línea`, `Rectángulo`, `Polígono` (tecla `.`).
 
-- `Línea`/`Rectángulo`: dos pulsos de Aplicar (A y B; semiancho = radio, esquinas definen área con bordes suaves).
-- `Polígono`: un vértice por pulso, doble-pulso cierra (3+ vértices).
+- `Línea`/`Rectángulo`: dos pulsos de Aplicar (A y B; el semiancho de la línea = radio de la brocha, las esquinas definen el área con bordes suaves).
+- `Polígono`: suma un vértice por pulso y cierra con doble pulso (3+ vértices).
 - Todas las operaciones de área aplican sobre estas huellas con soporte de deshacer.
 
 ---
 
-## ⚙️ Modos de caída / Falloff Modes (Subir/Bajar / Raise/Lower)
+## ⚙️ Modos de caída (Subir/Bajar)
 
 Cicla en AJUSTES → "Caída Raise/Lower":
 
-| Modo / Mode | Efecto / Effect |
-|-------------|----------------|
-| **Punta** / **Pointy** | Pico central (original), controlado por "Potencia caída" |
-| **Plano** / **Flat** | Disco uniforme, mismo peso en todo el radio |
-| **Suave** / **Smooth** | Campana coseno, transición suave |
-| **Lineal** / **Linear** | Decrece en línea recta del centro al borde |
+| Modo | Efecto |
+|------|--------|
+| **Punta** (original) | Pico central, controlado por "Potencia caída" |
+| **Plano** | Disco uniforme, mismo peso en todo el radio |
+| **Suave** | Campana coseno, transición suave |
+| **Lineal** | Decrece en línea recta del centro al borde |
 
 ---
 
-## 🌐 Idiomas / Languages
+## 🌐 Idiomas
 
 **15 opciones:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
 
-**Auto-detect:** por defecto `Auto` detecta el idioma configurado en Valheim (`Localization.instance.GetSelectedLanguage()`) vía reflection. Si el idioma no tiene traducción completa, usa English como fallback.
+**Auto-detect:** por defecto `Auto` detecta el idioma configurado en Valheim vía reflection. Si el idioma no tiene traducción completa, usa English como fallback.
 
 ---
 
@@ -134,45 +131,42 @@ Pestaña **STAMPS** en AJUSTES:
 
 ---
 
-## 🔧 Operaciones Detalladas / Detailed Operations
+## 🔧 Operaciones Detalladas
 
-### Aplanar / Flatten
+### Aplanar
 Sigue el suelo **bajo la mira** por defecto, se adapta a lo que apuntes (p.ej. una rampa). Mantén `Shift` izq. para nivelar a tus pies.
 
-### Subir / Raise
-Eleva terreno según modo de caída y potencia.
+### Subir / Bajar
+Eleva/baja terreno según modo de caída y potencia.
 
-### Bajar / Lower
-Baja terreno según modo de caída y potencia.
-
-### Suavizar / Smooth
+### Suavizar
 Promedia cada punto con sus vecinos (blur real), alisando lomos, escalones y ruido. Mantén pulsado para suavizar progresivamente.  
 Modos: `Completo` (ambos sentidos), `SoloLomos` (solo baja), `SoloHoyos` (solo rellena).  
 Forma Línea + Suavizar = suavizado a lo largo de un camino.
 
-### Rampa / Ramp
+### Rampa
 Tres modos (`H`): **dos puntos** (marcas **A** y **B**, une ambas alturas con pendiente recta), **ángulo fijo** (**B** da dirección y largo, la altura sigue `Ángulo rampa`, ajustable con `Alt` + radio), y **senda** (marcas una curva **A→B→C…**, doble pulso cierra). El radio de la brocha pone el ancho de la rampa y la suavidad solo ablanda los bordes laterales. Vista previa: corredor relleno semitransparente + anillos de altura en A y B.
 
-### Costa / Shore
+### Costa
 Aplana hacia el nivel del agua + margen (playas/costas), con suavidad mezclando como Aplanar.
 
-### Pintar / Paint
+### Pintar
 Tipos: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.
 
-### Restaurar / Restore
+### Restaurar
 Devuelve el terreno a su estado original.
 
-### Nieve / Snow
+### Nieve
 Pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suelo original.
 
 ---
 
-## 🎨 Vista Previa / Preview
+## 🎨 Vista Previa
 
 - Anillo sólido: área real generada.
 - Guías tenues: zona a plena fuerza, radio máximo, distancia máxima de mira.
 - En Rampa: corredor A-B real (bordes + relleno semitransparente) + anillos de altura en A y B.
-- En Flatten/Shore: anillo marcador de nivel objetivo.
+- En Aplanar/Costa: anillo marcador de nivel objetivo.
 - Bloqueado por servidor/ward: guías en gris.
 - Bajo agua: preview flota en superficie.
 
@@ -182,8 +176,8 @@ Pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suel
 
 3 pestañas con **scroll global** (rueda del ratón):
 
-| Pestaña / Tab | Función |
-|---------------|---------|
+| Pestaña | Función |
+|---------|---------|
 | **TECLAS** | Reasigna teclas: click → presiona tecla/botón; `Esc` cancela. Combos: mantené modificadores y después tecla principal. Botones ratón soportados. |
 | **AYUDA** | Referencia completa de operaciones, controles, preview, multijugador, guardado. |
 | **AJUSTES** | Todo editable en vivo: sliders, toggles, ciclos, perfiles, stamps, snapshots, idioma. Se guarda al cerrar. |
@@ -192,7 +186,7 @@ Pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suel
 
 ---
 
-## 🌍 Servidor + Cliente / Server + Client
+## 🌍 Servidor + Cliente
 
 - **Requerido en ambos** para edits >±8m y replicación correcta.
 - Sección `Servidor` (autoritaria via config sync):
@@ -204,35 +198,9 @@ Pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suel
 
 ---
 
-## ⚡ Rendimiento / Performance
+## ⚡ Rendimiento
 
 `TilesPorFrame` (1–32, default 4): tiles por frame en trazos grandes. Evita lag.
-
----
-
-## 🛠️ Compilar / Build
-
-Requiere .NET SDK 8+ y las DLLs de referencia del juego + BepInEx.
-
-```bash
-dotnet build -c Release \
-  -p:ValheimDir="D:\Steam\steamapps\common\Valheim" \
-  -p:BepInExCoreDir="%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\TuPerfil\BepInEx\core" \
-  -p:JotunnDir="%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\TuPerfil\BepInEx\plugins\ValheimModding-Jotunn" \
-  -p:Deploy=true
-```
-
-- `ValheimDir`: carpeta raíz de Valheim (donde está `valheim_Data/Managed`).
-- `BepInExCoreDir`: carpeta `core` de BepInEx del perfil que uses.
-- `JotunnDir`: carpeta del plugin Jotunn instalado en ese perfil.
-- `Deploy=true`: copia el `.dll` a `PluginsDir`.
-
----
-
-## 📝 Notas / Notes
-
-- Radio de herramienta vanilla grande es best-effort y puede desincronizar otros clientes; la brocha personalizada es el camino fiable para edits grandes.
-- Mantén `DeltaMáxSubida` / `DeltaMáxBajada` consistentes entre servidor y clientes.
 
 ---
 
@@ -242,7 +210,7 @@ Ver [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
-## 🔗 Enlaces / Links
+## 🔗 Enlaces
 
 - **Donaciones / Donations:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Issues / PRs:** GitHub del mod

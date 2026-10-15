@@ -1619,20 +1619,26 @@ namespace TerrainForge
             if (_hud != null)
                 return;
 
+            Font font = GameFont();
+
+            // Valheim HUD colors
+            Color valheimDark = new Color(0.05f, 0.05f, 0.06f, 0.9f);
+            Color valheimGold = new Color(0.95f, 0.82f, 0.25f, 1f);
+            Color valheimTextWhite = new Color(0.92f, 0.90f, 0.85f, 1f);
+
             _hudBg = new Texture2D(1, 1);
-            _hudBg.SetPixel(0, 0, Color.white);
+            _hudBg.SetPixel(0, 0, valheimDark);
             _hudBg.Apply();
             _hudBg.hideFlags = HideFlags.HideAndDontSave;
 
-            // Default IMGUI typeface (not the game's Averia): cleaner at small
-            // sizes and visually distinct from vanilla text.
             _hud = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 15,
+                fontSize = 13,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleRight,
-                font = null
+                font = font
             };
+            _hud.normal.textColor = valheimTextWhite;
         }
 
         internal static Font GameFont()
@@ -1729,14 +1735,17 @@ namespace TerrainForge
             if (Input.GetKeyDown(KeyCode.Escape))
                 _cancel = true;
 
-            _sel = HoverFromMouse();
-
-            // Mouse wheel rotates selection (like Valheim's native radial menus)
+            // Handle mouse wheel for selection (like Valheim native radial)
             float scroll = ZInput.GetMouseScrollWheel();
             if (Mathf.Abs(scroll) > 0.01f)
             {
                 int dir = scroll > 0f ? -1 : 1; // up = previous, down = next (like Valheim)
                 _sel = (_sel + dir + s_ops.Length) % s_ops.Length;
+            }
+            else
+            {
+                // Only update selection from mouse hover if not using wheel
+                _sel = HoverFromMouse();
             }
 
             if (Input.GetMouseButtonDown(0) && !_cancel && _sel >= 0)
@@ -1777,7 +1786,9 @@ namespace TerrainForge
             Vector2 m = Input.mousePosition;
             float dx = m.x - Screen.width * 0.5f;
             float dy = m.y - Screen.height * 0.5f;
-            if (dx * dx + dy * dy < 34f * 34f)
+            float distSq = dx * dx + dy * dy;
+            // Buttons are at ~104px radius, 116x32 size. Use ~120px radius to cover buttons.
+            if (distSq < 34f * 34f || distSq > 130f * 130f)
                 return -1;
             float deg = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
             float cw = (90f - deg + 360f) % 360f;
