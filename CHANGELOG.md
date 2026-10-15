@@ -9,6 +9,9 @@
 - **Interfaz nativa de Valheim / Valheim-native UI**: Rediseño completo de la UI usando la tipografía Averia, paleta de colores de Valheim (oro, grises oscuros), botones y paneles con estilo nativo.
 - **Menú radial nativo (Q)**: Rueda del mouse funcional usando `ZInput.GetMouseScrollWheel()`, hover corregido en botones (radio 34-130px), comportamiento idéntico a menús radiales vanilla.
 - **Cursor forzado visible**: En menú F5 y botón ESC, fuerza cursor visible y desbloqueado cada frame via `OnGUI()`.
+- **Heatmap Pendiente (H)**: Overlay de pendiente: 🟢 0-15° → 🟡 15-30° → 🟠 30-45° → 🔴 45°+.
+- **Heatmap Altura (J)**: Overlay de altura: 🔵 bajo → 🟢 medio → 🟡 alto → 🔴 pico.
+- **Stamp Preview Pro**: Contour lines (curvas de nivel) en preview de stamps — muestra curvas cada 1m en zona del stamp con color oro Valheim.
 
 ### Corregido / Fixed
 

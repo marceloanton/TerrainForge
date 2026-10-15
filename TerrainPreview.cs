@@ -70,6 +70,7 @@ namespace TerrainForge
         private LineRenderer _stamp;     // stamp paste preview wireframe (world)
         private LineRenderer _slopeHeatmap;  // slope heatmap overlay (world)
         private LineRenderer _heightHeatmap; // height heatmap overlay (world)
+        private LineRenderer _stampContours; // stamp contour lines (world)
 
         private Vector3[] _unitRing;
 
@@ -125,6 +126,10 @@ namespace TerrainForge
             _heightHeatmap = MakeLine("heightHeatmap", 0, true);
             _heightHeatmap.loop = true;
             _heightHeatmap.numCornerVertices = 2;
+
+            _stampContours = MakeLine("stampContours", 0, true);
+            _stampContours.loop = true;
+            _stampContours.numCornerVertices = 2;
 
             BuildRing();
             _root.SetActive(false);
@@ -408,6 +413,9 @@ namespace TerrainForge
 
             DrawStampPreview(s);
 
+            // Draw stamp contour lines
+            DrawStampContours(s);
+
             // Draw heatmap overlays
             DrawSlopeHeatmap(s);
             DrawHeightHeatmap(s);
@@ -595,6 +603,94 @@ namespace TerrainForge
             SetActive(_stamp, true);
         }
 
+        private void DrawStampContours(PreviewState s)
+        {
+            if (!s.ShowStamp || s.StampTilePositions == null || s.StampTilePositions.Count == 0)
+            {
+                SetActive(_stampContours, false);
+                return;
+            }
+
+            // Check if stamp has height data to contour
+            if (s.StampTilePositions.Count == 0)
+            {
+                SetActive(_stampContours, false);
+                return;
+            }
+
+            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
+            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
+
+            // Collect all tile positions and their heights
+            var contourData = new List<(Vector3 pos, float height)>();
+            float minH = float.MaxValue, maxH = float.MinValue;
+
+            foreach (Vector3 tp in s.StampTilePositions)
+            {
+                float h = GroundHeight(tp.x, tp.z);
+                contourData.Add((tp, h));
+                minH = Mathf.Min(minH, h);
+                maxH = Mathf.Max(maxH, h);
+            }
+
+            if (maxH <= minH + 0.1f)
+            {
+                SetActive(_stampContours, false);
+                return;
+            }
+
+            // Define contour levels (e.g., every 1 meter)
+            float contourInterval = 1f;
+            int numContours = Mathf.CeilToInt((maxH - minH) / contourInterval);
+            numContours = Mathf.Clamp(numContours, 1, 20);
+
+            const int pointsPerContour = 32;
+            int totalPoints = numContours * (pointsPerContour + 1);
+            _stampContours.positionCount = totalPoints;
+            int idx = 0;
+
+            for (int ci = 0; ci < numContours; ci++)
+            {
+                float contourHeight = minH + (ci + 1) * contourInterval;
+                if (contourHeight > maxH) break;
+
+                // For each contour level, draw a circle at each tile that crosses this height
+                // Simplified: draw contour circles at tile centers where height crosses the level
+                for (int ci2 = 0; ci2 < s.StampTilePositions.Count; ci2++)
+                {
+                    Vector3 tp = s.StampTilePositions[ci2];
+                    float tileHeight = contourData[ci2].height;
+
+                    // Check if this tile crosses the contour level
+                    // We'll draw a small circle at tile center if height is near contour level
+                    float diff = Mathf.Abs(tileHeight - contourHeight);
+                    if (diff < contourInterval * 0.5f)
+                    {
+                        float cx = contourData[ci2].pos.x;
+                        float cz = contourData[ci2].pos.z;
+                        float contourY = contourHeight + 0.15f; // slightly above ground
+
+                        const int segs = 16;
+                        float r = 3f; // contour circle radius
+
+                        for (int seg = 0; seg <= 16; seg++)
+                        {
+                            float angle = (float)seg / 16f * Mathf.PI * 2f;
+                            float wx = cx + Mathf.Cos(angle) * r;
+                            float wz = cz + Mathf.Sin(angle) * r;
+                            float cyPos = contourHeight + 0.1f;
+                            _stampContours.SetPosition(idx++, new Vector3(wx, cyPos, wz));
+                        }
+                    }
+                }
+            }
+
+            SetWidth(_stampContours, 0.03f);
+            Color contourColor = new Color(1f, 0.85f, 0.2f, 0.9f); // Valheim gold
+            SetColor(_stampContours, contourColor);
+            SetActive(_stampContours, true);
+        }
+
         private void SetRing(LineRenderer lr, float radius, TerrainShape shape)
         {
             if (shape == TerrainShape.Square)
@@ -688,6 +784,7 @@ public void Destroy()
                 _poly = null;
                 _level = null;
                 _stamp = null;
+                _stampContours = null;
             }
         }
 
