@@ -1,6 +1,6 @@
 {
   "name": "TerrainForge",
-  "version_number": "0.3.3",
+  "version_number": "0.3.4",
   "website_url": "https://cafecito.app/byrka",
   "description": "Free-form terrain brush for Valheim: 9 operations (flatten/raise/lower/smooth/ramp/shore/paint/restore/snow), 5 shapes, undo/redo, path ramps, terrain stamps (copy/paste), snapshots, radial menu, presets, 14 languages (auto-detect), server + client.",
   "dependencies": [

@@ -2,6 +2,23 @@
 
 ---
 
+## [0.3.4] - 2026-10-15
+
+### Añadido / Added
+
+- **Interfaz nativa de Valheim / Valheim-native UI**: Rediseño completo de la UI usando la tipografía Averia, paleta de colores de Valheim (oro, grises oscuros), botones y paneles con estilo nativo.
+- **Menú radial nativo (Q)**: Rueda del mouse funcional usando `ZInput.GetMouseScrollWheel()`, hover corregido en botones (radio 34-130px), comportamiento idéntico a menús radiales vanilla.
+- **Cursor forzado visible**: En menú F5 y botón ESC, fuerza cursor visible y desbloqueado cada frame via `OnGUI()`.
+
+### Corregido / Fixed
+
+- Preview: círculos/cuadrado ocultos en Line/Rect/Poly al marcar punto A.
+- Cursor visible en menú F5 y botón ESC (OnGUI fuerza visible).
+- Rueda mouse en menú radial (Q) usando `ZInput.GetMouseScrollWheel()` nativo.
+- Ventana menú: tamaño inicial 560×600, scroll mínimo 400px.
+
+---
+
 ## [0.3.3] - 2026-10-15
 
 ### Añadido

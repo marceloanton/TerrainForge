@@ -4,6 +4,15 @@
 
 ---
 
+## 🎨 Novedades 0.3.4 / What's New 0.3.4
+
+- **Interfaz nativa de Valheim**: Rediseño completo usando la tipografía **Averia** y la paleta de colores oficial de Valheim (oro, grises oscuros). Botones, paneles, pestañas y scrollbars con estilo nativo.
+- **Menú radial (Q) nativo**: La rueda del mouse ahora funciona como en los menús radiales vanilla de Valheim (construcción, mapa). Hover corregido en los botones del radial.
+- **Cursor siempre visible**: Al abrir el menú (F5 o botón ESC), el cursor se fuerza visible y desbloqueado cada frame, sin que el juego lo oculte.
+- **Ventana redimensionada**: Ventana inicial 560×600px con scroll suave (mínimo 400px), contenido completo visible.
+
+---
+
 ## 📋 Descripción
 
 Una brocha de terraformado libre para Valheim. Aplana, sube, baja, suaviza, crea **rampas** (dos puntos, ángulo fijo y senda), **costa**, pinta y restaura terreno de cualquier tamaño, superando el límite vanilla de ±8 m, con deshacer/rehacer, cinco formas de brocha, menú radial, perfiles guardados, **stamps (copiar/pegar terreno)**, snapshots de terreno y **14 idiomas + auto-detect** (detecta el idioma del juego automáticamente).
