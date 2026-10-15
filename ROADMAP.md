@@ -1,228 +1,94 @@
-# TerrainForge Roadmap
+# TerrainForge — Roadmap
 
-This document breaks down the requested features into a testable sequence, pinning them to the current codebase so we know where to touch first.
+> Documento interno de desarrollo. No se incluye en el paquete de release.
+> Versión actual en desarrollo: **0.3.4** (aún NO publicada en Thunderstore).
 
-## Quick orientation (current touch points)
+---
 
-| File | Purpose | Notes |
-|---|---|---|
-| `TerrainTypes.cs` | Enums, `BrushSpec`, `ToolRequirement` | Add new shapes/ops/fields (undo stack, paths, eyedrop, slope mode, ...) |
-| `TerrainEngine.cs` | Core: read/write `TerrainComp` deltas (reflection), `Apply`, `ApplyToComp`, `ApplyRampLine`, `Falloff`, `ClampDelta` | Also needs to expose "original" deltas for undo snapshots, per-heightmap snapshots |
-| `TerrainBrush.cs` | Input, HUD, colour, ramp A/B mark, tool detection, `TryApply`, HUD | Central: keys, state (`_rampHasA`, `_rampA`, `_applying`), HUD extension, eyedrop/slope, paths |
-| `TerrainPreview.cs` | Live footprint + guides (edge/full/reach/aim + ramp corridor) | New: slope shading, level contours, rect/line/poly previews |
-| `Plugin.cs` | BepInEx config | New keys (Ctrl+Z/Ctrl+Y, mode toggles, profiles) |
-| `KeybindMenu.cs` | Rebind + HELP tabs, skin | Update help, add radial/profiles help, localisation keys |
-| `TerrainTool.cs` | Custom tool (Jotunn) `TerrainForgeTool` (clone Hammer), equip/give | Remove/replace if dropping Jotunn (Harmony path) |
-| `Patches.cs` | Harmony patches (clamp ±8m, vanilla tool radius, no-build-cost) | Cleanups when removing Jotunn |
-| `manifest.json`, `TerrainForge.csproj` | Jotunn reference/deps | Edit if going no-Jotunn |
+## Estado de 0.3.4 (en desarrollo)
 
-## Phase 0 – Baseline (read-only check)
-- [ ] Audit `TerrainEngine` field accesses (`m_levelDelta`, `m_smoothDelta`, `m_modifiedHeight`, `m_paintMask`, `m_modifiedPaint`, `m_nview`) are still valid.
-- [ ] Check `ZNetView.ClaimOwnership()` + `Save(bool)` calls against `assembly_valheim` (already working).
-- [ ] Confirm no new publicizer needed (reflection only).
-- [ ] Review `LogOutput.log` quick scan for early errors after deploy.
+### Listo y en el código
+- UI nativa Valheim (fuente Averia, paleta de colores, botones/paneles).
+- Menú radial (Q) con selección por rueda (`ZInput.GetMouseScrollWheel()`).
+- Heatmaps: Pendiente (H) y Altura (J).
+- Stamp Preview Pro: curvas de nivel en la vista previa del stamp.
+- Shore falloff configurable (`ShoreFalloffMode`: Linear / Smooth / Flat / Pointy).
+- Stamps: copiar/pegar (`Ctrl+Shift+C` / `Ctrl+Shift+V`) + historial en RAM + persistencia en disco (`.stamp`).
+- Rampas: preview de corredor relleno + anillos de marcas A/B; ya no dibuja el círculo del footprint.
+- Keybinds reasignables (captura de teclas y botones del ratón).
+- 14 idiomas + autodetección; traducciones completas ES/EN.
+- Documentación ES/EN (README, CHANGELOG, WIKI).
 
-## Phase 1 – Undo/Redo (★ highest priority) — DONE
-Goal: let `Ctrl+Z` undo last brush application(s) and `Ctrl+Y` redo. Track per application a minimal "delta set".
+### A medias / sin verificar en juego
+- Rueda del menú radial: se reportó que solo funciona con ESC abierto (pendiente confirmar tras reinicio limpio).
+- `Alt` + Rueda para altura fija: implementado, sin confirmar.
+- Ventana del menú F5 con "textura antigua".
+- Cursor forzado visible: aplicado, sin confirmar.
 
-Implemented: sparse per-vertex recording in `TerrainEngine` (one frame per `Apply`
-call, ramp included), `History > UndoDepth` (0-500, slider + exact textbox in the
-TECLAS tab), HUD undo/redo counts + flash messages, history cleared on world exit.
+### Pendiente (no implementado)
+- **Botón "Restablecer atajos"** en el menú (claves de locale ya presentes, falta el método y el botón).
+- Reorganización del panel (funciones repetidas, se queda chico).
+- Más info en pantalla (queja 2 del usuario).
+- Texturas no-bioma (snow, gravel, paved, cultivated, etc.).
+- Acceso a funciones de herramientas que quedaron sin botón/atajo.
 
-**Design**
-- Keep a history per-heightmap? Or just remember what `TerrainEngine` wrote: for each affected `TerrainComp` (by `nview.GetZDO().m_uid` or the comp instance), snapshot the changed indices of `levelDelta`, `smoothDelta`, `modifiedHeight`, `paintMask`, `modifiedPaint` (and maybe whether created/restored). Also remember centre/search radius used.
-- Stack: `List<UndoFrame>` with `maxCount` (configurable, e.g. 50–200).
-- On `TerrainEngine.Apply` success → capture a frame before/after? Or capture "diff": store old values at changed indices (copy arrays or byte-diffs). `float[]` and `Color[]` small (max ~65k per comp) but easier: copy the subarrays of touched indices.
-- Keys: `Plugin.cs` add `UndoKey = (Ctrl+Z)`, `RedoKey = (Ctrl+Y)` in `Input`.
+---
 
-**Files to edit**
-- `TerrainTypes.cs`: add `UndoEntry { compRef, levelCopy, smoothCopy, modHCopy, paintCopy, modPCopy, indices[] }`, `UndoFrame { entries[] }`
-- `TerrainEngine.cs`: add `static Stack<UndoFrame> undo = new(), redo = new()`; `Record(...)` inside `ApplyToComp` after computing `any`, save `old` copies for touched indices; `Undo()`/`Redo()` methods that write back + `Save` + `hm.Poke(0)` + `ClutterSystem.ResetGrass`
-- `TerrainBrush.cs`: key handling in `Update()` (before menu/blocking as sensible); call engine `Undo/Redo`
-- `Plugin.cs`: config for keys + `UndoDepth`
+## Plan inmediato — 0.3.4 (antes de publicar)
 
-**Acceptance**
-- [x] One `Apply` → `Ctrl+Z` reverts terrain to before.
-- [x] Ramp creation undoable.
-- [x] Paint/Restore undoable.
-- [x] Redo works after undo.
-- [x] History bounded.
-- [ ] Verify in-game (player test + `LogOutput.log` check).
+1. **HUD persistente con más info**: coordenadas, bioma, recursos cercanos, estado del stamp.
+2. **Measurement HUD persistente**: distancia, volumen y pendiente siempre visibles.
+3. **Biome / Resource Mini-HUD**: bioma actual + recursos cercanos (radio ~50 m).
+4. **Botón "Restablecer atajos"** funcional.
+5. **Fix rueda radial** (que no requiera ESC) y **Alt+Rueda** para altura fija.
+6. **Reorganizar panel** F5 (agrupar, quitar repetidos).
+7. **Texturas no-bioma** (snow, gravel, paved, cultivated, etc.).
+8. **Documentar** los cambios en WIKI.md y CHANGELOG.md.
 
-**Effort:** M–L | **Risk:** medium (must write deltas back carefully)
+---
 
-## Phase 2 – HUD with live data (★) — DONE
-Show: current world height under crosshair (`ZoneSystem.GetGroundHeight(aim)`), target height (what tool will use), slope in degrees, paint strength etc.
+## Plan futuro
 
-Implemented: second HUD line (`apuntado Y m | objetivo | pendiente °`) computed
-every frame in `TerrainBrush.Update` (gradient from 4 ground samples 1 m around
-the aim point); per-operation target text (Flatten height incl. Shift modifier,
-Raise/Lower step, Smooth, paint + strength, Restore, ramp A→B heights).
+### 0.4.0 — "Advanced Tools"
+- Blueprint Ghost System: preview fantasma con snap grid (1 m / 2 m / 4 m) y rotación en pasos (90° / 45° / 15°).
+- Stamp Preview Pro mejorado (curvas de nivel reales sobre el terreno).
+- Measurement HUD en vivo durante el marcado.
 
-**Files**
-- `TerrainBrush.cs` (`OnGUI`, `EnsureHudStyle`): extend `status` string; compute slope: `deltaHeight / horizontalDist` over small ray/step or `Vector3.Angle(Vector3.up, normal)` approx via two nearby ground samples? Or sample 4 points around centre to get gradient.
-- `TerrainPreview.cs`: optional slope shading later but HUD first.
+### 0.5.0 — "World Building"
+- Texturas no-bioma + selector por bioma / personalizado.
+- Blueprint System completo (guardar/cargar/colocar).
+- Multiplayer: sync de stamps entre clientes y permisos por rango.
 
-**Acceptance**
-- [x] HUD shows `Aim Y: … m`, `Target: … m`, `Slope: …°`
-- [x] Updates every frame while equipped
-- [x] No layout break on small widths
-- [ ] Verify in-game (player test + `LogOutput.log` check)
+### 0.6.0 — "World Builder"
+- Biblioteca de blueprints (guardar/cargar/compartir).
+- Plantillas de terreno (prefabs) y biome painter.
+- Herramienta de ríos/caminos por spline.
+- Rendimiento: chunk streaming, LOD para stamps grandes, multithreading.
 
-**Effort:** S | **Risk:** low
+---
 
-## Phase 3 – Server permissions — DONE (server authority)
-The server decides: when it runs the mod, its `Server`-section values win through
-config sync; servers without the mod leave the client's local values alone, so the
-tool keeps working there for testing.
+## Arquitectura modular (refactor pendiente)
 
-Implemented (`Plugin.cs` `Server` section + `TerrainBrush.ServerAllows` gate):
-- `AllowTerrainEdits` (default true): master switch; when the server sets it false,
-  clients cannot apply, undo or redo.
-- `AdminOnlyEdits` (default false): only admins / host may edit, checked with
-  `ZNet.instance.LocalPlayerIsAdminOrHost()` (works on clients via synced admin list).
-- Gate covers brush apply, ramp marking and undo/redo; blocked attempts show the
-  reason as a HUD flash and the HUD carries a `SERVER: BLOQUEADO` tag.
+Objetivo: dejar de tener todo en pocos archivos gigantes. Un documento/archivo por
+herramienta, para que un problema en una herramienta se resuelva en su propio archivo.
 
-**Acceptance**
-- [x] Server with `AllowTerrainEdits=false` blocks client edits with reason
-- [x] Server with `AdminOnlyEdits=true` blocks non-admins, allows admins/host
-- [x] Server without the mod: client keeps working (local config applies)
-- [x] Message shown on blocked attempt (HUD flash + tag)
-- [ ] Verify in-game incl. dedicated server (player test + `LogOutput.log` check)
-- [ ] Optional follow-up: ward-owner checks via `PrivateArea.CheckAccess`
+### Core
+- `Plugin.cs` — plugin principal, config, ciclo de vida.
+- `TerrainEngine.cs` — operaciones de terreno, undo/redo, escritura a `TerrainComp`.
+- `TerrainTypes.cs` — enums y structs (`TerrainOperation`, `TerrainShape`, `BrushSpec`, …).
 
-**Effort:** M | **Risk:** low–medium
+### UI
+- `KeybindMenu.cs` — menú F5 (pestañas, keybinds, settings).
+- `TerrainRadial.cs` — menú radial Q *(hoy dentro de `TerrainBrush.cs`)*.
+- `TerrainHud.cs` — HUD en pantalla *(hoy dentro de `TerrainBrush.cs`)*.
+- `TerrainPreview.cs` — previews (brocha, rampas, stamps, heatmaps).
 
-## Phase 4 – "Smooth" polish + selective smooth — DONE
-`SmoothMode { Full, Bumps, Dips }` (`Brush > SmoothMode`, AJUSTES cycler, HUD
-shows `promedio vecinos` / `solo lomos` / `solo hoyos`): the 3x3 blur only writes
-when moving in the allowed direction. Smooth-along-path = Line shape + Smooth op
-(composition, no extra code).
+### Herramientas
+- `TerrainBrush.cs` — input, lógica de brocha, stamps.
+- `TerrainFx.cs` — efectos visuales (polvo, sonido) *(hoy dentro de `TerrainBrush.cs`)*.
 
-**Acceptance**
-- [x] Selective smoothing in both directions
-- [x] Path smoothing via Line footprint
-- [ ] Verify in-game (player test + `LogOutput.log` check)
-
-**Effort:** S | **Risk:** low
-
-## Phase 5 – Eyedropper (copy height) — DONE
-`EyedropKey` (default `G`) toggles a fixed Flatten height captured at the aim
-point (HUD shows `fija X m`, wins over Shift); press again to release. State
-clears on world exit. "Level to object" left out (fuzzy, low value).
-
-**Effort:** S | **Risk:** low
-
-## Phase 6 – Slope fixed (angle-based ramp) — DONE
-`RampMode { TwoPoint, FixedAngle }` + `SlopeAngle` (5-60°, default 30°).
-Fixed-angle ramps pass literal endpoint heights (`BrushSpec.UseFixedHeights` /
-`FixedHA` / `FixedHB`): B sets direction + length, height = A ± dist·tan(angle),
-climbing or descending by aim. Mode toggled with `RampModeKey` (default `H`);
-angle adjusted with `Alt` + radius keys/wheel (no extra keys). Existing corridor
-preview reused (shows path + width).
-
-**Acceptance**
-- [x] Fixed-angle ramp builds at the configured slope
-- [x] Direction/length from B, up/down from aim
-- [x] Angle adjustable in-game, HUD shows mode + angle
-- [ ] Verify in-game (player test + `LogOutput.log` check)
-
-**Effort:** M | **Risk:** low
-
-## Phase 7 – Forms: line, rect (drag), polygon — DONE
-Shapes define WHERE, operations define WHAT (`TerrainShape` grew to
-`Circle, Square, Line, Rect, Poly`, cycled with `.`).
-
-- `Line`: two-press capsule, half-width = brush radius, ramp-style flat-core +
-  side-fade profile; reuses the corridor preview.
-- `Rect`: two opposite corners (1×1 m minimum), axis-aligned in world XZ, soft
-  edges from radius + softness; rectangle outline preview.
-- `Poly`: one vertex per press (0.5 m min spacing), double-press with 3+ points
-  closes and applies; closed-loop outline preview.
-- Engine: `ApplyToComp` dispatches to `ApplyFootprint`; the per-vertex op switch
-  was extracted into shared `VertexWriter` (no behavior change for Circle/Square);
-  bbox-based search radius, frozen Smooth snapshot, sparse undo recording.
-- Marks clear on shape/operation change and world exit; Ramp ignores Shape.
-
-**Acceptance**
-- [x] Line/Rect/Poly apply every area op with soft edges
-- [x] Preview outlines + circular-guide suppression while marking
-- [x] HUD marking state, undo support
-- [ ] Verify in-game (player test + `LogOutput.log` check)
-
-**Effort:** L | **Risk:** medium–high (stateful)
-
-## Phase 8 – Remove Jotunn dependency
-Goal: drop `[BepInDependency("com.jotunn.jotunn")]`, `Jotunn.Managers.*`, `TerrainTool.cs` Jotunn path.
-
-Approach (Harmony-only):
-1. On `ObjectDB.Awake` postfix: clone Hammer prefab → rename to `TerrainForgeTool`, strip build pieces, set `m_itemType = ItemDrop.ItemData.ItemType.Tool`, `m_weight=2`, `m_maxStackSize=1`, `m_maxQuality=1`, `m_value=0`, `m_teleportable=true`, `m_equipDuration=0.2f`, clear `m_attack.m_attackStamina`. Keep same `m_name`, `m_shared.m_name`.
-2. Add to `ObjectDB.m_items` list and ensure `ObjectDB.instance.GetItemPrefab("TerrainForgeTool")` returns it.
-3. On `ZNetScene.Awake` postfix: register prefab in `m_prefabs`/`m_namedPrefabs` (reflection) so it's network-safe.
-4. `TerrainTool` becomes thin: `Has/Give/Equip/IsEquipped` use `ObjectDB.instance.GetItemPrefab` + `Player.m_localPlayer.m_inventory`.
-5. Remove Jotunn refs from `TerrainForge.csproj`, `manifest.json` (or keep optional? but "depend as little as possible").
-6. Keep `ToolRequirement.TerrainForgeTool` working.
-
-Need to mirror Jotunn's clone carefully (instantiate, copy components, don't touch vanilla). Also same peer name for networking.
-
-**Acceptance**
-- [ ] Loads without Jotunn DLL present (optional dep removed)
-- [ ] Tool spawns, equips, works same
-- [ ] Multiplayer sync unchanged
-- [ ] `AutoGiveTool` still works
-
-**Effort:** M–L | **Risk:** medium (networking/prefab lifecycle)
-
-## Phase 9 – Localisation + radial + profiles — DONE
-- **Localisation**: own `Loc` dictionary (`TerrainTypes.cs`), `General > Language`
-  (`Español`/`English`); every menu label, HUD string, flash/message and help body
-  goes through it; key labels rebuild when the menu opens in another language.
-- **Radial**: `TerrainRadial` (IMGUI, no assets), hold `RadialKey` (default `Q`),
-  8 color-coded wedges, dead-zone center, release/click confirms, `Esc` cancels;
-  brush application is suppressed while open; cursor state saved/restored.
-- **Profiles**: `TerrainPresets` (max 12, `Presets > Slots` string, invariant
-  culture) storing radius/softness/op/shape/paint/rampMode/slope/smooth/
-  raiseDelta/paintStrength/falloff/shoreOffset; save/load/delete UI in AJUSTES.
-
-**Acceptance**
-- [x] Full menu/HUD/help in both languages
-- [x] Radial picks all 8 operations, cancels cleanly
-- [x] Presets round-trip (save → load identical, delete works)
-- [ ] Verify in-game (player test + `LogOutput.log` check)
-
-**Effort:** M | **Risk:** low
-
-## Remaining gameplay/visual items — DONE in the "finish the roadmap" batch
-- **Shore / beach** (`TerrainOperation.Shore`, 8th op): flattens toward
-  `ZoneSystem` water level + `Brush > ShoreOffset`, softness blending, sandy
-  preview color, HUD target, undo support.
-- **Slope shading in preview**: footprint edge tints toward red past 15° of
-  slope (guides only).
-- **Level markers**: target-level ring for Flatten/Shore/eyedrop (reads as a
-  contour on slopes, occluded by terrain).
-- **Sound/particles**: `TerrainFx` reuses the tool's own `m_hitTerrainEffect`
-  (no prefab names); throttled while holding, always on discrete applications;
-  `General > PlayEffects` toggle.
-- **Full F5 menu integration**: new AJUSTES tab with cyclers (operation, shape,
-  paint, ramp mode, smooth mode), sliders (radius, softness, ramp angle,
-  raise/lower, paint strength, falloff, shore offset) and every toggle;
-  config saved on menu close; mark state cleared when cycling from the menu.
-
-## Suggested immediate order
-1. **Undo/Redo** (Phase 1) – biggest quality-of-life, directly requested.
-2. **HUD live data** (Phase 2) – quick win, useful for all ops.
-3. **Server permissions** (Phase 3) – multiplayer safety.
-4. ~~**Remove Jotunn** (Phase 8)~~ – postponed by decision (server authority leans
-   on its config sync; revisit on a concrete need).
-5. **Slope fixed + Eyedropper** (6–5) – very practical.
-6. **Forms** (7) – most work, highest UX.
-
-## Notes on implementation details
-- **Undo snapshots**: only copy touched indices. Track `min/max x,y` per frame to shrink copies.
-- **Smooth**: current 3x3 is fine; can add `KernelSize` later. Keep original snapshot (already planned).
-- **Ramp preview**: you already hide circular guides when corridor shown – good.
-- **Threading**: all Unity/BepInEx on main thread. Reflection cheap here.
-- **Sync**: never touch `m_levelDelta` directly except via arrays; always `Save(false)` + `hm.Poke(0)`. Same as now.
-
-Start with **Phase 1 (Undo/Redo)** – shall I implement it now?
+### Datos
+- `TerrainLoc.cs` — localización (`Loc`) *(hoy dentro de `TerrainTypes.cs`)*.
+- `TerrainPresets.cs` — presets de brocha *(hoy dentro de `KeybindMenu.cs`)*.
+- `TerrainStamps.cs` — sistema de stamps (RAM + disco).
+- `TerrainSnapshots.cs` — sistema de snapshots.

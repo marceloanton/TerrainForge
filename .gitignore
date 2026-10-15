@@ -26,3 +26,6 @@ Thumbs.db
 # IDE
 .vscode/
 *.swp
+
+# Local agent workspace (skills / MCPs) — never publish
+TerrainSkills/

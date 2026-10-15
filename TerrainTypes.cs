@@ -183,6 +183,8 @@ namespace TerrainForge
                 { "set.allow", new[] { "Server: permitir edición", "Server: allow editing" } },
                 { "set.adminonly", new[] { "Server: solo admins", "Server: admins only" } },
                 { "set.profiles", new[] { "Perfiles (guardar/cargar brocha)", "Profiles (save/load brush)" } },
+                { "set.keybinds", new[] { "Atajos", "Keybinds" } },
+                { "set.resetkeys", new[] { "Restablecer atajos", "Reset keybinds" } },
                 { "set.stamps", new[] { "Stamps (guardar/cargar terreno)", "Stamps (save/load terrain)" } },
                 { "set.profilename", new[] { "Nombre:", "Name:" } },
                 { "set.stampname", new[] { "Nombre stamp:", "Stamp name:" } },

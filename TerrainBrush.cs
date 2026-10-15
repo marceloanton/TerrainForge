@@ -420,6 +420,7 @@ namespace TerrainForge
                         // Non-circular shapes never show the round footprint: only the
                         // marked outline (line corridor, rect, poly trail) is drawn.
                         SuppressCircles = pathMarking ||
+                            isRamp ||
                             (!isRamp && (p.Shape.Value == TerrainShape.Line ||
                                          p.Shape.Value == TerrainShape.Rect ||
                                          p.Shape.Value == TerrainShape.Poly)) ||
@@ -1639,9 +1640,6 @@ namespace TerrainForge
 
         private void EnsureHudStyle()
         {
-            if (_hud != null)
-                return;
-
             Font font = GameFont();
 
             // Valheim HUD colors
@@ -1769,6 +1767,9 @@ namespace TerrainForge
                     _cursorLock = Cursor.lockState;
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
+                    // Force input focus capture for radial menu
+                    GUIUtility.hotControl = 0;
+                    GUIUtility.keyboardControl = 0;
                 }
                 return;
             }
@@ -1776,7 +1777,7 @@ namespace TerrainForge
             if (Input.GetKeyDown(KeyCode.Escape))
                 _cancel = true;
 
-            // Handle mouse wheel for selection (like Valheim native radial)
+            // Handle mouse wheel for selection (like Valheim native radial) - ALWAYS works when menu is open
             float scroll = ZInput.GetMouseScrollWheel();
             if (Mathf.Abs(scroll) > 0.01f)
             {
@@ -1847,6 +1848,10 @@ namespace TerrainForge
             if (p == null)
                 return;
             EnsureStyle();
+
+            // Force cursor visible and unlocked for this menu
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
 
             TerrainPaint paint = p.Paint.Value;
 

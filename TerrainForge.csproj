@@ -27,6 +27,15 @@
     <PluginsDir Condition="'$(PluginsDir)' == ''">$(APPDATA)\Thunderstore Mod Manager\DataFolder\Valheim\profiles\Valheim\BepInEx\plugins\TerrainForge</PluginsDir>
   </PropertyGroup>
 
+  <!--
+    TerrainSkills/ is a separate scratch project. Exclude it (and its generated
+    obj/** files) from this project's default **/*.cs glob so its AssemblyInfo /
+    GlobalUsings never leak into the main build.
+  -->
+  <ItemGroup>
+    <Compile Remove="TerrainSkills/**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
