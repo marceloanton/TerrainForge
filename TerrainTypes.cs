@@ -123,6 +123,8 @@ namespace TerrainForge
                 { "key.undo", new[] { "Deshacer", "Undo" } },
                 { "key.redo", new[] { "Rehacer", "Redo" } },
                 { "key.eyedrop", new[] { "Fijar altura (eyedrop)", "Fix height (eyedrop)" } },
+                { "key.heightAdjustUp", new[] { "Subir altura fija (+0.1m)", "Increase fixed height (+0.1m)" } },
+                { "key.heightAdjustDown", new[] { "Bajar altura fija (-0.1m)", "Decrease fixed height (-0.1m)" } },
                 { "key.rampMode", new[] { "Modo de rampa", "Ramp mode" } },
                 { "key.radial", new[] { "Menú radial (mantener)", "Radial menu (hold)" } },
                 { "key.give", new[] { "Obtener herramienta", "Get tool" } },

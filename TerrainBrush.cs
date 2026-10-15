@@ -205,6 +205,18 @@ namespace TerrainForge
                 }
                 if (p.EyedropKey.Value.IsDown())
                     ToggleEyedrop(groundCenter);
+                if (p.UseFixedHeight.Value)
+                {
+                    // Handle Alt + Mouse Wheel for height adjustment
+                    bool altHeld = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+                    float scroll = Input.mouseScrollDelta.y;
+                    if (altHeld && Mathf.Abs(scroll) > 0.01f)
+                    {
+                        float delta = scroll > 0f ? 0.1f : -0.1f;
+                        p.FixedHeight.Value = Mathf.Clamp(p.FixedHeight.Value + delta, -10f, 150f);
+                        Flash($"Altura fija: {p.FixedHeight.Value:0.1} m");
+                    }
+                }
                 if (p.RampModeKey.Value.IsDown())
                 {
                     p.RampMode.Value = (RampMode)(((int)p.RampMode.Value + 1) % 3);
