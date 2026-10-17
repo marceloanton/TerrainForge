@@ -4,6 +4,8 @@
 
 A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ramps** (two-point, fixed-angle and path), shape **shorelines**, paint and restore terrain of any size — beyond the vanilla ±8 m limit — with undo/redo, five brush shapes, a radial menu, saved profiles, **terrain stamps (copy/paste)**, terrain snapshots and **14 in-game languages with auto-detect**.
 
+> **Free to download:** You can download and use TerrainForge at no cost from [Thunderstore](https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/) or [GitHub Releases](https://github.com/marceloanton/TerrainForge/releases). The source code is public so it can be viewed on GitHub. Please contact the author and get permission before redistributing the files, publishing modified versions, or using this project in another project. **GitHub still allows anyone to fork a public repository**, so this request cannot technically prevent forks. No open-source license is granted by this notice.
+
 > 📖 **Full documentation & translations (14 languages):** [Wiki](https://github.com/marceloanton/TerrainForge/wiki) — see the **Documentation languages** list below.
 
 ---
