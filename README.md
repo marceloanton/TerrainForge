@@ -1,225 +1,222 @@
 # TerrainForge
 
-[![Invítame un café en cafecito.app](https://cdn.cafecito.app/imgs/buttons/button_5.svg)](https://cafecito.app/byrka)
+[![Buy me a coffee at cafecito.app](https://cdn.cafecito.app/imgs/buttons/button_5.svg)](https://cafecito.app/byrka)
+
+A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ramps** (two-point, fixed-angle and path), shape **shorelines**, paint and restore terrain of any size — beyond the vanilla ±8 m limit — with undo/redo, five brush shapes, a radial menu, saved profiles, **terrain stamps (copy/paste)**, terrain snapshots and **14 in-game languages with auto-detect**.
+
+> 📖 **Full documentation & translations (14 languages):** [Wiki](https://github.com/marceloanton/TerrainForge/wiki) — see the **Documentation languages** list below.
 
 ---
 
-## 🎨 Novedades 0.3.4 / What's New 0.3.4
+## What's New in 0.3.5
 
-- **Interfaz nativa de Valheim**: Rediseño completo usando la tipografía **Averia** y la paleta de colores oficial de Valheim (oro, grises oscuros). Botones, paneles, pestañas y scrollbars con estilo nativo.
-- **Menú radial (Q) nativo**: La rueda del mouse ahora funciona como en los menús radiales vanilla de Valheim (construcción, mapa). Hover corregido en los botones del radial.
-- **Cursor siempre visible**: Al abrir el menú (F5 o botón ESC), el cursor se fuerza visible y desbloqueado cada frame, sin que el juego lo oculte.
-- **Ventana redimensionada**: Ventana inicial 560×600px con scroll suave (mínimo 400px), contenido completo visible.
-
----
-
-## 📋 Descripción
-
-Una brocha de terraformado libre para Valheim. Aplana, sube, baja, suaviza, crea **rampas** (dos puntos, ángulo fijo y senda), **costa**, pinta y restaura terreno de cualquier tamaño, superando el límite vanilla de ±8 m, con deshacer/rehacer, cinco formas de brocha, menú radial, perfiles guardados, **stamps (copiar/pegar terreno)**, snapshots de terreno y **14 idiomas + auto-detect** (detecta el idioma del juego automáticamente).
-
-El mod incluye su propia **Varita TerrainForge** (clon del martillo) como herramienta de brocha, te la entrega automáticamente al entrar y lo explica todo en una pestaña de **ayuda in-game** (tecla de menú, por defecto `F5`).
+- **Terrain stamps — rectangle selection (A→B)** — with the Rectangle shape, mark corner **A** (right-click once), aim at **B** and press `Ctrl+Shift+C` to copy **exactly that rectangle**, cropped to the vertex level (no whole 64 m tiles, no surrounding untouched terrain). Pasting writes **only inside the copied region**.
+- **Free camera (`F`) fixed** — while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments take priority.
+- **Docs & wiki in 14 languages** — README and CHANGELOG in English, and the full manual on the [Wiki](https://github.com/marceloanton/TerrainForge/wiki) (`Home` + 13 translations).
 
 ---
 
-## 🎯 Por qué cliente Y servidor
+## Description
 
-Los cambios de terreno se guardan en el mundo y el servidor los replica a todos los jugadores. Como el juego recorta los edits a ±8 m, **TerrainForge debe instalarse también en el servidor**; si no, el servidor regenera el terreno recortado mientras los clientes ven el edit completo → desincronización.
-
----
-
-## 📦 Requisitos
-
-- **BepInEx 5** (x64, Mono) en cliente y servidor. Usuarios de Thunderstore ya lo tienen.
-- **Jotunn** (`ValheimModding-Jotunn`) — registra la herramienta personalizada. Está en `manifest.json`; Thunderstore lo instala solo.
+TerrainForge ships its own **TerrainForge Rod** (a Hammer clone) as the brush tool. It is handed to you automatically when you join a world and everything is explained in an in-game **Help** tab (menu key, default `F5`).
 
 ---
 
-## 📥 Instalación
+## Why client AND server
 
-1. Descarga la última versión desde Thunderstore o GitHub Releases.
-2. Colócala en:
-   - **Cliente:** `...\BepInEx\plugins\TerrainForge\TerrainForge.dll`
-   - **Servidor:** `<servidor>\BepInEx\plugins\TerrainForge\TerrainForge.dll`
-3. Reinicia el juego / servidor.
-
-> ⚠️ **Debe estar en ambos** (cliente y servidor) para edits >±8m y replicación correcta.
+Terrain edits are stored in the world and the server replicates them to every player. Because the game clamps edits to ±8 m, **TerrainForge must also be installed on the server**; otherwise the server regenerates the clamped terrain while clients see the full edit → desync.
 
 ---
 
-## 🎮 Uso
+## Requirements
 
-Equipa la **Varita TerrainForge** (te la dan al entrar al mundo; vuelve a conseguirla con `F8`), apunta al suelo y mantén **clic derecho** para esculpir.
-
-Mientras apuntas, un anillo sólido marca el área real que se genera, con guías tenues del color de la operación (zona a plena fuerza, radio máximo, distancia máxima de mira). En Rampa se dibuja el corredor A-B real mientras marcas. El HUD (abajo a la derecha) muestra operación, radio, forma, pintura y contadores de deshacer/rehacer; una segunda línea muestra la altura apuntada, el objetivo actual y la pendiente local en grados. Las guías se desactivan en `Vista previa > Mostrar guías`.
-
----
-
-## ⌨️ Controles
-
-| Acción | Tecla por defecto |
-|--------|-------------------|
-| Aplicar brocha | Mantener `Mouse1` (clic derecho) |
-| Subir radio | `=` (también `Ctrl` + rueda) |
-| Bajar radio | `-` (también `Ctrl` + rueda) |
-| Cambiar operación | `,` |
-| Cambiar forma | `.` |
-| Cambiar pintura | `/` |
-| Usar altura apuntada (en vez de tus pies) para Aplanar | Mantener `Shift` izq. |
-| Deshacer último trazo | `Ctrl+Z` |
-| Rehacer trazo deshecho | `Ctrl+Y` |
-| Fijar / liberar altura de Aplanar (cuentagotas) | `G` |
-| Cambiar modo de rampa (dos puntos / ángulo fijo / senda) | `H` |
-| Ajustar ángulo de rampa fija (con Rampa seleccionada) | Mantener `Alt` + teclas de radio / rueda |
-| Menú radial de operaciones (mantener, soltar para confirmar) | `Q` |
-| Modo ajuste (rueda = radio, zoom congelado) | `V` |
-| Ajuste fino del radio (pasos de 0.1 m) | Mantener `Shift` + rueda / teclas de radio |
-| **Copiar terreno (Stamp)** | `Ctrl+Shift+C` |
-| **Pegar terreno (Stamp)** | `Ctrl+Shift+V` |
-| Obtener la Varita TerrainForge | `F8` |
-| Abrir menú de teclas + ayuda | `F5` |
-
-**Teclas extra (sin tecla por defecto, asígnalas en TECLAS):**
-- Operación directa: Aplanar, Subir, Bajar, Suavizar, Pintar, Restaurar, Rampa, Costa, Nieve
-- Siguiente / anterior perfil
-- Siguiente / anterior stamp (historial)
+- **BepInEx 5** (x64, Mono) on both client and server. Thunderstore users already have it.
+- **Jotunn** (`ValheimModding-Jotunn`) — registers the custom tool. It is listed in `manifest.json`; Thunderstore installs it automatically.
 
 ---
 
-## 🔄 Operaciones
+## Installation
 
-Las operaciones ciclan: `Aplanar`, `Subir`, `Bajar`, `Suavizar`, `Rampa`, `Pintar`, `Restaurar`, `Costa` (aplana hacia el nivel del agua + margen, para playas) y `Nieve` (pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suelo original).
+1. Download the latest version from Thunderstore or GitHub Releases.
+2. Place it at:
+   - **Client:** `...\BepInEx\plugins\TerrainForge\TerrainForge.dll`
+   - **Server:** `<server>\BepInEx\plugins\TerrainForge\TerrainForge.dll`
+3. Restart the game / server.
 
----
-
-## 📐 Formas
-
-`Círculo`, `Cuadrado`, `Línea`, `Rectángulo`, `Polígono` (tecla `.`).
-
-- `Línea`/`Rectángulo`: dos pulsos de Aplicar (A y B; el semiancho de la línea = radio de la brocha, las esquinas definen el área con bordes suaves).
-- `Polígono`: suma un vértice por pulso y cierra con doble pulso (3+ vértices).
-- Todas las operaciones de área aplican sobre estas huellas con soporte de deshacer.
+> ⚠️ **Must be on both** (client and server) for edits greater than ±8 m and correct replication.
 
 ---
 
-## ⚙️ Modos de caída (Subir/Bajar)
+## Usage
 
-Cicla en AJUSTES → "Caída Raise/Lower":
+Equip the **TerrainForge Rod** (given on world join; get it again with `F8`), aim at the ground and hold **right-click** to sculpt.
 
-| Modo | Efecto |
+While aiming, a solid ring marks the real brush area, with faint guides in the operation color (full-strength zone, max radius, max aim distance). For Ramp, the real A–B corridor is drawn while you mark. The HUD (bottom-right) shows operation, radius, shape, paint and undo/redo counters; a second line shows the aimed height, current target and local slope in degrees. Guides can be disabled in `Preview > Show guides`.
+
+---
+
+## Controls
+
+| Action | Default key |
+|--------|-------------|
+| Apply brush | Hold `Mouse1` (right-click) |
+| Radius + | `=` (also `Ctrl` + wheel) |
+| Radius − | `-` (also `Ctrl` + wheel) |
+| Cycle operation | `,` |
+| Cycle shape | `.` |
+| Cycle paint | `/` |
+| Use aimed height (instead of your feet) for Flatten | Hold `Left Shift` |
+| Undo last stroke | `Ctrl+Z` |
+| Redo undone stroke | `Ctrl+Y` |
+| Fix / release Flatten height (eyedropper) | `G` |
+| Cycle ramp mode (two-point / fixed-angle / path) | `H` |
+| Adjust fixed-ramp angle (with Ramp selected) | Hold `Alt` + radius keys / wheel |
+| Radial operation menu (hold, release to confirm) | `Q` |
+| Adjust mode (wheel = radius, zoom frozen) | `V` |
+| Fine radius steps (0.1 m) | Hold `Shift` + wheel / radius keys |
+| **Copy terrain (Stamp)** | `Ctrl+Shift+C` |
+| **Paste terrain (Stamp)** | `Ctrl+Shift+V` |
+| Get the TerrainForge Rod | `F8` |
+| Open the keys + help menu | `F5` |
+
+**Extra keys (no default, assign them in KEYS):**
+- Direct operation: Flatten, Raise, Lower, Smooth, Paint, Restore, Ramp, Shore, Snow
+- Next / previous profile
+- Next / previous stamp (history)
+
+---
+
+## Operations
+
+Operations cycle: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`, `Restore`, `Shore` (flattens toward the water level + margin, for beaches) and `Snow` (paints snow like Paint but snow only; `Shift` removes it and restores the original ground).
+
+### Details
+
+- **Flatten** — follows the ground **under the crosshair** by default and adapts to what you aim at (e.g. a ramp). Hold `Left Shift` to level at your feet.
+- **Raise / Lower** — raise or lower terrain according to the falloff mode and power.
+- **Smooth** — averages each point with its neighbours (a real blur), smoothing ridges, steps and noise. Hold to smooth progressively. Modes: `Full` (both ways), `Ridges only` (lowers only), `Dips only` (fills only). Shape Line + Smooth = smooth along a path.
+- **Ramp** — three modes (`H`): **two-point** (mark **A** and **B**, joins both heights with a straight slope), **fixed-angle** (**B** gives direction and length, height follows `Ramp angle`, adjustable with `Alt` + radius), and **path** (mark a curve **A→B→C…**, double-press to close). The brush radius sets the ramp width and softness only softens the side edges. Preview: filled semi-transparent corridor + height rings at A and B.
+- **Shore** — flattens toward the water level + margin (beaches/coastlines), with softness blending like Flatten.
+- **Paint** — types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.
+- **Restore** — returns the terrain to its original state.
+- **Snow** — paints snow like Paint but snow only; `Shift` removes it and restores the original ground.
+
+---
+
+## Shapes
+
+`Circle`, `Square`, `Line`, `Rectangle`, `Polygon` (key `.`).
+
+- `Line` / `Rectangle`: two Apply presses (A and B; line half-width = brush radius, corners define the area with soft edges).
+- `Polygon`: adds a vertex per press and closes on a double-press (3+ vertices).
+- All area operations apply over these footprints with undo support.
+
+---
+
+## Falloff modes (Raise/Lower)
+
+Cycle in SETTINGS → "Raise/Lower falloff":
+
+| Mode | Effect |
 |------|--------|
-| **Punta** (original) | Pico central, controlado por "Potencia caída" |
-| **Plano** | Disco uniforme, mismo peso en todo el radio |
-| **Suave** | Campana coseno, transición suave |
-| **Lineal** | Decrece en línea recta del centro al borde |
+| **Pointy** (original) | Central peak, controlled by "Falloff power" |
+| **Flat** | Uniform disc, same weight across the whole radius |
+| **Smooth** | Cosine bell, smooth transition |
+| **Linear** | Decreases in a straight line from centre to edge |
 
 ---
 
-## 🌐 Idiomas
+## In-game languages
 
-**15 opciones:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
+**15 options:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
 
-**Auto-detect:** por defecto `Auto` detecta el idioma configurado en Valheim vía reflection. Si el idioma no tiene traducción completa, usa English como fallback.
+**Auto-detect:** by default `Auto` detects the language configured in Valheim via reflection. If a language has no complete translation, it falls back to English.
 
----
-
-## 💾 Snapshots (Backups)
-
-Pestaña **SNAPSHOTS** en AJUSTES: ponle un nombre para guardar todos los tiles editados en `BepInEx/config/TerrainForge/snapshots/<nombre>.dat`, luego cárgalo después (incluso en otra partida). La importación restaura con propiedad y es deshacible; tiles no cargados avisan limpiamente.
+> Documentation is available in other languages on the [Wiki](https://github.com/marceloanton/TerrainForge/wiki). See the **Documentation languages** list at the bottom of this page.
 
 ---
 
-## 🧱 Stamps (Copiar/Pegar Terreno)
+## Snapshots (Backups)
 
-Pestaña **STAMPS** en AJUSTES:
-
-- `Ctrl+Shift+C` copia el área marcada (forma actual) al portapapeles (RAM).
-- `Ctrl+Shift+V` muestra preview fantasma (wireframe) en la mira; `Q`/`E` rotan, `Alt`+rueda rota continuo, `Shift`+rueda escala, click confirma.
-- Historial de 10 stamps en RAM: teclas "Siguiente stamp" / "Stamp anterior" para ciclar.
-- Guardar stamp a disco (`.stamp` en `BepInEx/config/TerrainForge/stamps/`, tope 12), cargar al portapapeles, listar y borrar desde la UI.
-- **Herramienta stamp**: en AJUSTES → "Herramienta stamp" (4 opciones): `Igual a brocha` (default), `Cualquiera`, `Pico`, `Varita TerrainForge`. El HUD muestra `STAMP LISTO [2/5]` cuando la tool correcta está equipada y hay stamps en el portapapeles; si no, avisa `Stamp: herramienta no equipada`. `Ctrl+Shift+C/V` no funcionan sin la tool equipada.
+**SNAPSHOTS** tab in SETTINGS: give it a name to save all edited tiles to `BepInEx/config/TerrainForge/snapshots/<name>.dat`, then load it later (even in another save). Import restores with ownership and is undoable; unloaded tiles warn cleanly.
 
 ---
 
-## 🔧 Operaciones Detalladas
+## Stamps (Copy/Paste Terrain)
 
-### Aplanar
-Sigue el suelo **bajo la mira** por defecto, se adapta a lo que apuntes (p.ej. una rampa). Mantén `Shift` izq. para nivelar a tus pies.
+**STAMPS** tab in SETTINGS.
 
-### Subir / Bajar
-Eleva/baja terreno según modo de caída y potencia.
-
-### Suavizar
-Promedia cada punto con sus vecinos (blur real), alisando lomos, escalones y ruido. Mantén pulsado para suavizar progresivamente.  
-Modos: `Completo` (ambos sentidos), `SoloLomos` (solo baja), `SoloHoyos` (solo rellena).  
-Forma Línea + Suavizar = suavizado a lo largo de un camino.
-
-### Rampa
-Tres modos (`H`): **dos puntos** (marcas **A** y **B**, une ambas alturas con pendiente recta), **ángulo fijo** (**B** da dirección y largo, la altura sigue `Ángulo rampa`, ajustable con `Alt` + radio), y **senda** (marcas una curva **A→B→C…**, doble pulso cierra). El radio de la brocha pone el ancho de la rampa y la suavidad solo ablanda los bordes laterales. Vista previa: corredor relleno semitransparente + anillos de altura en A y B.
-
-### Costa
-Aplana hacia el nivel del agua + margen (playas/costas), con suavidad mezclando como Aplanar.
-
-### Pintar
-Tipos: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.
-
-### Restaurar
-Devuelve el terreno a su estado original.
-
-### Nieve
-Pinta nieve como Pintar pero solo nieve; con `Shift` la quita y restaura el suelo original.
+- **Copy with a rectangle selection:** switch the shape to `Rectangle` (key `.`), press Apply once to mark corner **A** (no edit is made), aim at corner **B**, then press `Ctrl+Shift+C` → copies exactly that rectangle (cropped to the selection, it does not drag whole 64 m tiles or untouched ground around it).
+- `Ctrl+Shift+V` shows a ghost (wireframe) preview at the crosshair; `Q`/`E` rotate, `Alt`+wheel rotates continuously, `Shift`+wheel scales, click confirms.
+- Pasting writes **only inside the copied region**; it does not erase terrain outside it.
+- History of 10 stamps in RAM: "Next stamp" / "Previous stamp" keys cycle them.
+- Save a stamp to disk (`.stamp` in `BepInEx/config/TerrainForge/stamps/`, max 12), load it into the clipboard, list and delete from the UI.
+- **Stamp tool**: in SETTINGS → "Stamp tool" (4 options): `Same as brush` (default), `Any`, `Pickaxe`, `TerrainForge Rod`. The HUD shows `STAMP READY [2/5]` when the right tool is equipped and the clipboard has stamps; otherwise it warns `Stamp: tool not equipped`. `Ctrl+Shift+C/V` do nothing without the tool equipped.
 
 ---
 
-## 🎨 Vista Previa
+## Preview
 
-- Anillo sólido: área real generada.
-- Guías tenues: zona a plena fuerza, radio máximo, distancia máxima de mira.
-- En Rampa: corredor A-B real (bordes + relleno semitransparente) + anillos de altura en A y B.
-- En Aplanar/Costa: anillo marcador de nivel objetivo.
-- Bloqueado por servidor/ward: guías en gris.
-- Bajo agua: preview flota en superficie.
-
----
-
-## 🖥️ Menú In-Game (`F5`)
-
-3 pestañas con **scroll global** (rueda del ratón):
-
-| Pestaña | Función |
-|---------|---------|
-| **TECLAS** | Reasigna teclas: click → presiona tecla/botón; `Esc` cancela. Combos: mantené modificadores y después tecla principal. Botones ratón soportados. |
-| **AYUDA** | Referencia completa de operaciones, controles, preview, multijugador, guardado. |
-| **AJUSTES** | Todo editable en vivo: sliders, toggles, ciclos, perfiles, stamps, snapshots, idioma. Se guarda al cerrar. |
-
-**Botón en ESC:** el menú de pausa tiene un botón "TerrainForge" que abre el menú.
+- Solid ring: the real generated area.
+- Faint guides: full-strength zone, max radius, max aim distance.
+- For Ramp: the real A–B corridor (edges + semi-transparent fill) + height rings at A and B.
+- For Flatten/Shore: a marker ring for the target level.
+- Blocked by server/ward: guides in grey.
+- Underwater: the preview floats on the surface.
 
 ---
 
-## 🌍 Servidor + Cliente
+## In-game menu (`F5`)
 
-- **Requerido en ambos** para edits >±8m y replicación correcta.
-- Sección `Servidor` (autoritaria via config sync):
-  - `PermitirEditsTerreno` (default on)
-  - `SoloAdmins` (default off)
-  - `RespetarWards` (default on)
-  - `TopeRadio` / `TopeDelta` (0 = sin límite)
-- Servidor **sin** el mod ignora la sección → cliente funciona para test.
+3 tabs with a **global scroll** (mouse wheel):
 
----
+| Tab | Purpose |
+|-----|---------|
+| **KEYS** | Rebind keys: click → press a key/button; `Esc` cancels. Combos: hold modifiers, then the main key. Mouse buttons supported. |
+| **HELP** | Complete reference of operations, controls, preview, multiplayer and saving. |
+| **SETTINGS** | Everything editable live: sliders, toggles, cycles, profiles, stamps, snapshots, language. Saved on close. |
 
-## ⚡ Rendimiento
-
-`TilesPorFrame` (1–32, default 4): tiles por frame en trazos grandes. Evita lag.
+**ESC button:** the pause menu has a "TerrainForge" button that opens the menu.
 
 ---
 
-## 📝 Changelog
+## Server + Client
 
-Ver [CHANGELOG.md](CHANGELOG.md).
+- **Required on both** for edits greater than ±8 m and correct replication.
+- `Server` section (authoritative via config sync):
+  - `AllowTerrainEdits` (default on)
+  - `AdminOnlyEdits` (default off)
+  - `RespectWards` (default on)
+  - `RadiusCap` / `DeltaCap` (0 = no limit)
+- A server **without** the mod ignores the section → the client still works for testing.
 
 ---
 
-## 🔗 Enlaces
+## Performance
 
-- **Donaciones / Donations:** [cafecito.app/byrka](https://cafecito.app/byrka)
-- **Issues / PRs:** GitHub del mod
+`TilesPerFrame` (1–32, default 4): tiles per frame on large strokes. Prevents lag.
+
+---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## Links
+
+- **Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **GitHub repository:** https://github.com/marceloanton/TerrainForge
+- **Wiki / documentation:** https://github.com/marceloanton/TerrainForge/wiki
+- **Donations:** [cafecito.app/byrka](https://cafecito.app/byrka)
+
+### Documentation languages
+
+*English* (this page) · [Español](https://github.com/marceloanton/TerrainForge/wiki/Home-es) · [Français](https://github.com/marceloanton/TerrainForge/wiki/Home-fr) · [Deutsch](https://github.com/marceloanton/TerrainForge/wiki/Home-de) · [Русский](https://github.com/marceloanton/TerrainForge/wiki/Home-ru) · [中文](https://github.com/marceloanton/TerrainForge/wiki/Home-zh) · [繁體中文](https://github.com/marceloanton/TerrainForge/wiki/Home-zh-tw) · [日本語](https://github.com/marceloanton/TerrainForge/wiki/Home-ja) · [한국어](https://github.com/marceloanton/TerrainForge/wiki/Home-ko) · [Polski](https://github.com/marceloanton/TerrainForge/wiki/Home-pl) · [Português](https://github.com/marceloanton/TerrainForge/wiki/Home-pt) · [Türkçe](https://github.com/marceloanton/TerrainForge/wiki/Home-tr) · [Українська](https://github.com/marceloanton/TerrainForge/wiki/Home-uk) · [Italiano](https://github.com/marceloanton/TerrainForge/wiki/Home-it)
+
+<!--
+All 14 wiki pages are live: Home (en), Home-es, Home-fr, Home-de, Home-ru,
+Home-zh, Home-zh-tw, Home-ja, Home-ko, Home-pl, Home-pt, Home-tr, Home-uk, Home-it.
+When a new translated page is published, add it to the list above and to wiki/_Sidebar.md.
+-->
