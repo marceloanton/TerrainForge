@@ -33,4 +33,6 @@ try {
 } catch {
   // Spanish is the default when browser storage is unavailable.
 }
-if (savedLanguage) setLanguage(savedLanguage);
+const browserLanguage = navigator.language?.toLowerCase() || '';
+const initialLanguage = savedLanguage || (browserLanguage.startsWith('en') ? 'en' : 'es');
+setLanguage(initialLanguage);
