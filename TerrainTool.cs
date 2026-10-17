@@ -61,6 +61,8 @@ namespace TerrainForge
 
                 Shared = shared;
 
+                ApplyIcon(shared);
+
                 if (!ItemManager.Instance.AddItem(custom))
                 {
                     LogWarning("ItemManager.AddItem returned false; tool unavailable.");
@@ -69,6 +71,7 @@ namespace TerrainForge
                 }
 
                 Registered = true;
+                ApplyTint(custom.ItemPrefab);
                 LogInfo("tool registered as '" + PrefabName + "'.");
             }
             catch (Exception e)
@@ -153,6 +156,116 @@ namespace TerrainForge
 
             try { player.EquipItem(data, false); }
             catch { /* ignore: another action may be in progress */ }
+        }
+
+        // ---------------------------------------------------------------------
+        //  Tint: recolor our Hammer clone so it is obvious at a glance which
+        //  hammer is the TerrainForge tool. We only touch the clone's own
+        //  materials / icons, never the vanilla Hammer. Best-effort: anything
+        //  that can't be recolored is silently left untouched.
+        // ---------------------------------------------------------------------
+
+        private static void ApplyTint(GameObject prefab)
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null || p.ToolTint == null || !p.ToolTint.Value)
+                return;
+
+            GameObject live = ObjectDB.instance != null ? ObjectDB.instance.GetItemPrefab(PrefabName) : null;
+            if (live != null)
+                prefab = live;
+
+            Color tint = ParseColor(p.ToolTintColor != null ? p.ToolTintColor.Value : null,
+                new Color(0.31f, 0.76f, 0.97f)); // #4FC3F7 cyan
+
+            int mats = TintRenderers(prefab, tint, out string shader);
+            LogInfo("tint " + ColorUtility.ToHtmlStringRGB(tint) + ": mats=" + mats + " shader=" + shader);
+        }
+
+        // ---------------------------------------------------------------------
+        //  Icon: replace the cloned Hammer icon with a mod-specific pictogram so
+        //  the tool is unmistakable in the inventory (and no longer inherits the
+        //  Hammer's atlas, which showed stray colours).
+        // ---------------------------------------------------------------------
+
+        private static void ApplyIcon(ItemDrop.ItemData.SharedData shared)
+        {
+            if (shared == null)
+                return;
+
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            Color accent = ParseColor(p != null && p.ToolTintColor != null ? p.ToolTintColor.Value : null,
+                new Color(0.31f, 0.76f, 0.97f));
+
+            Sprite icon = TerrainToolIcon.Build(accent);
+            if (icon != null)
+            {
+                shared.m_icons = new[] { icon };
+                LogInfo("custom icon applied.");
+            }
+        }
+
+        private static Color ParseColor(string hex, Color fallback)
+        {
+            if (!string.IsNullOrEmpty(hex))
+            {
+                if (hex[0] != '#')
+                    hex = "#" + hex;
+                Color c;
+                if (ColorUtility.TryParseHtmlString(hex, out c))
+                    return c;
+            }
+            return fallback;
+        }
+
+        private static int TintRenderers(GameObject prefab, Color tint, out string shaderName)
+        {
+            shaderName = "(none)";
+            if (prefab == null)
+                return 0;
+            int count = 0;
+            try
+            {
+                foreach (Renderer r in prefab.GetComponentsInChildren<Renderer>(true))
+                {
+                    Material[] src = r.sharedMaterials;
+                    if (src == null || src.Length == 0)
+                        continue;
+                    var dst = new Material[src.Length];
+                    for (int i = 0; i < src.Length; i++)
+                    {
+                        dst[i] = TintMaterial(src[i], tint);
+                        if (dst[i] != null)
+                            count++;
+                    }
+                    if (count > 0 && src[0] != null && src[0].shader != null && shaderName == "(none)")
+                        shaderName = src[0].shader.name;
+                    r.sharedMaterials = dst;
+                }
+            }
+            catch (Exception e)
+            {
+                LogWarning("model tint failed: " + e.Message);
+            }
+            return count;
+        }
+
+        private static Material TintMaterial(Material src, Color tint)
+        {
+            if (src == null)
+                return src;
+            Material m = new Material(src);
+            if (m.HasProperty("_Color"))
+                m.color = m.color * tint;
+            else if (m.HasProperty("_BaseColor"))
+                m.SetColor("_BaseColor", m.GetColor("_BaseColor") * tint);
+            if (m.HasProperty("_EmissionColor"))
+            {
+                m.EnableKeyword("_EMISSION");
+                m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+                m.SetColor("_EmissionColor", tint * 0.5f);
+            }
+            return m;
         }
 
         private static void LogInfo(string msg) => TerrainForgePlugin.Log?.LogInfo("TerrainForgeTool: " + msg);

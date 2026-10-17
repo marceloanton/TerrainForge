@@ -5,184 +5,6 @@ using UnityEngine;
 
 namespace TerrainForge
 {
-    /// <summary>
-    /// Named brush presets stored in a single config string:
-    /// name|radius|softness|op|shape|paint|rampMode|slope|smooth|raiseDelta|paintStrength|falloff|shoreOffset; ...
-    /// </summary>
-    internal static class TerrainPresets
-    {
-        private const int MaxSlots = 12;
-
-        internal sealed class Preset
-        {
-            public string Name = "";
-            public float Radius = 8f;
-            public float Softness = 50f;
-            public TerrainOperation Operation = TerrainOperation.Flatten;
-            public TerrainShape Shape = TerrainShape.Circle;
-            public TerrainPaint Paint = TerrainPaint.Dirt;
-            public RampMode RampMode = RampMode.TwoPoint;
-            public float SlopeAngle = 30f;
-            public SmoothMode SmoothMode = SmoothMode.Full;
-            public float RaiseDelta = 2f;
-            public float PaintStrength = 1f;
-            public float FalloffPower = 3f;
-            public FalloffMode FalloffMode = FalloffMode.Pointy;
-            public float ShoreOffset = 0.5f;
-        }
-
-        public static List<Preset> Load()
-        {
-            var list = new List<Preset>();
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p == null || p.PresetSlots == null)
-                return list;
-            string raw = p.PresetSlots.Value;
-            if (string.IsNullOrEmpty(raw))
-                return list;
-            string[] entries = raw.Split(';');
-            for (int i = 0; i < entries.Length && list.Count < MaxSlots; i++)
-            {
-                Preset pr = Parse(entries[i]);
-                if (pr != null)
-                    list.Add(pr);
-            }
-            return list;
-        }
-
-        public static void SaveCurrent(string name)
-        {
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p == null)
-                return;
-            name = (name ?? "").Trim().Replace("|", " ").Replace(";", " ");
-            if (name.Length == 0)
-                return;
-
-            var list = Load();
-            list.RemoveAll(x => x.Name == name);
-            list.Add(Capture(p, name));
-            while (list.Count > MaxSlots)
-                list.RemoveAt(0);
-            Write(list);
-        }
-
-        public static void Delete(string name)
-        {
-            var list = Load();
-            list.RemoveAll(x => x.Name == name);
-            Write(list);
-        }
-
-        public static void ApplyPreset(Preset s)
-        {
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p == null || s == null)
-                return;
-            p.Radius.Value = Mathf.Clamp(s.Radius, 1f, 100f);
-            p.Softness.Value = Mathf.Clamp(s.Softness, 0f, 100f);
-            p.DefaultOperation.Value = s.Operation;
-            p.Shape.Value = s.Shape;
-            p.Paint.Value = s.Paint;
-            p.RampMode.Value = s.RampMode;
-            p.SlopeAngle.Value = Mathf.Clamp(s.SlopeAngle, 5f, 60f);
-            p.SmoothMode.Value = s.SmoothMode;
-            p.RaiseDelta.Value = Mathf.Clamp(s.RaiseDelta, 0.5f, 10f);
-            p.PaintStrength.Value = Mathf.Clamp(s.PaintStrength, 0f, 1f);
-            p.FalloffPower.Value = Mathf.Clamp(s.FalloffPower, 1f, 5f);
-            p.FalloffMode.Value = s.FalloffMode;
-            p.ShoreOffset.Value = Mathf.Clamp(s.ShoreOffset, -2f, 5f);
-        }
-
-        private static Preset Capture(TerrainForgePlugin p, string name)
-        {
-            return new Preset
-            {
-                Name = name,
-                Radius = p.Radius.Value,
-                Softness = p.Softness.Value,
-                Operation = p.DefaultOperation.Value,
-                Shape = p.Shape.Value,
-                Paint = p.Paint.Value,
-                RampMode = p.RampMode.Value,
-                SlopeAngle = p.SlopeAngle.Value,
-                SmoothMode = p.SmoothMode.Value,
-                RaiseDelta = p.RaiseDelta.Value,
-                PaintStrength = p.PaintStrength.Value,
-                FalloffPower = p.FalloffPower.Value,
-                FalloffMode = p.FalloffMode.Value,
-                ShoreOffset = p.ShoreOffset.Value
-            };
-        }
-
-        private static void Write(List<Preset> list)
-        {
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p == null || p.PresetSlots == null)
-                return;
-            System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
-            var parts = new List<string>();
-            for (int i = 0; i < list.Count; i++)
-            {
-                Preset s = list[i];
-                parts.Add(string.Join("|", new string[]
-                {
-                    s.Name,
-                    s.Radius.ToString("0.##", inv), s.Softness.ToString("0.##", inv),
-                    ((int)s.Operation).ToString(inv), ((int)s.Shape).ToString(inv), ((int)s.Paint).ToString(inv),
-                    ((int)s.RampMode).ToString(inv), s.SlopeAngle.ToString("0.##", inv), ((int)s.SmoothMode).ToString(inv),
-                    s.RaiseDelta.ToString("0.##", inv), s.PaintStrength.ToString("0.##", inv),
-                    s.FalloffPower.ToString("0.##", inv), ((int)s.FalloffMode).ToString(inv), s.ShoreOffset.ToString("0.##", inv)
-                }));
-            }
-            p.PresetSlots.Value = string.Join(";", parts.ToArray());
-        }
-
-        private static Preset Parse(string entry)
-        {
-            if (string.IsNullOrEmpty(entry))
-                return null;
-            string[] f = entry.Split('|');
-            if (f.Length != 14)
-                return null;
-            try
-            {
-                System.Globalization.CultureInfo inv = System.Globalization.CultureInfo.InvariantCulture;
-                var s = new Preset { Name = f[0].Trim() };
-                if (s.Name.Length == 0)
-                    return null;
-                s.Radius = float.Parse(f[1], inv);
-                s.Softness = float.Parse(f[2], inv);
-                s.Operation = (TerrainOperation)int.Parse(f[3], inv);
-                s.Shape = (TerrainShape)int.Parse(f[4], inv);
-                s.Paint = (TerrainPaint)int.Parse(f[5], inv);
-                s.RampMode = (RampMode)int.Parse(f[6], inv);
-                s.SlopeAngle = float.Parse(f[7], inv);
-                s.SmoothMode = (SmoothMode)int.Parse(f[8], inv);
-                s.RaiseDelta = float.Parse(f[9], inv);
-                s.PaintStrength = float.Parse(f[10], inv);
-                s.FalloffPower = float.Parse(f[11], inv);
-                s.FalloffMode = (FalloffMode)int.Parse(f[12], inv);
-                s.ShoreOffset = float.Parse(f[13], inv);
-                if (!System.Enum.IsDefined(typeof(TerrainOperation), s.Operation)) return null;
-                if (!System.Enum.IsDefined(typeof(TerrainShape), s.Shape)) return null;
-                if (!System.Enum.IsDefined(typeof(TerrainPaint), s.Paint)) return null;
-                if (!System.Enum.IsDefined(typeof(RampMode), s.RampMode)) return null;
-                if (!System.Enum.IsDefined(typeof(SmoothMode), s.SmoothMode)) return null;
-                if (!System.Enum.IsDefined(typeof(FalloffMode), s.FalloffMode)) return null;
-                return s;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-    }
-
-    /// <summary>
-    /// In-mod key rebinding UI with a custom skin. Toggle with the configured menu
-    /// key (default F5); click a binding then press a key / mouse button. Saved to config.
-    /// </summary>
     internal sealed class TerrainKeybinds : MonoBehaviour
     {
         private const int WindowId = 9911735;
@@ -200,7 +22,7 @@ namespace TerrainForge
         private int _capturing = -1;
         private int _tab;
         private Vector2 _mainScroll;
-        private Rect _window = new Rect(40f, 60f, 560f, 600f);
+        private Rect _window = new Rect(40f, 60f, 680f, 720f);
 
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
@@ -211,6 +33,9 @@ namespace TerrainForge
         private string _snapshotName = "";
         private string _stampName = "";
         private string _stampLoadName = "";
+        private string _keySearch = "";
+        private bool _resizing;
+        private GUIStyle _gripStyle;
 
         private GUIStyle _winStyle;
         private GUIStyle _headerStyle;
@@ -228,6 +53,11 @@ namespace TerrainForge
         private GUIStyle _scrollStyle;
         private GUIStyle _scrollBarStyle;
         private GUIStyle _scrollBarThumbStyle;
+        private GUIStyle _iconBtnStyle;
+        private GUIStyle _iconBtnSelStyle;
+        private GUIStyle _iconCapStyle;
+        private GUIStyle _iconCapSelStyle;
+        private GUIStyle _iconOnlyStyle;
 
         private Texture2D _texPanel;
         private Texture2D _texHeader;
@@ -273,6 +103,7 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.rampMode"), Bind = p.RampModeKey });
             _entries.Add(new Entry { Label = Loc.T("key.radial"), Bind = p.RadialKey });
             _entries.Add(new Entry { Label = Loc.T("key.adjust"), Bind = p.AdjustModeKey });
+            _entries.Add(new Entry { Label = Loc.T("key.freecam"), Bind = p.FreeCameraKey });
             _entries.Add(new Entry { Label = Loc.T("key.give"), Bind = p.GiveToolKey });
             _entries.Add(new Entry { Label = Loc.T("key.menu"), Bind = p.RebindMenuKey });
             _entries.Add(new Entry { Label = Loc.T("key.op.flatten"), Bind = p.OpFlattenKey });
@@ -437,25 +268,33 @@ namespace TerrainForge
             GUILayout.Space(8f);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_tab == 0, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(30f)))
+            if (GUILayout.Toggle(_tab == 0, Loc.T("tab.tool"), _tabStyle, GUILayout.Height(30f)))
                 _tab = 0;
-            if (GUILayout.Toggle(_tab == 1, Loc.T("tab.help"), _tabStyle, GUILayout.Height(30f)))
+            if (GUILayout.Toggle(_tab == 1, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(30f)))
                 _tab = 1;
-            if (GUILayout.Toggle(_tab == 2, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(30f)))
+            if (GUILayout.Toggle(_tab == 2, Loc.T("tab.advanced"), _tabStyle, GUILayout.Height(30f)))
                 _tab = 2;
+            if (GUILayout.Toggle(_tab == 3, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(30f)))
+                _tab = 3;
+            if (GUILayout.Toggle(_tab == 4, Loc.T("tab.help"), _tabStyle, GUILayout.Height(30f)))
+                _tab = 4;
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10f);
 
             // Main scroll view for all tab content
-            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _scrollStyle, GUILayout.MinHeight(400f), GUILayout.ExpandHeight(true));
+            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _scrollStyle, GUILayout.MinHeight(380f), GUILayout.ExpandHeight(true));
 
             if (_tab == 0)
-                DrawKeysTab();
+                DrawToolTab();
             else if (_tab == 1)
-                DrawHelpTabContent();
-            else
+                DrawKeysTab();
+            else if (_tab == 2)
+                DrawAdvancedTab();
+            else if (_tab == 3)
                 DrawSettingsTabContent();
+            else
+                DrawHelpTabContent();
 
             GUILayout.EndScrollView();
 
@@ -466,42 +305,262 @@ namespace TerrainForge
             }
 
             GUILayout.EndVertical();
+
+            DrawResizeGrip();
             GUI.DragWindow(new Rect(0f, 0f, 10000f, 34f));
+        }
+
+        private void DrawResizeGrip()
+        {
+            var grip = new Rect(_window.width - 22f, _window.height - 22f, 22f, 22f);
+            GUI.Label(grip, "\u25E2", _gripStyle);
+
+            Event e = Event.current;
+            if (e == null)
+                return;
+
+            if (e.type == EventType.MouseDown && e.button == 0 && grip.Contains(e.mousePosition))
+            {
+                _resizing = true;
+                e.Use();
+            }
+            else if (_resizing && e.type == EventType.MouseDrag)
+            {
+                _window.width = Mathf.Clamp(_window.width + e.delta.x, 560f, Screen.width - 30f);
+                _window.height = Mathf.Clamp(_window.height + e.delta.y, 440f, Screen.height - 30f);
+                e.Use();
+            }
+            else if (_resizing && e.type == EventType.MouseUp)
+            {
+                _resizing = false;
+                e.Use();
+            }
+        }
+
+        private void DrawToolTab()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+
+            SettingHeader(Loc.T("set.operation"));
+            DrawOpPicker(p);
+
+            SettingHeader(Loc.T("set.shape"));
+            DrawShapePicker(p);
+
+            SettingHeader(Loc.T("set.paint"));
+            CycleRow(Loc.T("set.paint"), p.Paint.Value.ToString(), () =>
+            {
+                p.Paint.Value = (TerrainPaint)(((int)p.Paint.Value + 1) % 6);
+            });
+            SegmentedRow(Loc.T("set.rampmode"),
+                new[] { Loc.T("rampmode.two"), Loc.T("rampmode.fixed"), Loc.T("rampmode.path") },
+                (int)p.RampMode.Value,
+                i => { p.RampMode.Value = (RampMode)i; TerrainBrush.RequestClearMarks(); });
+            CycleRow(Loc.T("set.smoothmode"), SmoothModeText(p.SmoothMode.Value), () =>
+            {
+                p.SmoothMode.Value = (SmoothMode)(((int)p.SmoothMode.Value + 1) % 3);
+            });
+            CycleRow(Loc.T("set.falloff"), FalloffModeText(p.FalloffMode.Value), () =>
+            {
+                p.FalloffMode.Value = (FalloffMode)(((int)p.FalloffMode.Value + 1) % 4);
+            });
+
+            SettingHeader(Loc.T("set.sizes"));
+            FloatSlider(Loc.T("set.radius"), p.Radius, 1f, 100f, "0.#");
+            FloatSlider(Loc.T("set.softness"), p.Softness, 0f, 100f, "0");
+            FloatSlider(Loc.T("set.angle"), p.SlopeAngle, 5f, 60f, "0");
+            FloatSlider(Loc.T("set.raisedelta"), p.RaiseDelta, 0.5f, 10f, "0.#");
+            FloatSlider(Loc.T("set.paintstrength"), p.PaintStrength, 0f, 1f, "0.00");
+            FloatSlider(Loc.T("set.falloff"), p.FalloffPower, 1f, 5f, "0.#");
+            FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
+            CycleRow(Loc.T("set.shorefalloff"), ShoreFalloffModeText(p.ShoreFalloffMode.Value), () =>
+            {
+                p.ShoreFalloffMode.Value = (ShoreFalloffMode)(((int)p.ShoreFalloffMode.Value + 1) % 4);
+            });
+
+            DrawFixedHeight(p);
+
+            SettingHeader(Loc.T("set.profiles"));
+            DrawPresets(p);
+        }
+
+        private void DrawOpPicker(TerrainForgePlugin p)
+        {
+            TerrainOperation cur = p.DefaultOperation.Value;
+            var ops = (TerrainOperation[])System.Enum.GetValues(typeof(TerrainOperation));
+            const int perRow = 5;
+            const float cell = 74f;
+
+            for (int i = 0; i < ops.Length; i += perRow)
+            {
+                GUILayout.BeginHorizontal();
+                for (int j = i; j < ops.Length && j < i + perRow; j++)
+                {
+                    TerrainOperation op = ops[j];
+                    bool sel = op == cur;
+                    GUILayout.BeginVertical(GUILayout.Width(cell));
+                    if (GUILayout.Button(new GUIContent(TerrainUiIcons.Op(op), Loc.OpName(op)),
+                        sel ? _iconBtnSelStyle : _iconBtnStyle, GUILayout.Width(cell - 6f), GUILayout.Height(46f)))
+                    {
+                        p.DefaultOperation.Value = op;
+                        TerrainBrush.RequestClearMarks();
+                    }
+                    GUILayout.Label(Loc.OpName(op), sel ? _iconCapSelStyle : _iconCapStyle,
+                        GUILayout.Width(cell), GUILayout.Height(14f));
+                    GUILayout.EndVertical();
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.Space(2f);
+        }
+
+        private void DrawShapePicker(TerrainForgePlugin p)
+        {
+            TerrainShape cur = p.Shape.Value;
+            var shapes = (TerrainShape[])System.Enum.GetValues(typeof(TerrainShape));
+            const float cell = 64f;
+
+            GUILayout.BeginHorizontal();
+            foreach (TerrainShape sh in shapes)
+            {
+                bool sel = sh == cur;
+                GUILayout.BeginVertical(GUILayout.Width(cell));
+                if (GUILayout.Button(new GUIContent(TerrainUiIcons.Shape(sh), ShapeText(sh)),
+                    sel ? _iconBtnSelStyle : _iconBtnStyle, GUILayout.Width(cell - 6f), GUILayout.Height(46f)))
+                {
+                    p.Shape.Value = sh;
+                    TerrainBrush.RequestClearMarks();
+                }
+                GUILayout.Label(ShapeText(sh), sel ? _iconCapSelStyle : _iconCapStyle,
+                    GUILayout.Width(cell), GUILayout.Height(14f));
+                GUILayout.EndVertical();
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Space(2f);
         }
 
         private void DrawKeysTab()
         {
             GUILayout.Label(_capturing >= 0 ? Loc.T("keys.hint.capture") : Loc.T("keys.hint.idle"),
                 _capturing >= 0 ? _capturingStyle : _hintStyle);
+            GUILayout.Space(6f);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.T("set.search"), _rowStyle, GUILayout.Width(90f), GUILayout.Height(26f));
+            _keySearch = GUILayout.TextField(_keySearch ?? "", GUILayout.Height(26f));
+            if (GUILayout.Button("X", _btnStyle, GUILayout.Width(44f), GUILayout.Height(26f)))
+                _keySearch = "";
+            GUILayout.EndHorizontal();
             GUILayout.Space(8f);
 
+            string filter = (_keySearch ?? "").Trim().ToLowerInvariant();
             for (int i = 0; i < _entries.Count; i++)
             {
+                if (filter.Length > 0 && !_entries[i].Label.ToLowerInvariant().Contains(filter))
+                    continue;
+
                 GUILayout.BeginHorizontal();
 
                 Color prev = GUI.color;
                 GUI.color = _capturing == i ? new Color(1f, 0.85f, 0.45f) : Color.white;
-                GUILayout.Label(_entries[i].Label, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+                GUILayout.Label(_entries[i].Label, _rowStyle, GUILayout.Width(250f), GUILayout.Height(26f));
                 GUI.color = prev;
 
                 string text = _capturing == i ? Loc.T("keys.press") : _entries[i].Bind.Value.ToString();
-                if (GUILayout.Button(text, _capturing == i ? _capturingBtnStyle : _btnStyle, GUILayout.Width(205f), GUILayout.Height(26f)))
+                if (GUILayout.Button(text, _capturing == i ? _capturingBtnStyle : _btnStyle, GUILayout.Width(235f), GUILayout.Height(26f)))
                     _capturing = i;
 
                 GUILayout.EndHorizontal();
                 GUILayout.Space(3f);
             }
 
-            GUILayout.Space(10f);
-            DrawHistorySection();
-
             GUILayout.Space(6f);
+            if (GUILayout.Button(Loc.T("set.resetkeys"), _btnStyle, GUILayout.Height(26f)))
+                ResetKeybinds();
+
+            GUILayout.Space(10f);
             if (GUILayout.Button(Loc.T("btn.get"), _btnStyle, GUILayout.Height(28f)))
                 TerrainTool.Give(Player.m_localPlayer);
+        }
 
-            GUILayout.Space(6f);
-            if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
-                Toggle(false);
+        private void DrawAdvancedTab()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+
+            DrawQuickActions();
+
+            SettingHeader(Loc.T("set.snapshots"));
+            DrawSnapshots();
+
+            SettingHeader(Loc.T("set.stamps"));
+            DrawStamps(p);
+
+            GUILayout.Space(10f);
+            DrawHistorySection();
+        }
+
+        private void DrawQuickActions()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+
+            SettingHeader(Loc.T("set.quick"));
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(Loc.T("key.undo"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestUndo();
+            if (GUILayout.Button(Loc.T("key.redo"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestRedo();
+            if (GUILayout.Button(Loc.T("act.eyedrop"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestEyedrop();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(Loc.T("act.copystamp"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestCopyStamp();
+            if (GUILayout.Button(Loc.T("act.pastestamp"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestPasteStamp();
+            if (GUILayout.Button(Loc.T("act.stampprev"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestCycleStampBack();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(Loc.T("act.clearmarks"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestClearMarks();
+            if (GUILayout.Button(Loc.T("set.slopeheatmap"), _btnStyle, GUILayout.Height(26f)))
+                p.ShowSlopeHeatmap.Value = !p.ShowSlopeHeatmap.Value;
+            if (GUILayout.Button(Loc.T("set.heightheatmap"), _btnStyle, GUILayout.Height(26f)))
+                p.ShowHeightHeatmap.Value = !p.ShowHeightHeatmap.Value;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(Loc.T("act.diag"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestDumpMaterial();
+            if (GUILayout.Button(Loc.T("key.freecam"), _btnStyle, GUILayout.Height(26f)))
+                TerrainBrush.RequestFreeCamera();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+        }
+
+        private void ResetKeybinds()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null)
+                return;
+
+            for (int i = 0; i < _entries.Count; i++)
+                _entries[i].Bind.Value = (KeyboardShortcut)_entries[i].Bind.DefaultValue;
+
+            _capturing = -1;
+            TerrainForgePlugin.Message(Loc.T("keys.resetdone"));
         }
 
         private static bool TryParseLenient(string t, out float v)
@@ -563,17 +622,28 @@ namespace TerrainForge
             {
                 TerrainPresets.Preset pr = presets[i];
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(pr.Name, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
-                if (GUILayout.Button(Loc.T("set.profileload"), _btnStyle, GUILayout.Width(120f), GUILayout.Height(26f)))
+                GUILayout.Label(new GUIContent(TerrainUiIcons.Op(pr.Operation)), _iconOnlyStyle,
+                    GUILayout.Width(24f), GUILayout.Height(24f));
+                GUILayout.Label(new GUIContent(TerrainUiIcons.Shape(pr.Shape)), _iconOnlyStyle,
+                    GUILayout.Width(24f), GUILayout.Height(24f));
+                GUILayout.Label(pr.Name, _rowStyle, GUILayout.Width(120f), GUILayout.Height(26f));
+                GUILayout.Label(PresetSummary(pr), _hintStyle, GUILayout.Width(190f), GUILayout.Height(26f));
+                if (GUILayout.Button(Loc.T("set.profileload"), _btnStyle, GUILayout.Width(110f), GUILayout.Height(26f)))
                 {
                     TerrainPresets.ApplyPreset(pr);
                     TerrainBrush.RequestClearMarks();
                 }
-                if (GUILayout.Button("X", _btnStyle, GUILayout.Width(60f), GUILayout.Height(26f)))
+                if (GUILayout.Button("X", _btnStyle, GUILayout.Width(50f), GUILayout.Height(26f)))
                     TerrainPresets.Delete(pr.Name);
                 GUILayout.EndHorizontal();
                 GUILayout.Space(3f);
             }
+        }
+
+        private string PresetSummary(TerrainPresets.Preset pr)
+        {
+            return string.Format("{0} · {1} · r{2}",
+                Loc.OpName(pr.Operation), ShapeText(pr.Shape), pr.Radius.ToString("0.#"));
         }
 
         private void DrawSnapshots()
@@ -634,7 +704,7 @@ namespace TerrainForge
                     }
                     else
                     {
-                        TerrainForgePlugin.Message("No hay stamp en el portapapeles para guardar.");
+                        TerrainForgePlugin.Message(Loc.T("set.stampnoclip"));
                     }
                 }
             }
@@ -700,8 +770,8 @@ namespace TerrainForge
             }
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Loc.T("hist.exact"), _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
-            string t = GUILayout.TextField(_undoDepthText ?? depth.ToString(), GUILayout.Width(205f), GUILayout.Height(26f));
+            GUILayout.Label(Loc.T("hist.exact"), _rowStyle, GUILayout.Width(250f), GUILayout.Height(26f));
+            string t = GUILayout.TextField(_undoDepthText ?? depth.ToString(), GUILayout.Width(235f), GUILayout.Height(26f));
             if (t != _undoDepthText)
             {
                 _undoDepthText = t;
@@ -721,74 +791,13 @@ namespace TerrainForge
             GUILayout.Label(Loc.F("hist.saved", TerrainEngine.UndoCount, TerrainEngine.RedoCount), _hintStyle);
         }
 
-        private void DrawSettingsTab()
-        {
-            DrawSettingsTabContent();
-
-            GUILayout.Space(8f);
-            if (GUILayout.Button(Loc.T("btn.close"), _btnStyle, GUILayout.Height(28f)))
-                Toggle(false);
-        }
-
         private void DrawSettingsTabContent()
         {
             TerrainForgePlugin p = TerrainForgePlugin.Instance;
             if (p == null)
                 return;
 
-            SettingHeader(Loc.T("set.brush"));
-            CycleRow(Loc.T("set.operation"), p.DefaultOperation.Value.ToString(), () =>
-            {
-                p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 9);
-                TerrainBrush.RequestClearMarks();
-            });
-            CycleRow(Loc.T("set.shape"), ShapeText(p.Shape.Value), () =>
-            {
-                p.Shape.Value = (TerrainShape)(((int)p.Shape.Value + 1) % 5);
-                TerrainBrush.RequestClearMarks();
-            });
-            CycleRow(Loc.T("set.paint"), p.Paint.Value.ToString(), () =>
-            {
-                p.Paint.Value = (TerrainPaint)(((int)p.Paint.Value + 1) % 6);
-            });
-            CycleRow(Loc.T("set.rampmode"), RampModeText(p.RampMode.Value), () =>
-            {
-                p.RampMode.Value = (RampMode)(((int)p.RampMode.Value + 1) % 3);
-                TerrainBrush.RequestClearMarks();
-            });
-            CycleRow(Loc.T("set.smoothmode"), SmoothModeText(p.SmoothMode.Value), () =>
-            {
-                p.SmoothMode.Value = (SmoothMode)(((int)p.SmoothMode.Value + 1) % 3);
-            });
-            CycleRow(Loc.T("set.falloff"), FalloffModeText(p.FalloffMode.Value), () =>
-            {
-                p.FalloffMode.Value = (FalloffMode)(((int)p.FalloffMode.Value + 1) % 4);
-            });
-
-            SettingHeader(Loc.T("set.sizes"));
-            FloatSlider(Loc.T("set.radius"), p.Radius, 1f, 100f, "0.#");
-            FloatSlider(Loc.T("set.softness"), p.Softness, 0f, 100f, "0");
-            FloatSlider(Loc.T("set.angle"), p.SlopeAngle, 5f, 60f, "0");
-            FloatSlider(Loc.T("set.raisedelta"), p.RaiseDelta, 0.5f, 10f, "0.#");
-            FloatSlider(Loc.T("set.paintstrength"), p.PaintStrength, 0f, 1f, "0.00");
-            FloatSlider(Loc.T("set.falloff"), p.FalloffPower, 1f, 5f, "0.#");
-            FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
-            CycleRow(Loc.T("set.shorefalloff"), ShoreFalloffModeText(p.ShoreFalloffMode.Value), () =>
-            {
-                p.ShoreFalloffMode.Value = (ShoreFalloffMode)(((int)p.ShoreFalloffMode.Value + 1) % 4);
-            });
-
-            DrawFixedHeight(p);
-
-            SettingHeader(Loc.T("set.profiles"));
-            DrawPresets(p);
-
-            SettingHeader(Loc.T("set.snapshots"));
-            DrawSnapshots();
-
-            SettingHeader(Loc.T("set.stamps"));
-            DrawStamps(p);
-
+            SettingHeader(Loc.T("set.general"));
             CycleRow(Loc.T("set.language"), p.Language.Value.ToString(), () =>
             {
                 var langs = new[]
@@ -813,23 +822,37 @@ namespace TerrainForge
                 p.Language.Value = langs[(idx + 1) % langs.Length];
             });
 
-            SettingHeader(Loc.T("set.switches"));
+            SettingHeader(Loc.T("set.tool"));
+            BoolToggle(Loc.T("set.tooltint"), p.ToolTint);
+            CycleRow(Loc.T("set.toolcolor"), p.ToolTintColor.Value, () =>
+            {
+                string[] colors = { "#4FC3F7", "#FFC400", "#8BC34A", "#FF5252", "#AB47BC", "#FFFFFF" };
+                int idx = System.Array.IndexOf(colors, p.ToolTintColor.Value);
+                p.ToolTintColor.Value = colors[(idx + 1) % colors.Length];
+            });
+            BoolToggle(Loc.T("set.autogive"), p.AutoGiveTool);
+            BoolToggle(Loc.T("set.blockvanilla"), p.BlockVanillaTerrainTools);
+            CycleRow(Loc.T("set.stamptool"), StampToolModeText(p.StampToolMode.Value), () =>
+            {
+                p.StampToolMode.Value = (StampToolMode)(((int)p.StampToolMode.Value + 1) % 4);
+            });
+
+            SettingHeader(Loc.T("set.view"));
             BoolToggle(Loc.T("set.preview"), p.ShowPreview);
             BoolToggle(Loc.T("set.guides"), p.ShowGuides);
             BoolToggle(Loc.T("set.slopeheatmap"), p.ShowSlopeHeatmap);
             BoolToggle(Loc.T("set.heightheatmap"), p.ShowHeightHeatmap);
             BoolToggle(Loc.T("set.effects"), p.PlayEffects);
-            BoolToggle(Loc.T("set.autogive"), p.AutoGiveTool);
+
+            SettingHeader(Loc.T("set.vanilla"));
             BoolToggle(Loc.T("set.nocost"), p.NoBuildCost);
             BoolToggle(Loc.T("set.protected"), p.AllowInProtectedZones);
+
+            SettingHeader(Loc.T("set.server"));
             BoolToggle(Loc.T("set.deltalimit"), p.UnlockDeltaLimit);
             BoolToggle(Loc.T("set.allow"), p.AllowTerrainEdits);
             BoolToggle(Loc.T("set.adminonly"), p.AdminOnlyEdits);
             BoolToggle(Loc.T("set.respectwards"), p.RespectWards);
-            CycleRow(Loc.T("set.stamptool"), StampToolModeText(p.StampToolMode.Value), () =>
-            {
-                p.StampToolMode.Value = (StampToolMode)(((int)p.StampToolMode.Value + 1) % 4);
-            });
             FloatSlider(Loc.T("set.radiuscap"), p.RadiusCap, 0f, 100f, "0.#");
             FloatSlider(Loc.T("set.deltacap"), p.DeltaCap, 0f, 64f, "0.#");
             IntSlider(Loc.T("set.chunkcomps"), p.ChunkCompsPerFrame, 1, 32);
@@ -847,6 +870,19 @@ namespace TerrainForge
             GUILayout.Label(label, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
             if (GUILayout.Button(value, _btnStyle, GUILayout.Width(205f), GUILayout.Height(26f)))
                 onClick();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+        }
+
+        private void SegmentedRow(string label, string[] options, int current, System.Action<int> onSelect)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label, _rowStyle, GUILayout.Width(215f), GUILayout.Height(26f));
+            for (int i = 0; i < options.Length; i++)
+            {
+                if (GUILayout.Button(options[i], i == current ? _capturingBtnStyle : _btnStyle, GUILayout.Height(26f)))
+                    onSelect(i);
+            }
             GUILayout.EndHorizontal();
             GUILayout.Space(3f);
         }
@@ -946,14 +982,6 @@ namespace TerrainForge
             }
         }
 
-private void DrawHelpTab()
-        {
-            DrawHelpTabContent();
-            GUILayout.Space(8f);
-            if (GUILayout.Button("Cerrar", _btnStyle, GUILayout.Height(28f)))
-                Toggle(false);
-        }
-
         private void DrawHelpTabContent()
         {
             Topic(Loc.T("help.what.t"));
@@ -970,6 +998,9 @@ private void DrawHelpTab()
 
             Topic(Loc.T("help.preview.t"));
             Body(Loc.T("help.preview.b"));
+
+            Topic(Loc.T("help.stamp.t"));
+            Body(Loc.T("help.stamp.b"));
 
             Topic(Loc.T("help.mp.t"));
             Body(Loc.T("help.mp.b"));
@@ -998,19 +1029,19 @@ private void DrawHelpTab()
 
             Font font = TerrainBrush.GameFont();
 
-            // Valheim color palette
-            Color valheimDark = new Color(0.07f, 0.07f, 0.08f, 0.97f);      // Dark panel bg
-            Color valheimHeader = new Color(0.10f, 0.10f, 0.12f, 1f);        // Header bg
-            Color valheimGold = new Color(0.92f, 0.78f, 0.18f, 1f);          // Valheim gold
-            Color valheimGoldBright = new Color(1f, 0.88f, 0.25f, 1f);       // Bright gold
-            Color valheimPanel = new Color(0.12f, 0.12f, 0.14f, 0.98f);      // Panel bg
-            Color valheimBtn = new Color(0.16f, 0.16f, 0.18f, 1f);           // Button normal
-            Color valheimBtnHover = new Color(0.22f, 0.22f, 0.25f, 1f);      // Button hover
-            Color valheimBtnActive = new Color(0.75f, 0.60f, 0.15f, 1f);     // Button active (gold)
-            Color valheimTextGold = new Color(0.95f, 0.82f, 0.25f, 1f);      // Gold text
-            Color valheimTextWhite = new Color(0.92f, 0.90f, 0.85f, 1f);     // Warm white
-            Color valheimTextDim = new Color(0.65f, 0.62f, 0.55f, 1f);       // Dim text
-            Color valheimTextBright = new Color(1f, 0.92f, 0.65f, 1f);       // Bright gold text
+            // Valheim color palette (shared theme)
+            Color valheimDark = TerrainTheme.PanelDark;
+            Color valheimHeader = TerrainTheme.PanelHeader;
+            Color valheimGold = TerrainTheme.Gold;
+            Color valheimGoldBright = TerrainTheme.GoldBright;
+            Color valheimPanel = TerrainTheme.PanelBg;
+            Color valheimBtn = TerrainTheme.Button;
+            Color valheimBtnHover = TerrainTheme.ButtonHover;
+            Color valheimBtnActive = TerrainTheme.ButtonActive;
+            Color valheimTextGold = TerrainTheme.TextGold;
+            Color valheimTextWhite = TerrainTheme.TextWhite;
+            Color valheimTextDim = TerrainTheme.TextDim;
+            Color valheimTextBright = TerrainTheme.TextBright;
 
             _texPanel = MakeTex(valheimDark);
             _texHeader = MakeTex(valheimHeader);
@@ -1082,6 +1113,48 @@ private void DrawHelpTab()
             _closeStyle = MakeButtonStyle(font, _texBtn, _texBtnHover, _texBtnActive, new Color(1f, 0.5f, 0.4f, 1f));
             _closeStyle.fontSize = 14;
             _closeStyle.fontStyle = FontStyle.Bold;
+
+            _gripStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 16,
+                alignment = TextAnchor.MiddleCenter,
+                font = font
+            };
+            _gripStyle.normal.textColor = valheimTextDim;
+
+            _iconBtnStyle = new GUIStyle(GUI.skin.button)
+            {
+                padding = new RectOffset(3, 3, 3, 3),
+                margin = new RectOffset(2, 2, 2, 2),
+                font = font,
+                normal = { background = _texBtn },
+                hover = { background = _texBtnHover },
+                active = { background = _texBtnActive }
+            };
+            _iconBtnSelStyle = new GUIStyle(_iconBtnStyle)
+            {
+                normal = { background = _texBtnActive },
+                hover = { background = _texBtnActive },
+                active = { background = _texBtnActive }
+            };
+
+            _iconCapStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 10,
+                alignment = TextAnchor.MiddleCenter,
+                clipping = TextClipping.Clip,
+                font = font
+            };
+            _iconCapStyle.normal.textColor = valheimTextDim;
+            _iconCapSelStyle = new GUIStyle(_iconCapStyle);
+            _iconCapSelStyle.normal.textColor = valheimGoldBright;
+
+            _iconOnlyStyle = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                padding = new RectOffset(0, 0, 0, 0),
+                margin = new RectOffset(1, 1, 0, 0)
+            };
 
             _tabStyle = new GUIStyle(GUI.skin.button)
             {

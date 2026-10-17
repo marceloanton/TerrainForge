@@ -5,11 +5,12 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>TerrainForge</AssemblyName>
     <RootNamespace>TerrainForge</RootNamespace>
-    <Version>0.3.4</Version>
+    <Version>0.3.5</Version>
     <Product>TerrainForge</Product>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>build\</OutputPath>
     <DebugType>none</DebugType>
     <Deterministic>true</Deterministic>
     <NoWarn>$(NoWarn);CS0649</NoWarn>
@@ -108,6 +109,24 @@
     <MakeDir Directories="$(PluginsDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)" />
     <Message Importance="high" Text="Deployed TerrainForge.dll to $(PluginsDir)" />
+  </Target>
+
+  <!--
+    Builds the Thunderstore release zip (flat layout) into build/:
+      dotnet build -c Release -p:Package=true
+  -->
+  <Target Name="PackageRelease" AfterTargets="Build" Condition="'$(Package)' == 'true'">
+    <PropertyGroup>
+      <_PkgDir>$(MSBuildProjectDirectory)\build\pkg</_PkgDir>
+      <_PkgZip>$(MSBuildProjectDirectory)\build\TerrainForge-$(Version).zip</_PkgZip>
+    </PropertyGroup>
+    <RemoveDir Directories="$(_PkgDir)" />
+    <MakeDir Directories="$(_PkgDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(_PkgDir)" />
+    <Copy SourceFiles="manifest.json;README.md;CHANGELOG.md;icon.png" DestinationFolder="$(_PkgDir)" />
+    <ZipDirectory SourceDirectory="$(_PkgDir)" DestinationFile="$(_PkgZip)" Overwrite="true" />
+    <RemoveDir Directories="$(_PkgDir)" />
+    <Message Importance="high" Text="Packaged $(_PkgZip)" />
   </Target>
 
 </Project>

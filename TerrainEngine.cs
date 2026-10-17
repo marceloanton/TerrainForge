@@ -140,6 +140,7 @@ namespace TerrainForge
         }
 
         private static bool s_pendingChanged;
+        private static float s_dbgApplyAt;
 
         /// <summary>
         /// A brush stroke in progress: tiles left to process plus the undo frame
@@ -201,6 +202,24 @@ namespace TerrainForge
                     Save(comp);
                     hm.Poke(0);
                     p.Changed = true;
+                    if (Time.time >= s_dbgApplyAt)
+                    {
+                        s_dbgApplyAt = Time.time + 0.5f;
+                        float[] lv = LevelDelta(comp);
+                        int mh = 0;
+                        float mx = 0f;
+                        if (lv != null)
+                            for (int q = 0; q < lv.Length; q++)
+                            {
+                                bool[] m = (bool[])f_modifiedHeight.GetValue(comp);
+                                if (m != null && m[q]) mh++;
+                                float aa = Mathf.Abs(lv[q]);
+                                if (aa > mx) mx = aa;
+                            }
+                        TerrainForgePlugin.Log?.LogInfo("[TF] applied op=" + p.Spec.Operation +
+                            " modH=" + mh + " maxAbsLevel=" + mx.ToString("0.00") +
+                            " origin=" + hm.transform.position);
+                    }
                 }
             }
 
@@ -490,6 +509,8 @@ namespace TerrainForge
             int y1 = Mathf.Min(width, cy + span);
             int x0 = Mathf.Max(0, cx - span);
             int x1 = Mathf.Min(width, cx + span);
+            if (x1 < x0 || y1 < y0)
+                return false;
 
             // Smooth needs a frozen snapshot of the surrounding heights so every
             // vertex averages its ORIGINAL neighbours; without it the blur would
@@ -1078,6 +1099,9 @@ namespace TerrainForge
                 return false;
             }
 
+            if (x1 < x0 || y1 < y0)
+                return false;
+
             // Frozen snapshot for Smooth, over the bbox expanded by one vertex
             // (unclamped: border vertices sample across the tile edge, so the
             // blur stays seamless between neighbouring tiles).
@@ -1352,12 +1376,14 @@ namespace TerrainForge
             public string Label;        // e.g. "Copy: 5 tiles"
             public DateTime Time;       // when it was copied
             public string Name;         // user name for saved stamps (empty = clipboard)
+            public bool RegionMask;     // true = per-vertex ModH is a selection mask (rect copy)
         }
 
         public sealed class StampTile
         {
             public Vector3 TilePos;     // tile world position (Heightmap transform)
             public int Width;           // vertex grid size (width+1 per side)
+            public float Size;          // footprint side in metres (runtime only, for preview)
             public float[] Level;
             public float[] Smooth;
             public bool[] ModH;
@@ -1458,6 +1484,17 @@ namespace TerrainForge
                 searchRadius = maxD + radius + 4f;
             }
 
+            // Rectangle selection: clip every tile to the A->B box (per-vertex mask).
+            bool rectMode = shape == TerrainShape.Rect && rectA.HasValue && rectB.HasValue;
+            float minX = 0f, maxX = 0f, minZ = 0f, maxZ = 0f;
+            if (rectMode)
+            {
+                minX = Mathf.Min(rectA.Value.x, rectB.Value.x);
+                maxX = Mathf.Max(rectA.Value.x, rectB.Value.x);
+                minZ = Mathf.Min(rectA.Value.z, rectB.Value.z);
+                maxZ = Mathf.Max(rectA.Value.z, rectB.Value.z);
+            }
+
             Heightmap.FindHeightmap(searchCenter, searchRadius, hmaps);
             if (hmaps.Count == 0)
                 return null;
@@ -1486,11 +1523,73 @@ namespace TerrainForge
                 if (level.Length != pitch * pitch)
                     continue;
 
+                int modHCount = 0;
+                float maxAbs = 0f;
+                for (int q = 0; q < level.Length; q++)
+                {
+                    if (modH[q])
+                        modHCount++;
+                    float aa = Mathf.Abs(level[q]);
+                    if (aa > maxAbs)
+                        maxAbs = aa;
+                }
+                TerrainForgePlugin.Log?.LogInfo("[TF] CopyStamp tile w=" + w +
+                    " modH=" + modHCount + " maxAbsLevel=" + maxAbs.ToString("0.00") +
+                    " size=" + (w * hm.m_scale).ToString("0") + " pos=" + hm.transform.position);
+
+                if (rectMode)
+                {
+                    int len = pitch * pitch;
+                    var lv = new float[len];
+                    var sm = new float[len];
+                    var mh = new bool[len];
+                    var pt = new Color[len];
+                    var mp = new bool[len];
+                    Vector3 o = hm.transform.position;
+                    float scale = hm.m_scale;
+                    float half = w * 0.5f;
+                    int inside = 0;
+                    for (int ii = 0; ii <= w; ii++)
+                    {
+                        for (int jj = 0; jj <= w; jj++)
+                        {
+                            int idx = ii * pitch + jj;
+                            float wx = o.x + (jj - half) * scale;
+                            float wz = o.z + (ii - half) * scale;
+                            if (wx >= minX && wx <= maxX && wz >= minZ && wz <= maxZ)
+                            {
+                                lv[idx] = level[idx];
+                                sm[idx] = smooth[idx];
+                                mh[idx] = true;
+                                pt[idx] = paint[idx];
+                                mp[idx] = modP[idx];
+                                inside++;
+                            }
+                        }
+                    }
+                    if (inside == 0)
+                        continue;
+                    stamp.Tiles.Add(new StampTile
+                    {
+                        TilePos = o,
+                        Width = w,
+                        Size = w * scale,
+                        Level = lv,
+                        Smooth = sm,
+                        ModH = mh,
+                        Paint = pt,
+                        ModP = mp
+                    });
+                    copied++;
+                    continue;
+                }
+
                 // Clone the whole tile (simple, fast enough for copy)
                 var tile = new StampTile
                 {
                     TilePos = hm.transform.position,
                     Width = w,
+                    Size = w * hm.m_scale,
                     Level = (float[])level.Clone(),
                     Smooth = (float[])smooth.Clone(),
                     ModH = (bool[])modH.Clone(),
@@ -1504,7 +1603,8 @@ namespace TerrainForge
             if (copied == 0)
                 return null;
 
-            stamp.Label = "Copy: " + copied + " tile" + (copied > 1 ? "s" : "");
+            stamp.RegionMask = rectMode;
+            stamp.Label = (rectMode ? "Rect: " : "Copy: ") + copied + " tile" + (copied > 1 ? "s" : "");
             AddToClipboard(stamp);
             return stamp;
         }
@@ -1632,18 +1732,47 @@ namespace TerrainForge
                 var rec = new Recorder(level, smooth, modH, paint, modP);
                 bool any = false;
 
-                for (int idx = 0; idx < src.Level.Length; idx++)
+                if (stamp.RegionMask)
                 {
-                    if (level[idx] != src.Level[idx] || smooth[idx] != src.Smooth[idx] ||
-                        modH[idx] != src.ModH[idx] || paint[idx] != src.Paint[idx] || modP[idx] != src.ModP[idx])
+                    // Selection stamp: only vertices inside the A->B rectangle are written.
+                    for (int idx = 0; idx < src.Level.Length; idx++)
                     {
+                        if (!src.ModH[idx])
+                            continue;
+                        bool h = level[idx] != src.Level[idx] || smooth[idx] != src.Smooth[idx] || !modH[idx];
+                        bool pc = src.ModP[idx] && (paint[idx] != src.Paint[idx] || !modP[idx]);
+                        if (!h && !pc)
+                            continue;
                         rec.Add(idx);
-                        level[idx] = src.Level[idx];
-                        smooth[idx] = src.Smooth[idx];
-                        modH[idx] = src.ModH[idx];
-                        paint[idx] = src.Paint[idx];
-                        modP[idx] = src.ModP[idx];
+                        if (h)
+                        {
+                            level[idx] = src.Level[idx];
+                            smooth[idx] = src.Smooth[idx];
+                            modH[idx] = true;
+                        }
+                        if (pc)
+                        {
+                            paint[idx] = src.Paint[idx];
+                            modP[idx] = true;
+                        }
                         any = true;
+                    }
+                }
+                else
+                {
+                    for (int idx = 0; idx < src.Level.Length; idx++)
+                    {
+                        if (level[idx] != src.Level[idx] || smooth[idx] != src.Smooth[idx] ||
+                            modH[idx] != src.ModH[idx] || paint[idx] != src.Paint[idx] || modP[idx] != src.ModP[idx])
+                        {
+                            rec.Add(idx);
+                            level[idx] = src.Level[idx];
+                            smooth[idx] = src.Smooth[idx];
+                            modH[idx] = src.ModH[idx];
+                            paint[idx] = src.Paint[idx];
+                            modP[idx] = src.ModP[idx];
+                            any = true;
+                        }
                     }
                 }
 
@@ -1699,7 +1828,7 @@ namespace TerrainForge
         // ---- terrain stamps (disk persistence) -----------------------------------
 
         private const string StampMagic = "TFST";
-        private const int StampVersion = 1;
+        private const int StampVersion = 2;
         private const int MaxSavedStamps = 12;
 
         private static string StampDir()
@@ -1796,6 +1925,7 @@ namespace TerrainForge
                     w.Write(stamp.Center.z);
                     w.Write(stamp.Radius);
                     w.Write(stamp.Time.ToBinary());
+                    w.Write(stamp.RegionMask);
                     w.Write(stamp.Tiles.Count);
                     foreach (var tile in stamp.Tiles)
                     {
@@ -1845,7 +1975,7 @@ namespace TerrainForge
                         return false;
                     }
                     int version = r.ReadInt32();
-                    if (version != StampVersion)
+                    if (version < 1 || version > StampVersion)
                     {
                         message = "Versión de stamp incompatible.";
                         return false;
@@ -1854,6 +1984,7 @@ namespace TerrainForge
                     Vector3 center = new Vector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
                     float radius = r.ReadSingle();
                     DateTime time = DateTime.FromBinary(r.ReadInt64());
+                    bool regionMask = version >= 2 && r.ReadBoolean();
                     int tileCount = r.ReadInt32();
                     if (tileCount <= 0 || tileCount > 512)
                     {
@@ -1890,6 +2021,7 @@ namespace TerrainForge
                         Center = center,
                         Radius = radius,
                         Time = time,
+                        RegionMask = regionMask,
                         Tiles = tiles
                     };
                     message = "Stamp cargado: " + name + " (" + tiles.Count + " tiles).";

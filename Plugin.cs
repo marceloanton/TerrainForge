@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TerrainForge
 {
-    [BepInPlugin(Guid, "TerrainForge", "0.3.4")]
+    [BepInPlugin(Guid, "TerrainForge", "0.3.5")]
     [BepInDependency("com.jotunn.jotunn")]
     public class TerrainForgePlugin : BaseUnityPlugin
     {
@@ -20,6 +20,8 @@ namespace TerrainForge
         public ConfigEntry<bool> Enabled;
         public ConfigEntry<bool> PlayEffects;
         public ConfigEntry<ModLanguage> Language;
+        public ConfigEntry<bool> ToolTint;
+        public ConfigEntry<string> ToolTintColor;
 
         // Brush
         public ConfigEntry<float> Radius;
@@ -61,6 +63,8 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> RampModeKey;
         public ConfigEntry<KeyboardShortcut> RadialKey;
         public ConfigEntry<KeyboardShortcut> AdjustModeKey;
+        public ConfigEntry<KeyboardShortcut> FreeCameraKey;
+        public ConfigEntry<float> FreeCameraAimDistance;
         public ConfigEntry<KeyboardShortcut> OpFlattenKey;
         public ConfigEntry<KeyboardShortcut> OpRaiseKey;
         public ConfigEntry<KeyboardShortcut> OpLowerKey;
@@ -86,6 +90,7 @@ namespace TerrainForge
         public ConfigEntry<float> VanillaToolRadius;
         public ConfigEntry<bool> NoBuildCost;
         public ConfigEntry<bool> AllowInProtectedZones;
+        public ConfigEntry<bool> BlockVanillaTerrainTools;
 
         // Preview
         public ConfigEntry<bool> ShowPreview;
@@ -122,6 +127,12 @@ namespace TerrainForge
                 "Play the tool's terrain-hit effect (dust + thud) when the brush applies.");
             Language = Config.Bind("General", "Language", ModLanguage.Auto,
                 "Menu / HUD language: Auto (detect from game), Español, English, or other supported languages.");
+            ToolTint = Config.Bind("General", "ToolTint", true,
+                "Recolor the TerrainForge tool (a Hammer clone) so it is instantly " +
+                "distinguishable from the vanilla Hammer. Only affects this mod's tool.");
+            ToolTintColor = Config.Bind("General", "ToolTintColor", "#4FC3F7",
+                "Hex color applied to the TerrainForge tool's model and inventory icon " +
+                "(e.g. #4FC3F7 cyan, #FFC400 gold, #8BC34A green).");
 
             Radius = Config.Bind("Brush", "Radius", 8f,
                 new ConfigDescription("Brush radius in meters.", new AcceptableValueRange<float>(1f, 100f)));
@@ -201,6 +212,14 @@ namespace TerrainForge
             AdjustModeKey = Config.Bind("Input", "AdjustModeKey", new KeyboardShortcut(KeyCode.V),
                 "Toggle adjust mode: the mouse wheel changes the brush radius and vanilla " +
                 "scroll uses (camera zoom, hotbar, map) are frozen while active.");
+            FreeCameraKey = Config.Bind("Input", "FreeCameraKey", new KeyboardShortcut(KeyCode.F),
+                "Toggle Valheim's free-fly camera (photo mode) while the brush is active: the " +
+                "player is frozen and the camera flies freely (WASD move, mouse look, wheel " +
+                "changes fly speed, F again to exit). Use it to reach areas the player camera " +
+                "cannot, e.g. copying large stamps.");
+            FreeCameraAimDistance = Config.Bind("Input", "FreeCameraAimDistance", 300f,
+                "Aim distance (metres) while the free-fly camera is active. Normal aiming is " +
+                "capped at 40 m; the free camera raises the cap so you can target distant ground.");
             OpFlattenKey = Config.Bind("Input", "OpFlattenKey", new KeyboardShortcut(KeyCode.None),
                 "Direct key to select Flatten operation.");
             OpRaiseKey = Config.Bind("Input", "OpRaiseKey", new KeyboardShortcut(KeyCode.None),
@@ -250,6 +269,9 @@ namespace TerrainForge
                 "Remove workstation requirements and material cost for placing build pieces.");
             AllowInProtectedZones = Config.Bind("VanillaTools", "AllowInProtectedZones", false,
                 "Allow placement inside no-build zones and ward zones. Bypasses protection.");
+            BlockVanillaTerrainTools = Config.Bind("VanillaTools", "BlockVanillaTerrainTools", false,
+                "While the TerrainForge tool is equipped, block vanilla hoe / cultivator terrain edits " +
+                "(level, raise, paint) so only TerrainForge shapes the ground.");
 
 ShowPreview = Config.Bind("Preview", "ShowPreview", true,
                 "Draw the brush footprint while aiming.");
@@ -323,6 +345,26 @@ ShowPreview = Config.Bind("Preview", "ShowPreview", true,
             catch (System.Exception e)
             {
                 Log.LogWarning("TerrainForge scroll patch failed: " + e.Message);
+            }
+
+            try
+            {
+                System.Reflection.MethodInfo down = HarmonyLib.AccessTools.Method(
+                    typeof(ZInput), "GetButtonDown", new[] { typeof(string) });
+                if (down != null && down.ReturnType == typeof(bool))
+                {
+                    _harmony.Patch(down, prefix: new HarmonyMethod(
+                        typeof(FreeFlyButtonSuppressPatch), nameof(FreeFlyButtonSuppressPatch.Prefix)));
+                }
+                else
+                {
+                    Log.LogWarning("TerrainForge: ZInput.GetButtonDown not found; " +
+                        "free camera may still lock on / coast when applying.");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Log.LogWarning("TerrainForge free camera button patch failed: " + e.Message);
             }
 
             gameObject.AddComponent<TerrainBrush>();

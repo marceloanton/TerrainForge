@@ -207,6 +207,7 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## Links
 
 - **Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Project website:** https://marceloanton.github.io/TerrainForge/
 - **GitHub repository:** https://github.com/marceloanton/TerrainForge
 - **Wiki / documentation:** https://github.com/marceloanton/TerrainForge/wiki
 - **Donations:** [cafecito.app/byrka](https://cafecito.app/byrka)

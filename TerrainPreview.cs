@@ -30,10 +30,11 @@ namespace TerrainForge
         public bool Blocked; // server/ward deny: draw guides greyed out
         public float WaterLevel; // for underwater preview: draw at water surface
         public bool ShowStamp;           // stamp paste preview active
-        public Vector3 StampCenter;      // target center for stamp
+        public TerrainEngine.TerrainStamp Stamp; // stamp to visualise (paste target or copy source)
+        public Vector3 StampTarget;      // aim point where the stamp will land
         public float StampRotation;      // rotation in degrees
         public float StampScale;         // scale factor
-        public List<Vector3> StampTilePositions; // tile positions for wireframe
+        public float CopyHighlightStart; // Time.time of the last copy (0 = none)
         public bool ShowSlopeHeatmap;    // show slope heatmap overlay
         public bool ShowHeightHeatmap;   // show height heatmap overlay
     }
@@ -66,11 +67,28 @@ namespace TerrainForge
         private LineRenderer _rampMarkB; // height marker at B
         private LineRenderer _rect;      // rectangle footprint outline (world)
         private LineRenderer _poly;      // polygon footprint outline (world)
+        private LineRenderer _edgeShadow; // dark outline backing (contrast)
+        private LineRenderer _rectShadow; // dark outline backing (contrast)
+        private LineRenderer _polyShadow; // dark outline backing (contrast)
         private LineRenderer _level;     // target-level marker ring (world)
-        private LineRenderer _stamp;     // stamp paste preview wireframe (world)
         private LineRenderer _slopeHeatmap;  // slope heatmap overlay (world)
         private LineRenderer _heightHeatmap; // height heatmap overlay (world)
-        private LineRenderer _stampContours; // stamp contour lines (world)
+
+        private GameObject _patchGo;     // translucent 3D surface patch
+        private MeshFilter _patchMf;
+        private MeshRenderer _patchMr;
+        private Mesh _patchMesh;
+        private Material _patchMat;
+        private TerrainShape _patchShape = (TerrainShape)(-1);
+        private float _patchRadius = -1f;
+        private float _patchNext;
+
+        private GameObject _stampGo;     // translucent footprint for stamps
+        private MeshFilter _stampMf;
+        private MeshRenderer _stampMr;
+        private Mesh _stampMesh;
+        private Material _stampMat;
+        private float _stampNext;
 
         private Vector3[] _unitRing;
 
@@ -115,9 +133,30 @@ namespace TerrainForge
             _rampMarkB.loop = true;
             _rect = MakeLine("rect", 0, true);
             _poly = MakeLine("poly", 0, true);
+
+            // Dark, slightly wider backing lines drawn behind the main outlines so
+            // they stay legible over bright or busy terrain (snow, water, foliage).
+            _edgeShadow = MakeLine("edgeShadow", 2, false);
+            _edgeShadow.sortingOrder = -1;
+            _rectShadow = MakeLine("rectShadow", 0, true);
+            _rectShadow.sortingOrder = -1;
+            _polyShadow = MakeLine("polyShadow", 0, true);
+            _polyShadow.sortingOrder = -1;
+
+            // Translucent surface patch: samples the ground under the brush and
+            // draws a soft cap so you can read the affected 3D volume.
+            _patchMat = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
+            _patchMat.color = new Color(1f, 1f, 1f, 0.22f);
+            _patchGo = new GameObject("patch") { hideFlags = HideFlags.HideAndDontSave };
+            _patchMf = _patchGo.AddComponent<MeshFilter>();
+            _patchMr = _patchGo.AddComponent<MeshRenderer>();
+            _patchMr.sharedMaterial = _patchMat;
+            _patchMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            _patchMr.receiveShadows = false;
+            _patchMesh = new Mesh { hideFlags = HideFlags.HideAndDontSave };
+            _patchMf.sharedMesh = _patchMesh;
+            _patchGo.SetActive(false);
             _level = MakeLine("level", 2, true);
-            _stamp = MakeLine("stamp", 0, true);
-            _stamp.loop = false;
 
             _slopeHeatmap = MakeLine("slopeHeatmap", 0, true);
             _slopeHeatmap.loop = true;
@@ -127,9 +166,19 @@ namespace TerrainForge
             _heightHeatmap.loop = true;
             _heightHeatmap.numCornerVertices = 2;
 
-            _stampContours = MakeLine("stampContours", 0, true);
-            _stampContours.loop = true;
-            _stampContours.numCornerVertices = 2;
+            // Translucent footprint for stamps: a filled quad per tile so the
+            // copied region is actually visible where it will be placed.
+            _stampMat = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
+            _stampMat.color = new Color(1f, 1f, 1f, 0.3f);
+            _stampGo = new GameObject("stampFoot") { hideFlags = HideFlags.HideAndDontSave };
+            _stampMf = _stampGo.AddComponent<MeshFilter>();
+            _stampMr = _stampGo.AddComponent<MeshRenderer>();
+            _stampMr.sharedMaterial = _stampMat;
+            _stampMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            _stampMr.receiveShadows = false;
+            _stampMesh = new Mesh { hideFlags = HideFlags.HideAndDontSave };
+            _stampMf.sharedMesh = _stampMesh;
+            _stampGo.SetActive(false);
 
             BuildRing();
             _root.SetActive(false);
@@ -165,6 +214,10 @@ namespace TerrainForge
         {
             if (_root != null && _root.activeSelf)
                 _root.SetActive(false);
+            if (_patchGo != null && _patchGo.activeSelf)
+                _patchGo.SetActive(false);
+            if (_stampGo != null && _stampGo.activeSelf)
+                _stampGo.SetActive(false);
         }
 
         public void Update(PreviewState s)
@@ -239,6 +292,7 @@ namespace TerrainForge
             bool suppress = s.SuppressCircles || (s.IsRamp && s.HasRampA);
 
             SetActive(_edge, !suppress);
+            SyncShadow(_edge, _edgeShadow, w * 2.2f, 0.55f);
             SetActive(_full, !suppress && s.FullRadius < s.Radius - 0.05f && fullR > 0.05f);
             SetActive(_reach, !suppress && s.ReachRadius > s.Radius + 0.05f);
 
@@ -353,6 +407,7 @@ namespace TerrainForge
             {
                 SetActive(_rect, false);
             }
+            SyncShadow(_rect, _rectShadow, w * 1.5f, 0.55f);
 
             // Polygon footprint outline (fixed points + cursor, closed loop).
             if (s.PolyPreview != null && s.PolyPreview.Length >= 2)
@@ -373,6 +428,7 @@ namespace TerrainForge
             {
                 SetActive(_poly, false);
             }
+            SyncShadow(_poly, _polyShadow, w * 1.5f, 0.55f);
 
             // Target-level marker: a horizontal ring at the height Flatten /
             // Shore (or a fixed eyedrop height) would produce. Terrain occludes
@@ -411,14 +467,13 @@ namespace TerrainForge
                 SetActive(_level, false);
             }
 
-            DrawStampPreview(s);
-
-            // Draw stamp contour lines
-            DrawStampContours(s);
+            DrawStampFootprint(s);
 
             // Draw heatmap overlays
             DrawSlopeHeatmap(s);
             DrawHeightHeatmap(s);
+
+            UpdatePatch(s, c, suppress);
 
             if (!_root.activeSelf)
                 _root.SetActive(true);
@@ -506,7 +561,7 @@ namespace TerrainForge
             float startZ = s.Center.z - s.Radius;
 
             int totalPoints = gridSize * gridSize * (segments + 1);
-            _heightHeatmap.positionCount = gridSize * gridSize * (segments + 1);
+            _heightHeatmap.positionCount = totalPoints;
             int idx = 0;
 
             // Get min/max height in the area for normalization
@@ -568,127 +623,152 @@ namespace TerrainForge
                 return new Color(1f, 0.2f, 0.1f, alpha);      // Red
         }
 
-        private void DrawStampPreview(PreviewState s)
+        private const float StampHighlightSeconds = 4f;
+        private const int StampTileLimit = 32;
+
+        /// <summary>
+        /// Draws the stamp as a real relief surface built from the stored per-vertex
+        /// height deltas, so you can recognise the shape being copied/pasted. Tile
+        /// centres are moved/rotated/scaled like <see cref="TerrainEngine.PasteStamp"/>
+        /// (pasted) or shown in gold at the source (just copied). Vertices are tinted
+        /// warm where terrain rises and cool where it drops; the tile rim is brighter
+        /// so the copied region reads clearly.
+        /// </summary>
+        private void DrawStampFootprint(PreviewState s)
         {
-            if (!s.ShowStamp || s.StampTilePositions == null || s.StampTilePositions.Count == 0)
+            TerrainEngine.TerrainStamp stamp = s.Stamp;
+            bool has = stamp != null && stamp.Tiles != null && stamp.Tiles.Count > 0;
+            bool paste = s.ShowStamp && has;
+            bool highlight = !paste && has && s.CopyHighlightStart > 0f &&
+                             (Time.time - s.CopyHighlightStart) < StampHighlightSeconds;
+
+            if (!paste && !highlight)
             {
-                SetActive(_stamp, false);
+                SetActive(_stampGo, false);
                 return;
             }
 
-            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
-            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
-            Color stampC = new Color(c.r, c.g, c.b, c.a * 0.5f);
-
-            // Draw each tile as a square outline at its position
-            const float tileSize = 64f; // typical Heightmap tile size in meters (width * scale)
-            int totalPoints = s.StampTilePositions.Count * 5;
-            _stamp.positionCount = totalPoints;
-            int idx = 0;
-            foreach (Vector3 tp in s.StampTilePositions)
+            // Throttle the (potentially large) relief rebuild to ~10 Hz.
+            if (Time.time < _stampNext)
             {
-                float x0 = tp.x - tileSize * 0.5f;
-                float x1 = tp.x + tileSize * 0.5f;
-                float z0 = tp.z - tileSize * 0.5f;
-                float z1 = tp.z + tileSize * 0.5f;
-                float y = DrawHeight(tp.x, tp.z, s) + 0.2f;
-                _stamp.SetPosition(idx++, new Vector3(x0, y, z0));
-                _stamp.SetPosition(idx++, new Vector3(x0, y, z1));
-                _stamp.SetPosition(idx++, new Vector3(x1, y, z1));
-                _stamp.SetPosition(idx++, new Vector3(x1, y, z0));
-                _stamp.SetPosition(idx++, new Vector3(x0, y, z0));
-            }
-            SetWidth(_stamp, w * 0.5f);
-            SetColor(_stamp, stampC);
-            SetActive(_stamp, true);
-        }
-
-        private void DrawStampContours(PreviewState s)
-        {
-            if (!s.ShowStamp || s.StampTilePositions == null || s.StampTilePositions.Count == 0)
-            {
-                SetActive(_stampContours, false);
+                SetActive(_stampGo, true);
                 return;
             }
+            _stampNext = Time.time + 0.1f;
 
-            // Check if stamp has height data to contour
-            if (s.StampTilePositions.Count == 0)
+            Vector3 target = paste ? s.StampTarget : stamp.Center;
+            float rot = paste ? s.StampRotation : 0f;
+            float scl = paste ? s.StampScale : 1f;
+            Vector3 origin = stamp.Center;
+            float cosR = Mathf.Cos(rot * Mathf.Deg2Rad);
+            float sinR = Mathf.Sin(rot * Mathf.Deg2Rad);
+            bool blocked = paste && s.Blocked;
+
+            int tileCount = Mathf.Min(stamp.Tiles.Count, StampTileLimit);
+
+            float maxAbs = 0.5f;
+            for (int ti = 0; ti < tileCount; ti++)
             {
-                SetActive(_stampContours, false);
-                return;
-            }
-
-            float w = Mathf.Clamp(s.Radius * 0.035f, 0.08f, 0.7f);
-            Color c = s.Blocked ? new Color(0.45f, 0.45f, 0.48f, s.Color.a) : s.Color;
-
-            // Collect all tile positions and their heights
-            var contourData = new List<(Vector3 pos, float height)>();
-            float minH = float.MaxValue, maxH = float.MinValue;
-
-            foreach (Vector3 tp in s.StampTilePositions)
-            {
-                float h = GroundHeight(tp.x, tp.z);
-                contourData.Add((tp, h));
-                minH = Mathf.Min(minH, h);
-                maxH = Mathf.Max(maxH, h);
-            }
-
-            if (maxH <= minH + 0.1f)
-            {
-                SetActive(_stampContours, false);
-                return;
-            }
-
-            // Define contour levels (e.g., every 1 meter)
-            float contourInterval = 1f;
-            int numContours = Mathf.CeilToInt((maxH - minH) / contourInterval);
-            numContours = Mathf.Clamp(numContours, 1, 20);
-
-            const int pointsPerContour = 32;
-            int totalPoints = numContours * (pointsPerContour + 1);
-            _stampContours.positionCount = totalPoints;
-            int idx = 0;
-
-            for (int ci = 0; ci < numContours; ci++)
-            {
-                float contourHeight = minH + (ci + 1) * contourInterval;
-                if (contourHeight > maxH) break;
-
-                // For each contour level, draw a circle at each tile that crosses this height
-                // Simplified: draw contour circles at tile centers where height crosses the level
-                for (int ci2 = 0; ci2 < s.StampTilePositions.Count; ci2++)
+                float[] lv = stamp.Tiles[ti].Level;
+                if (lv == null)
+                    continue;
+                for (int k = 0; k < lv.Length; k++)
                 {
-                    Vector3 tp = s.StampTilePositions[ci2];
-                    float tileHeight = contourData[ci2].height;
+                    float a = lv[k] < 0f ? -lv[k] : lv[k];
+                    if (a > maxAbs)
+                        maxAbs = a;
+                }
+            }
 
-                    // Check if this tile crosses the contour level
-                    // We'll draw a small circle at tile center if height is near contour level
-                    float diff = Mathf.Abs(tileHeight - contourHeight);
-                    if (diff < contourInterval * 0.5f)
+            var verts = new List<Vector3>();
+            var cols = new List<Color>();
+            var tris = new List<int>();
+
+            Color flat = blocked ? new Color(0.45f, 0.45f, 0.48f) : new Color(0.62f, 0.62f, 0.66f);
+            Color upCol = blocked ? flat : new Color(1.00f, 0.55f, 0.25f);
+            Color downCol = blocked ? flat : new Color(0.35f, 0.65f, 1.00f);
+            Color rim = highlight ? new Color(1f, 0.85f, 0.25f) : new Color(s.Color.r, s.Color.g, s.Color.b);
+            float rimAlpha = 0.95f;
+
+            for (int ti = 0; ti < tileCount; ti++)
+            {
+                TerrainEngine.StampTile tile = stamp.Tiles[ti];
+                if (tile.Level == null || tile.Width <= 0)
+                    continue;
+                int w = tile.Width;
+                int pitch = w + 1;
+                if (tile.Level.Length < pitch * pitch)
+                    continue;
+
+                float st = (tile.Size > 0.5f ? tile.Size : 64f) / w;
+                float half = w * 0.5f;
+
+                Vector3 rel = tile.TilePos - origin;
+                float rx = rel.x * scl;
+                float rz = rel.z * scl;
+                float tcx = target.x + rx * cosR - rz * sinR;
+                float tcz = target.z + rx * sinR + rz * cosR;
+
+                int tbase = verts.Count;
+                for (int i = 0; i <= w; i++)
+                {
+                    for (int j = 0; j <= w; j++)
                     {
-                        float cx = contourData[ci2].pos.x;
-                        float cz = contourData[ci2].pos.z;
-                        float contourY = contourHeight + 0.15f; // slightly above ground
+                        float wx = tcx + (j - half) * st;
+                        float wz = tcz + (i - half) * st;
+                        float d = tile.Level[i * pitch + j];
+                        float wy = GroundHeight(wx, wz) + d + 0.10f;
+                        verts.Add(new Vector3(wx, wy, wz));
 
-                        const int segs = 16;
-                        float r = 3f; // contour circle radius
-
-                        for (int seg = 0; seg <= 16; seg++)
+                        bool border = i == 0 || i == w || j == 0 || j == w;
+                        if (border)
                         {
-                            float angle = (float)seg / 16f * Mathf.PI * 2f;
-                            float wx = cx + Mathf.Cos(angle) * r;
-                            float wz = cz + Mathf.Sin(angle) * r;
-                            float cyPos = contourHeight + 0.1f;
-                            _stampContours.SetPosition(idx++, new Vector3(wx, cyPos, wz));
+                            cols.Add(new Color(rim.r, rim.g, rim.b, rimAlpha));
                         }
+                        else
+                        {
+                            float t = Mathf.Clamp(d / maxAbs, -1f, 1f);
+                            Color c = t > 0.04f ? Color.Lerp(flat, upCol, t)
+                                    : t < -0.04f ? Color.Lerp(flat, downCol, -t)
+                                    : flat;
+                            c.a = Mathf.Lerp(0.18f, highlight ? 0.55f : 0.50f, Mathf.Abs(t));
+                            cols.Add(c);
+                        }
+                    }
+                }
+
+                bool region = stamp.RegionMask && tile.ModH != null;
+                for (int i = 0; i < w; i++)
+                {
+                    for (int j = 0; j < w; j++)
+                    {
+                        int cA = i * pitch + j;
+                        if (region && !(tile.ModH[cA] && tile.ModH[cA + 1] &&
+                                        tile.ModH[cA + pitch] && tile.ModH[cA + pitch + 1]))
+                            continue;
+                        int a = tbase + i * pitch + j;
+                        int b = a + 1;
+                        int c2 = a + pitch + 1;
+                        int d2 = a + pitch;
+                        tris.Add(a); tris.Add(c2); tris.Add(b);
+                        tris.Add(a); tris.Add(d2); tris.Add(c2);
                     }
                 }
             }
 
-            SetWidth(_stampContours, 0.03f);
-            Color contourColor = new Color(1f, 0.85f, 0.2f, 0.9f); // Valheim gold
-            SetColor(_stampContours, contourColor);
-            SetActive(_stampContours, true);
+            if (verts.Count == 0)
+            {
+                SetActive(_stampGo, false);
+                return;
+            }
+
+            _stampMesh.Clear();
+            _stampMesh.SetVertices(verts);
+            _stampMesh.SetColors(cols);
+            _stampMesh.SetTriangles(tris, 0);
+            _stampMesh.RecalculateBounds();
+            _stampMat.color = Color.white;
+            SetActive(_stampGo, true);
         }
 
         private void SetRing(LineRenderer lr, float radius, TerrainShape shape)
@@ -711,6 +791,73 @@ namespace TerrainForge
             }
         }
 
+        private void UpdatePatch(PreviewState s, Color c, bool suppress)
+        {
+            bool want = !suppress && !s.Blocked && s.Radius > 0.5f &&
+                        (s.Shape == TerrainShape.Circle || s.Shape == TerrainShape.Square);
+            if (!want)
+            {
+                SetActive(_patchGo, false);
+                return;
+            }
+
+            _patchMat.color = new Color(c.r, c.g, c.b, 0.22f);
+
+            bool stale = _patchShape != s.Shape || !Mathf.Approximately(_patchRadius, s.Radius);
+            if (stale || Time.time >= _patchNext)
+            {
+                _patchShape = s.Shape;
+                _patchRadius = s.Radius;
+                _patchNext = Time.time + 0.1f;
+                RebuildPatch(s);
+            }
+
+            SetActive(_patchGo, true);
+        }
+
+        private void RebuildPatch(PreviewState s)
+        {
+            const int G = 18;
+            float r = s.Radius;
+            var verts = new List<Vector3>();
+            var ids = new int[G + 1, G + 1];
+            for (int i = 0; i <= G; i++)
+                for (int j = 0; j <= G; j++)
+                    ids[i, j] = -1;
+
+            float step = 2f * r / G;
+            for (int i = 0; i <= G; i++)
+            {
+                float gx = -r + i * step;
+                for (int j = 0; j <= G; j++)
+                {
+                    float gz = -r + j * step;
+                    if (s.Shape == TerrainShape.Circle && gx * gx + gz * gz > r * r)
+                        continue;
+                    float wx = s.Center.x + gx;
+                    float wz = s.Center.z + gz;
+                    ids[i, j] = verts.Count;
+                    verts.Add(new Vector3(wx, DrawHeight(wx, wz, s) + 0.06f, wz));
+                }
+            }
+
+            var tris = new List<int>();
+            for (int i = 0; i < G; i++)
+                for (int j = 0; j < G; j++)
+                {
+                    int a = ids[i, j], b = ids[i + 1, j], d = ids[i + 1, j + 1], e = ids[i, j + 1];
+                    if (a < 0 || b < 0 || d < 0 || e < 0)
+                        continue;
+                    tris.Add(a); tris.Add(b); tris.Add(d);
+                    tris.Add(a); tris.Add(d); tris.Add(e);
+                }
+
+            _patchMesh.Clear();
+            _patchMesh.SetVertices(verts);
+            _patchMesh.SetTriangles(tris, 0);
+            _patchMesh.RecalculateBounds();
+        }
+
         private static void SetWidth(LineRenderer lr, float w)
         {
             lr.startWidth = w;
@@ -727,6 +874,30 @@ namespace TerrainForge
         {
             if (lr != null && lr.gameObject.activeSelf != on)
                 lr.gameObject.SetActive(on);
+        }
+
+        private static void SetActive(GameObject go, bool on)
+        {
+            if (go != null && go.activeSelf != on)
+                go.SetActive(on);
+        }
+
+        // Keeps a dark backing line in sync with a source outline so the main
+        // colour stays readable over bright/busy terrain.
+        private static void SyncShadow(LineRenderer src, LineRenderer dst, float width, float alpha)
+        {
+            if (dst == null)
+                return;
+            bool on = src != null && src.gameObject.activeSelf && src.positionCount > 1;
+            SetActive(dst, on);
+            if (!on)
+                return;
+            int n = src.positionCount;
+            dst.positionCount = n;
+            for (int i = 0; i < n; i++)
+                dst.SetPosition(i, src.GetPosition(i));
+            SetWidth(dst, width);
+            SetColor(dst, new Color(0f, 0f, 0f, alpha));
         }
 
         private static Color Col(Color c, float a)
@@ -763,9 +934,27 @@ namespace TerrainForge
             SetColor(lr, new Color(c.r, c.g, c.b, c.a * 0.6f));
         }
 
-public void Destroy()
+        public void Destroy()
         {
             SafeDestroy(_lineMat);
+            SafeDestroy(_patchMat);
+            SafeDestroy(_patchMesh);
+            if (_patchGo != null)
+            {
+                Object.Destroy(_patchGo);
+                _patchGo = null;
+                _patchMf = null;
+                _patchMr = null;
+            }
+            SafeDestroy(_stampMat);
+            SafeDestroy(_stampMesh);
+            if (_stampGo != null)
+            {
+                Object.Destroy(_stampGo);
+                _stampGo = null;
+                _stampMf = null;
+                _stampMr = null;
+            }
             if (_root != null)
             {
                 Object.Destroy(_root);
@@ -782,9 +971,10 @@ public void Destroy()
                 _rampMarkB = null;
                 _rect = null;
                 _poly = null;
+                _edgeShadow = null;
+                _rectShadow = null;
+                _polyShadow = null;
                 _level = null;
-                _stamp = null;
-                _stampContours = null;
             }
         }
 

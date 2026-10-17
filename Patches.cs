@@ -239,6 +239,36 @@ namespace TerrainForge
     }
 
     /// <summary>
+    /// Optional: while the TerrainForge tool is equipped, cancel placement of vanilla
+    /// terrain-editing pieces (hoe level/raise, cultivator paint) so the ground is only
+    /// shaped by TerrainForge. Off by default.
+    /// </summary>
+    internal static class BlockVanillaTerrainPatch
+    {
+        [HarmonyPatch(typeof(Player), nameof(Player.TryPlacePiece))]
+        [HarmonyPrefix]
+        private static bool Prefix(Player __instance, Piece piece, ref bool __result)
+        {
+            var plugin = TerrainForgePlugin.Instance;
+            if (plugin == null || !plugin.BlockVanillaTerrainTools.Value)
+                return true;
+            if (__instance != Player.m_localPlayer || piece == null)
+                return true;
+
+            ItemDrop.ItemData held = TerrainBrush.GetHeldItem(__instance);
+            if (!TerrainTool.IsEquipped(held))
+                return true;
+
+            if (piece.GetComponentInChildren<TerrainOp>(true) == null &&
+                piece.GetComponentInChildren<TerrainModifier>(true) == null)
+                return true;
+
+            __result = false;
+            return false; // skip vanilla placement of terrain-editing pieces
+        }
+    }
+
+    /// <summary>
     /// Adds a "TerrainForge" button to the ESC pause menu (cloned from the settings
     /// button so it matches the game's styling) that opens the mod menu. Hooked on
     /// every open (not just Start) so the entry survives other menu mods and is
@@ -340,9 +370,81 @@ namespace TerrainForge
     {
         internal static bool Prefix(ref float __result)
         {
-            if (TerrainBrush.AdjustModeActive)
+            if (TerrainBrush.AdjustModeActive || TerrainBrush.FreeFlyWheelBusy)
             {
                 __result = 0f;
+                return false;
+            }
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// While the free-fly camera is active the right mouse button is the tool's
+    /// apply key, but the vanilla camera also treats Mouse1 as "take screenshot".
+    /// Suppress that so sculpting in free camera does not spam screenshots.
+    /// </summary>
+    [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.ScreenShot))]
+    internal static class FreeFlyScreenshotPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix()
+        {
+            return !TerrainBrush.SuppressFreeFlyScreenshot;
+        }
+    }
+
+    /// <summary>
+    /// In the free-fly camera the vanilla game "locks on" to whatever the crosshair
+    /// hits when the SecondaryAttack button (right mouse, the tool's Apply key) is
+    /// pressed, which pins the camera (position + rotation) to that object and makes
+    /// the view stuck until the button is pressed again — so you can no longer aim and
+    /// stop sculpting. The Attack button (left mouse) does the same with a "look-at"
+    /// target. While TerrainForge is using the free camera both are cleared every frame.
+    /// </summary>
+    [HarmonyPatch(typeof(GameCamera), "UpdateFreeFly")]
+    internal static class FreeFlyNoLockonPatch
+    {
+        private static FieldInfo s_lockon;
+        private static FieldInfo s_target;
+
+        [HarmonyPostfix]
+        private static void Postfix(GameCamera __instance)
+        {
+            if (!TerrainBrush.SuppressFreeFlyLockon)
+                return;
+
+            if (s_lockon == null)
+                s_lockon = AccessTools.Field(typeof(GameCamera), "m_freeFlyLockon");
+            if (s_lockon != null && s_lockon.GetValue(__instance) != null)
+                s_lockon.SetValue(__instance, null);
+
+            if (s_target == null)
+                s_target = AccessTools.Field(typeof(GameCamera), "m_freeFlyTarget");
+            if (s_target != null && s_target.GetValue(__instance) != null)
+                s_target.SetValue(__instance, null);
+        }
+    }
+
+    /// <summary>
+    /// While editing from the free-fly camera, cancel the vanilla free-fly buttons that
+    /// conflict with the tool. Right mouse is both "SecondaryAttack" (camera lock-on) and
+    /// "Block" (stores the current velocity, so the camera keeps coasting forward), and
+    /// left mouse is "Attack" (pins a look-at target). The tool reads its Apply key via
+    /// Unity's Input directly, so silencing these only removes the vanilla camera side.
+    /// Patched manually and guarded: if the input API changes, the camera just keeps its
+    /// vanilla behaviour and we log.
+    /// </summary>
+    internal static class FreeFlyButtonSuppressPatch
+    {
+        internal static bool Prefix(string __0, ref bool __result)
+        {
+            if (!TerrainBrush.SuppressFreeFlyLockon)
+                return true;
+
+            if (__0 == "SecondaryAttack" || __0 == "Block" || __0 == "Attack")
+            {
+                __result = false;
                 return false;
             }
             return true;

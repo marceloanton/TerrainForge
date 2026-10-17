@@ -14,6 +14,22 @@ namespace TerrainForge
         private const float ApplyInterval = 0.1f;
         private const float MaxAimDistance = 40f;
 
+        // Effective aim distance. The free-fly camera raises the cap so the
+        // crosshair can target distant ground (e.g. marking a large stamp).
+        private static float AimDistance
+        {
+            get
+            {
+                if (GameCamera.InFreeFly())
+                {
+                    TerrainForgePlugin p = TerrainForgePlugin.Instance;
+                    if (p != null)
+                        return Mathf.Max(MaxAimDistance, p.FreeCameraAimDistance.Value);
+                }
+                return MaxAimDistance;
+            }
+        }
+
         private readonly TerrainPreview _preview = new TerrainPreview();
         private float _lastApply = -999f;
         private bool _applying;
@@ -22,6 +38,7 @@ namespace TerrainForge
         private Vector3 _rampA;
 
         private GUIStyle _hud;
+        private GUIStyle _banner;
         private Texture2D _hudBg;
         private string _flashMsg;
         private float _flashUntil;
@@ -48,16 +65,37 @@ namespace TerrainForge
         private float _lastRedo = -999f;
         private bool _adjustMode;
 
+        // Persistent HUD info: position.
+        private string _posTxt = "";
+
         // Stamp copy/paste
         private bool _pastePreview;
         private float _stampRotation;
         private float _stampScale = 1f;
         private Vector3 _stampPreviewCenter;
+        // Timestamp of the last copy, for the short "just copied" highlight.
+        private float _clipFxStart;
 
         internal static bool AdjustModeActive { get; private set; }
+        internal static bool FreeFlyWheelBusy { get; private set; }
         private static bool s_clearMarks;
+        private static bool s_reqUndo, s_reqRedo, s_reqEyedrop, s_reqGiveTool;
+        private static bool s_reqCopyStamp, s_reqPasteStamp, s_reqCycleStampBack;
+        private static bool s_reqDumpMat;
+        private static bool s_reqFreeCam;
+        internal static bool SuppressFreeFlyScreenshot;
+        internal static bool SuppressFreeFlyLockon;
 
         internal static void RequestClearMarks() => s_clearMarks = true;
+        internal static void RequestUndo() => s_reqUndo = true;
+        internal static void RequestRedo() => s_reqRedo = true;
+        internal static void RequestEyedrop() => s_reqEyedrop = true;
+        internal static void RequestGiveTool() => s_reqGiveTool = true;
+        internal static void RequestCopyStamp() => s_reqCopyStamp = true;
+        internal static void RequestPasteStamp() => s_reqPasteStamp = true;
+        internal static void RequestCycleStampBack() => s_reqCycleStampBack = true;
+        internal static void RequestDumpMaterial() => s_reqDumpMat = true;
+        internal static void RequestFreeCamera() => s_reqFreeCam = true;
 
         private void OnDestroy()
         {
@@ -145,6 +183,14 @@ namespace TerrainForge
             ItemDrop.ItemData weapon = GetHeldItem(player);
             bool equipped = IsToolEquipped(p, weapon);
 
+            // Free-fly "photo" camera (F): while it is active the player is frozen
+            // and the held item may be hidden by the game, so treat the tool as the
+            // dominant mode for the HUD, preview and editing regardless of equip.
+            bool freeCam = GameCamera.InFreeFly();
+            bool active = equipped || freeCam;
+            SuppressFreeFlyScreenshot = freeCam;
+            SuppressFreeFlyLockon = freeCam;
+
             if (equipped && !p.SeenTutorial.Value)
             {
                 p.SeenTutorial.Value = true;
@@ -152,6 +198,12 @@ namespace TerrainForge
                 TerrainForgePlugin.Message(Loc.T("tut.1"));
                 TerrainForgePlugin.Message(Loc.T("tut.2"));
             }
+
+            // Free-fly camera: toggle while the brush is active. Allowed even when
+            // the tool is unequipped if the camera is already flying, so the same
+            // key can always be used to exit and never strands the player.
+            if (!blocked && active && p.FreeCameraKey.Value.IsDown())
+                ToggleFreeCamera();
 
             Vector3 aim;
             bool hasAim = TryGetAim(out aim);
@@ -163,11 +215,16 @@ namespace TerrainForge
             }
             else
             {
-                float gy = GroundHeight(player.transform.position);
-                groundCenter = new Vector3(player.transform.position.x, gy, player.transform.position.z);
+                // In the free-fly camera the (frozen) player may be nowhere near
+                // what the crosshair is over, so fall back to the terrain below the
+                // camera, never below the player.
+                Camera cam = Camera.main;
+                Vector3 src = freeCam && cam != null ? cam.transform.position : player.transform.position;
+                float gy = GroundHeight(src);
+                groundCenter = new Vector3(src.x, gy, src.z);
             }
 
-            if (!blocked && equipped)
+            if (!blocked && active)
             {
                 if (p.CycleOperationKey.Value.IsDown())
                 {
@@ -205,11 +262,11 @@ namespace TerrainForge
                 }
                 if (p.EyedropKey.Value.IsDown())
                     ToggleEyedrop(groundCenter);
-                if (p.UseFixedHeight.Value)
+                if (p.UseFixedHeight.Value && !GameCamera.InFreeFly())
                 {
                     // Handle Alt + Mouse Wheel for height adjustment
                     bool altHeld = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-                    float scroll = Input.mouseScrollDelta.y;
+                    float scroll = WheelDelta();
                     if (altHeld && Mathf.Abs(scroll) > 0.01f)
                     {
                         float delta = scroll > 0f ? 0.1f : -0.1f;
@@ -241,13 +298,27 @@ namespace TerrainForge
             // values (synced to clients) decide whether this client may write
             // terrain. Servers without the mod leave the local values alone, so
             // the tool keeps working there for testing.
-            _serverAllowed = !equipped || ServerAllows(p, out _serverWhy);
-            _wardOk = !equipped || WardAllows(p, groundCenter, EffectiveRadius(p), out _wardWhy);
+            _serverAllowed = !active || ServerAllows(p, out _serverWhy);
+            _wardOk = !active || WardAllows(p, groundCenter, EffectiveRadius(p), out _wardWhy);
             bool canEdit = _serverAllowed && _wardOk;
             string why = _serverAllowed ? _wardWhy : _serverWhy;
 
+            // Quick actions requested from the F5 menu.
+            if (!blocked)
+            {
+                if (s_reqUndo) { s_reqUndo = false; DoUndo(); }
+                if (s_reqRedo) { s_reqRedo = false; DoRedo(); }
+                if (s_reqEyedrop) { s_reqEyedrop = false; ToggleEyedrop(groundCenter); }
+                if (s_reqGiveTool) { s_reqGiveTool = false; TerrainTool.Give(player); }
+                if (s_reqCopyStamp) { s_reqCopyStamp = false; HandleCopyStamp(p, groundCenter); }
+                if (s_reqPasteStamp) { s_reqPasteStamp = false; HandlePasteStamp(p, groundCenter, canEdit, why); }
+                if (s_reqCycleStampBack) { s_reqCycleStampBack = false; HandleCycleStamp(p, -1); }
+                if (s_reqDumpMat) { s_reqDumpMat = false; DumpTerrainMaterial(groundCenter); }
+                if (s_reqFreeCam) { s_reqFreeCam = false; ToggleFreeCamera(); }
+            }
+
             // Stamp copy/paste (work outside normal apply flow)
-            if (!blocked && equipped)
+            if (!blocked && active)
             {
                 if (p.CopyStampKey.Value.IsDown())
                     HandleCopyStamp(p, groundCenter);
@@ -271,7 +342,7 @@ namespace TerrainForge
 
             TerrainOperation op = p.DefaultOperation.Value;
 
-            if (!blocked && equipped && !Held(p.RadialKey.Value))
+            if (!blocked && active && !Held(p.RadialKey.Value))
             {
                 if (op == TerrainOperation.Ramp)
                 {
@@ -304,12 +375,13 @@ namespace TerrainForge
                 }
             }
 
-            if (equipped)
+            if (active)
             {
                 _aimY = groundCenter.y;
                 _aimPoint = groundCenter;
                 _targetTxt = TargetText(p, player, groundCenter);
                 _slopeDeg = SlopeDeg(groundCenter);
+                UpdatePersistentHud(player, p);
 
                 // Level marker: the horizontal plane Flatten/Shore (or a fixed
                 // eyedrop height) would produce, for circle/square brushes.
@@ -327,7 +399,7 @@ namespace TerrainForge
                 }
             }
 
-            if (equipped && p.ShowPreview.Value)
+            if (active && p.ShowPreview.Value)
             {
                 if (!_previewLogged)
                 {
@@ -359,7 +431,7 @@ namespace TerrainForge
                     _stampPreviewCenter = groundCenter;
                     // Rotation: Q/E or mouse wheel with Alt
                     bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-                    float scroll = Input.mouseScrollDelta.y;
+                    float scroll = WheelDelta();
                     if (Mathf.Abs(scroll) > 0.01f)
                     {
                         if (alt)
@@ -378,20 +450,14 @@ namespace TerrainForge
                     }
 
                     var stamp = TerrainEngine.GetStamp();
-                    var tilePositions = new List<Vector3>();
-                    if (stamp != null)
-                    {
-                        foreach (var tile in stamp.Tiles)
-                            tilePositions.Add(tile.TilePos);
-                    }
 
                     _preview.Update(new PreviewState
                     {
                         ShowStamp = true,
-                        StampCenter = _stampPreviewCenter,
+                        Stamp = stamp,
+                        StampTarget = _stampPreviewCenter,
                         StampRotation = _stampRotation,
                         StampScale = _stampScale,
-                        StampTilePositions = tilePositions,
                         Radius = effRadius,
                         Color = BrushColor(p).WithAlpha(0.95f),
                         Blocked = !canEdit,
@@ -433,6 +499,8 @@ namespace TerrainForge
                         GuidesOn = guides,
                         LevelY = guides ? _levelY : float.NaN,
                         Blocked = equipped && !canEdit,
+                        CopyHighlightStart = _clipFxStart,
+                        Stamp = TerrainEngine.GetStamp(),
                         WaterLevel = TerrainEngine.WaterLevel(),
                     });
                 }
@@ -688,31 +756,27 @@ namespace TerrainForge
                 return;
             }
 
+            bool rectSel = _rectHasA;
             var stamp = TerrainEngine.CopyStamp(
                 center,
                 EffectiveRadius(p),
-                p.Shape.Value,
-                _rectHasA ? (Vector3?)_rectA : null,
-                _rectHasA ? (Vector3?)_rectA : null,
-                _polyPoints.Count >= 3 ? _polyPoints.ToArray() : null,
-                _lineHasA, _lineHasA ? (Vector3?)_lineA : null, _lineHasA ? (Vector3?)_aimPoint : null);
+                rectSel ? TerrainShape.Rect : p.Shape.Value,
+                rectSel ? (Vector3?)_rectA : null,
+                rectSel ? (Vector3?)_aimPoint : null,
+                (!rectSel && _polyPoints.Count >= 3) ? _polyPoints.ToArray() : null,
+                !rectSel && _lineHasA,
+                (!rectSel && _lineHasA) ? (Vector3?)_lineA : null,
+                (!rectSel && _lineHasA) ? (Vector3?)_aimPoint : null);
 
-            if (p.Shape.Value == TerrainShape.Rect && _rectHasA)
-            {
-                stamp = TerrainEngine.CopyStamp(
-                    center,
-                    EffectiveRadius(p),
-                    p.Shape.Value,
-                    _rectA,
-                    _aimPoint,
-                    null,
-                    false, null, null);
-            }
+            if (stamp != null && rectSel)
+                _rectHasA = false;
 
             if (stamp != null)
             {
                 Flash(Loc.F("flash.stamp.copied", stamp.Tiles.Count));
                 TerrainForgePlugin.Message(stamp.Label);
+                // Remember the copy time so the preview can highlight the region briefly.
+                _clipFxStart = Time.time;
             }
             else
             {
@@ -772,20 +836,13 @@ namespace TerrainForge
             _stampRotation = 0f;
             _stampScale = 1f;
 
-            // Build tile positions for preview
-            var tilePositions = new List<Vector3>();
-            foreach (var tile in stamp.Tiles)
-            {
-                tilePositions.Add(tile.TilePos);
-            }
-
             _preview.Update(new PreviewState
             {
                 ShowStamp = true,
-                StampCenter = center,
+                Stamp = stamp,
+                StampTarget = center,
                 StampRotation = 0f,
                 StampScale = 1f,
-                StampTilePositions = tilePositions,
                 Radius = EffectiveRadius(p),
                 Color = BrushColor(p).WithAlpha(0.95f),
                 Blocked = !canEdit,
@@ -806,16 +863,13 @@ namespace TerrainForge
                 // Update preview if we're in paste preview mode
                 if (_pastePreview)
                 {
-                    var tilePositions = new List<Vector3>();
-                    foreach (var tile in stamp.Tiles)
-                        tilePositions.Add(tile.TilePos);
                     _preview.Update(new PreviewState
                     {
                         ShowStamp = true,
-                        StampCenter = _stampPreviewCenter,
+                        Stamp = stamp,
+                        StampTarget = _stampPreviewCenter,
                         StampRotation = _stampRotation,
                         StampScale = _stampScale,
-                        StampTilePositions = tilePositions,
                         Radius = EffectiveRadius(p),
                         Color = BrushColor(p).WithAlpha(0.95f),
                         Blocked = false,
@@ -938,14 +992,23 @@ namespace TerrainForge
         {
             // Alt + radius controls adjust the fixed ramp angle instead of the
             // radius when a fixed-angle ramp is selected.
-            bool angleMode = (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) &&
+            bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
+            bool angleMode = alt &&
                              p.DefaultOperation.Value == TerrainOperation.Ramp &&
                              p.RampMode.Value == RampMode.FixedAngle;
 
             bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             bool fine = Held(p.AimHeightModifierKey.Value);
-            float scroll = Input.mouseScrollDelta.y;
-            if (Mathf.Abs(scroll) > 0.01f)
+
+            // In normal mode the wheel belongs to the brush. In the free-fly camera
+            // the plain wheel is the game's fly speed, so only take it when a modifier
+            // asks for a brush change (Ctrl/Shift, adjust mode, or Alt on a ramp angle).
+            bool inFly = GameCamera.InFreeFly();
+            bool wheelOurs = !inFly || _adjustMode || angleMode || fine || ctrl;
+            FreeFlyWheelBusy = inFly && wheelOurs;
+
+            float scroll = WheelDelta();
+            if (wheelOurs && Mathf.Abs(scroll) > 0.01f)
             {
                 if (_adjustMode)
                     AdjustRadius(p, Mathf.Sign(scroll) * p.RadiusStep.Value);
@@ -1091,6 +1154,34 @@ namespace TerrainForge
         {
             _flashMsg = msg;
             _flashUntil = Time.time + 2.5f;
+        }
+
+        // Diagnostic: log the ground material's shader and texture slots so we can see
+        // what the terrain shader exposes (feasibility check for non-biome textures).
+        private static void DumpTerrainMaterial(Vector3 center)
+        {
+            var hits = new Collider[16];
+            int n = Physics.OverlapSphereNonAlloc(center + Vector3.up * 1.5f, 3f, hits, ~0, QueryTriggerInteraction.Collide);
+            for (int i = 0; i < n; i++)
+            {
+                Heightmap hm = hits[i] != null ? hits[i].GetComponentInParent<Heightmap>() : null;
+                if (hm == null || hm.m_material == null)
+                    continue;
+
+                Material m = hm.m_material;
+                string[] props = m.GetTexturePropertyNames();
+                var sb = new System.Text.StringBuilder();
+                foreach (string prop in props)
+                {
+                    Texture t = m.GetTexture(prop);
+                    sb.Append(prop).Append('=').Append(t != null ? t.name : "null").Append("; ");
+                }
+                TerrainForgePlugin.Log?.LogInfo("TerrainForge material dump: shader=" + m.shader.name +
+                    " biome=" + hm.GetBiome(center) + " tex=" + props.Length + " [" + sb + "]");
+                TerrainForgePlugin.Message("Material dump -> log (" + props.Length + " tex)");
+                return;
+            }
+            TerrainForgePlugin.Message(Loc.T("act.diagfail"));
         }
 
         private void ToggleEyedrop(Vector3 center)
@@ -1280,7 +1371,7 @@ namespace TerrainForge
             if (!TryGetRay(out ray))
                 return false;
 
-            if (Physics.Raycast(ray, out RaycastHit hit, MaxAimDistance, ~0, QueryTriggerInteraction.Ignore) &&
+            if (Physics.Raycast(ray, out RaycastHit hit, AimDistance, ~0, QueryTriggerInteraction.Ignore) &&
                 hit.collider != null && hit.collider.GetComponentInParent<Player>() == null)
             {
                 if (hit.collider.GetComponentInParent<Heightmap>() != null)
@@ -1327,8 +1418,8 @@ namespace TerrainForge
         {
             point = default(Vector3);
 
-            float step = Mathf.Max(0.75f, MaxAimDistance * 0.05f);
-            float maxDist = MaxAimDistance * 2f;
+            float step = Mathf.Max(0.75f, AimDistance * 0.05f);
+            float maxDist = AimDistance * 2f;
 
             for (float dist = step; dist <= maxDist; dist += step)
             {
@@ -1503,10 +1594,17 @@ namespace TerrainForge
             if (player == null)
                 return;
 
-            if (!IsToolEquipped(p, GetHeldItem(player)))
+            bool freeCam = GameCamera.InFreeFly();
+            if (!IsToolEquipped(p, GetHeldItem(player)) && !freeCam)
                 return;
 
             EnsureHudStyle();
+
+            // The free-fly mode is self-explanatory and must be visible even when
+            // the tool is not equipped (the game freezes the player and may hide
+            // the held item), so the banner is drawn before anything else.
+            if (freeCam)
+                DrawFreeCamBanner();
 
             float er = EffectiveRadius(p);
             string rtxt = er.ToString("0.#") + " m" +
@@ -1564,29 +1662,33 @@ namespace TerrainForge
             status += string.Format("   |   {0} {1} / {2} {3}",
                 Loc.T("hud.undo"), TerrainEngine.UndoCount, Loc.T("hud.redo"), TerrainEngine.RedoCount);
 
-            // Stamp tool indicator
-            Player localPlayer = Player.m_localPlayer;
-            if (localPlayer != null)
+            // Stamp (copy/paste) status line — always visible in edit mode so the
+            // feature is discoverable even before anything is copied.
+            string stampLine;
+            Color stampColor;
             {
-                ItemDrop.ItemData weapon = GetHeldItem(localPlayer);
+                Player localPlayer = Player.m_localPlayer;
+                ItemDrop.ItemData weapon = localPlayer != null ? GetHeldItem(localPlayer) : null;
                 bool stampToolOk = IsStampToolEquipped(p, weapon);
                 var clipboard = TerrainEngine.GetClipboard();
-                if (stampToolOk && clipboard.Count > 0)
+                if (clipboard.Count == 0)
+                {
+                    stampLine = Loc.T("hud.stampEmpty");
+                    stampColor = TerrainTheme.TextDim;
+                }
+                else if (!stampToolOk)
+                {
+                    stampLine = string.Format("{0} [{1}]   |   {2}",
+                        Loc.T("hud.stampReady"), clipboard.Count, Loc.T("hud.stampNoTool"));
+                    stampColor = TerrainTheme.Danger;
+                }
+                else
                 {
                     var current = TerrainEngine.GetStamp();
-                    if (current != null)
-                    {
-                        int idx = clipboard.Count - 1 - clipboard.ToList().IndexOf(current);
-                        status += string.Format("   |   {0} [{1}/{2}]", Loc.T("hud.stampReady"), idx + 1, clipboard.Count);
-                    }
-                    else
-                    {
-                        status += string.Format("   |   {0} [1/{1}]", Loc.T("hud.stampReady"), clipboard.Count);
-                    }
-                }
-                else if (!stampToolOk && clipboard.Count > 0)
-                {
-                    status += "   |   Stamp: herramienta no equipada";
+                    int idx = current != null ? clipboard.Count - clipboard.ToList().IndexOf(current) : 1;
+                    stampLine = string.Format("{0} [{1}/{2}]   |   {3}",
+                        Loc.T("hud.stampReady"), idx, clipboard.Count, Loc.T("hud.stampPasteHint"));
+                    stampColor = TerrainTheme.GoldBright;
                 }
             }
 
@@ -1601,41 +1703,101 @@ namespace TerrainForge
 
             Color prev = GUI.color;
             Color c = BrushColor(p);
-            _hud.normal.textColor = _applying ? new Color(1f, 0.85f, 0.4f) : c;
+            Color mainColor = _applying ? new Color(1f, 0.85f, 0.4f) : c;
             string prefix = _applying ? "\u25B6  " : "\u2022  ";
-            string full = prefix + status;
-
-            // Bottom-right block: second line at the bottom, main line above it.
-            Vector2 size = _hud.CalcSize(new GUIContent(full));
-            float w = Mathf.Max(320f, size.x + 28f);
-            w = Mathf.Min(w, Mathf.Max(200f, Screen.width - 24f));
-            float h = Mathf.Max(30f, size.y + 12f);
 
             string line2 = string.Format("{0} {1:0.0} m   |   {2}   |   {3} {4:0}\u00B0",
                 Loc.T("hud.aimed"), _aimY, _targetTxt, Loc.T("hud.slope"), _slopeDeg);
-            Vector2 size2 = _hud.CalcSize(new GUIContent(line2));
-            float w2 = Mathf.Max(320f, size2.x + 28f);
-            w2 = Mathf.Min(w2, Mathf.Max(200f, Screen.width - 24f));
-            float h2 = Mathf.Max(30f, size2.y + 12f);
+
+            // In the free-fly camera the brush can sit far from the player, so show
+            // how far the target is — otherwise edits look like they do nothing.
+            if (GameCamera.InFreeFly())
+            {
+                Camera cam = Camera.main;
+                if (cam != null)
+                    line2 += "   |   " + Loc.F("hud.freecam.dist",
+                        Vector3.Distance(cam.transform.position, _aimPoint).ToString("0"));
+            }
+
+            // Stacked bottom-right block, drawn from the bottom up.
+            var lines = new List<string> { prefix + status, stampLine, line2 };
+            const int stampIdx = 1;
+            string infoLine = BuildInfoLine();
+            if (!string.IsNullOrEmpty(infoLine))
+                lines.Add(infoLine);
+
+            // The free-fly mode has its own top banner, so only the idle nudge
+            // (encouraging F while marking/copying a stamp) stays in the block.
+            int freeCamIdx = -1;
+            if (!GameCamera.InFreeFly() && (_pastePreview || Time.time - _clipFxStart < 4f))
+            {
+                freeCamIdx = lines.Count;
+                lines.Add(Loc.T("hud.freecamHint"));
+            }
 
             float margin = 12f;
-            var rect2 = new Rect(Screen.width - w2 - margin, Screen.height - h2 - margin, w2, h2);
-            var rect = new Rect(Screen.width - w - margin, rect2.y - 4f - h, w, h);
-
-            GUI.color = new Color(0f, 0f, 0f, 0.55f);
-            GUI.DrawTexture(rect, _hudBg);
-            GUI.color = prev;
-
-            GUI.Label(new Rect(rect.x + 8f, rect.y, rect.width - 20f, rect.height), full, _hud);
-
-            GUI.color = new Color(0f, 0f, 0f, 0.55f);
-            GUI.DrawTexture(rect2, _hudBg);
-            GUI.color = prev;
-
+            float bottom = Screen.height - margin;
             Color prevText = _hud.normal.textColor;
-            _hud.normal.textColor = Color.white;
-            GUI.Label(new Rect(rect2.x + 8f, rect2.y, rect2.width - 20f, rect2.height), line2, _hud);
+            for (int li = lines.Count - 1; li >= 0; li--)
+            {
+                string txt = lines[li];
+                if (li == 0)
+                    _hud.normal.textColor = mainColor;
+                else if (li == stampIdx)
+                    _hud.normal.textColor = stampColor;
+                else if (li == freeCamIdx)
+                    _hud.normal.textColor = TerrainTheme.GoldBright;
+                else
+                    _hud.normal.textColor = Color.white;
+
+                Vector2 sz = _hud.CalcSize(new GUIContent(txt));
+                float w = Mathf.Min(Mathf.Max(320f, sz.x + 28f), Mathf.Max(200f, Screen.width - 24f));
+                float h = Mathf.Max(30f, sz.y + 12f);
+                var rect = new Rect(Screen.width - w - margin, bottom - h, w, h);
+
+                GUI.color = new Color(0f, 0f, 0f, 0.55f);
+                GUI.DrawTexture(rect, _hudBg);
+                GUI.color = prev;
+
+                GUI.Label(new Rect(rect.x + 8f, rect.y, rect.width - 20f, rect.height), txt, _hud);
+                bottom = rect.y - 4f;
+            }
             _hud.normal.textColor = prevText;
+        }
+
+        private string BuildInfoLine()
+        {
+            return _posTxt;
+        }
+
+        private void UpdatePersistentHud(Player player, TerrainForgePlugin p)
+        {
+            Vector3 pos = player.transform.position;
+            _posTxt = string.Format("{0} {1:0}, {2:0}, {3:0}",
+                Loc.T("hud.coords"), pos.x, pos.z, pos.y);
+        }
+
+        internal static float WheelDelta()
+        {
+            float s = Input.mouseScrollDelta.y;
+            if (Mathf.Abs(s) < 0.01f)
+                s = ZInput.GetMouseScrollWheel();
+            return s;
+        }
+
+        internal static bool FreeCameraActive => GameCamera.InFreeFly();
+
+        private void ToggleFreeCamera()
+        {
+            GameCamera gc = GameCamera.instance;
+            if (gc == null)
+                return;
+
+            gc.ToggleFreeFly();
+            if (GameCamera.InFreeFly())
+                gc.SetFreeFlySmoothness(0.1f);
+
+            Flash(GameCamera.InFreeFly() ? Loc.T("flash.freecam.on") : Loc.T("flash.freecam.off"));
         }
 
         private void EnsureHudStyle()
@@ -1660,6 +1822,35 @@ namespace TerrainForge
                 font = font
             };
             _hud.normal.textColor = valheimTextWhite;
+
+            _banner = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 16,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter,
+                wordWrap = true,
+                font = font
+            };
+            _banner.normal.textColor = valheimGold;
+        }
+
+        private void DrawFreeCamBanner()
+        {
+            if (_banner == null || _hudBg == null)
+                return;
+
+            string txt = Loc.T("hud.freecam.banner");
+            float w = Mathf.Min(Screen.width - 40f, 780f);
+            Vector2 sz = _banner.CalcSize(new GUIContent(txt));
+            float h = Mathf.Max(38f, sz.y + 18f);
+            var rect = new Rect((Screen.width - w) * 0.5f, 16f, w, h);
+
+            Color prev = GUI.color;
+            GUI.color = new Color(0f, 0f, 0f, 0.62f);
+            GUI.DrawTexture(rect, _hudBg);
+            GUI.color = prev;
+
+            GUI.Label(rect, txt, _banner);
         }
 
         internal static Font GameFont()
@@ -1677,294 +1868,5 @@ namespace TerrainForge
             return null;
         }
     }
-
-    internal static class ColorExtensions
-    {
-        public static Color WithAlpha(this Color c, float a)
-        {
-            c.a = a;
-            return c;
-        }
-    }
-
-    /// <summary>
-    /// Hold-to-open radial menu for picking the brush operation with the mouse.
-    /// Release confirms the hovered wedge, Esc cancels. IMGUI only, no assets.
-    /// </summary>
-    internal sealed class TerrainRadial : MonoBehaviour
-    {
-        private static Texture2D MakeTex(Color c)
-        {
-            var t = new Texture2D(1, 1) { hideFlags = HideFlags.HideAndDontSave };
-            t.SetPixel(0, 0, c);
-            t.Apply();
-            return t;
-        }
-
-        public static bool Open { get; private set; }
-
-        private static readonly TerrainOperation[] s_ops =
-            (TerrainOperation[])System.Enum.GetValues(typeof(TerrainOperation));
-
-        private int _sel = -1;
-        private bool _cancel;
-        private GUIStyle _style;
-        private GUIStyle _centerStyle;
-        private GUIStyle _wedgeStyle;
-        private GUIStyle _centerLabelStyle;
-        private bool _cursorWasVisible;
-        private CursorLockMode _cursorLock;
-
-        // Valheim radial textures
-        private Texture2D _radialPanel;
-        private Texture2D _radialWedge;
-        private Texture2D _radialWedgeHover;
-        private Texture2D _radialWedgeActive;
-        private Texture2D _radialCenter;
-
-        private void Update()
-        {
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p == null || !p.Enabled.Value || TerrainKeybinds.MenuOpen)
-            {
-                if (Open)
-                    Close();
-                return;
-            }
-
-            Player player = Player.m_localPlayer;
-            if (player == null)
-            {
-                if (Open)
-                    Close();
-                return;
-            }
-
-            bool blocked = Console.IsVisible() || InventoryGui.IsVisible() || TextInput.IsVisible();
-            if (blocked)
-            {
-                if (Open)
-                    Close();
-                return;
-            }
-
-            if (!TerrainBrush.IsToolEquipped(p, TerrainBrush.GetHeldItem(player)))
-            {
-                if (Open)
-                    Close();
-                return;
-            }
-
-            if (!Open)
-            {
-                if (TerrainBrush.Held(p.RadialKey.Value))
-                {
-                    Open = true;
-                    _sel = (int)p.DefaultOperation.Value;
-                    _cancel = false;
-                    EnsureStyle();
-                    _cursorWasVisible = Cursor.visible;
-                    _cursorLock = Cursor.lockState;
-                    Cursor.visible = true;
-                    Cursor.lockState = CursorLockMode.None;
-                    // Force input focus capture for radial menu
-                    GUIUtility.hotControl = 0;
-                    GUIUtility.keyboardControl = 0;
-                }
-                return;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-                _cancel = true;
-
-            // Handle mouse wheel for selection (like Valheim native radial) - ALWAYS works when menu is open
-            float scroll = ZInput.GetMouseScrollWheel();
-            if (Mathf.Abs(scroll) > 0.01f)
-            {
-                int dir = scroll > 0f ? -1 : 1; // up = previous, down = next (like Valheim)
-                _sel = (_sel + dir + s_ops.Length) % s_ops.Length;
-            }
-            else
-            {
-                // Only update selection from mouse hover if not using wheel
-                _sel = HoverFromMouse();
-            }
-
-            if (Input.GetMouseButtonDown(0) && !_cancel && _sel >= 0)
-            {
-                ApplySel(p);
-                Close();
-                return;
-            }
-
-            if (!TerrainBrush.Held(p.RadialKey.Value))
-            {
-                if (!_cancel && _sel >= 0)
-                    ApplySel(p);
-                Close();
-            }
-        }
-
-        private void ApplySel(TerrainForgePlugin p)
-        {
-            if (_sel < 0 || _sel >= s_ops.Length)
-                return;
-            if (p.DefaultOperation.Value != s_ops[_sel])
-            {
-                p.DefaultOperation.Value = s_ops[_sel];
-                TerrainBrush.RequestClearMarks();
-            }
-        }
-
-        private void Close()
-        {
-            Open = false;
-            Cursor.visible = _cursorWasVisible;
-            Cursor.lockState = _cursorLock;
-        }
-
-        private static int HoverFromMouse()
-        {
-            Vector2 m = Input.mousePosition;
-            float dx = m.x - Screen.width * 0.5f;
-            float dy = m.y - Screen.height * 0.5f;
-            float distSq = dx * dx + dy * dy;
-            // Buttons are at ~104px radius, 116x32 size. Use ~120px radius to cover buttons.
-            if (distSq < 34f * 34f || distSq > 130f * 130f)
-                return -1;
-            float deg = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
-            float cw = (90f - deg + 360f) % 360f;
-            int idx = (int)((cw + 22.5f) / 45f) % 8;
-            if (idx < 0 || idx >= s_ops.Length)
-                return -1;
-            return idx;
-        }
-
-        private void OnGUI()
-        {
-            if (!Open)
-                return;
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p == null)
-                return;
-            EnsureStyle();
-
-            // Force cursor visible and unlocked for this menu
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-
-            TerrainPaint paint = p.Paint.Value;
-
-            float cx = Screen.width * 0.5f;
-            float cy = Screen.height * 0.5f;
-
-            Color prevBg = GUI.backgroundColor;
-            for (int i = 0; i < s_ops.Length; i++)
-            {
-                float ang = (-90f + i * 45f) * Mathf.Deg2Rad;
-                float bx = cx + Mathf.Cos(ang) * 104f - 58f;
-                float by = cy - Mathf.Sin(ang) * 104f - 16f;
-                Color c = TerrainBrush.OpColor(s_ops[i], paint, false);
-                if (i == _sel)
-                    GUI.backgroundColor = new Color(Mathf.Min(1f, c.r + 0.3f), Mathf.Min(1f, c.g + 0.3f), Mathf.Min(1f, c.b + 0.3f), 0.97f);
-                else
-                    GUI.backgroundColor = new Color(c.r * 0.35f, c.g * 0.35f, c.b * 0.35f, 0.92f);
-                GUI.Button(new Rect(bx, by, 116f, 32f), Loc.OpName(s_ops[i]), _wedgeStyle);
-            }
-            GUI.backgroundColor = prevBg;
-
-            string center = _sel >= 0 ? Loc.OpName(s_ops[_sel]) : Loc.OpName(p.DefaultOperation.Value);
-            GUI.Box(new Rect(cx - 70f, cy - 16f, 140f, 32f), center, _centerStyle);
-            GUI.Label(new Rect(cx - 70f, cy - 16f, 140f, 32f), center, _centerLabelStyle);
-        }
-
-        private void EnsureStyle()
-        {
-            if (_style != null)
-                return;
-
-            Font font = TerrainBrush.GameFont();
-
-            // Valheim radial color palette
-            Color valheimWedge = new Color(0.16f, 0.16f, 0.18f, 1f);
-            Color valheimWedgeHover = new Color(0.22f, 0.22f, 0.25f, 1f);
-            Color valheimWedgeActive = new Color(0.75f, 0.60f, 0.15f, 1f);
-            Color valheimCenter = new Color(0.10f, 0.10f, 0.12f, 1f);
-            Color valheimGold = new Color(0.92f, 0.78f, 0.18f, 1f);
-            Color valheimGoldBright = new Color(1f, 0.88f, 0.25f, 1f);
-            Color valheimTextWhite = new Color(0.92f, 0.90f, 0.85f, 1f);
-
-            _radialWedge = MakeTex(new Color(0.16f, 0.16f, 0.18f, 1f));
-            _radialWedgeHover = MakeTex(new Color(0.22f, 0.22f, 0.25f, 1f));
-            _radialWedgeActive = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f));
-            _radialCenter = MakeTex(new Color(0.10f, 0.10f, 0.12f, 1f));
-
-            _wedgeStyle = new GUIStyle(GUI.skin.button)
-            {
-                fontSize = 13,
-                alignment = TextAnchor.MiddleCenter,
-                font = TerrainBrush.GameFont(),
-                normal = { background = _radialWedge, textColor = new Color(0.78f, 0.80f, 0.84f) },
-                hover = { background = MakeTex(new Color(0.22f, 0.22f, 0.25f, 1f)), textColor = Color.white },
-                active = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
-                onNormal = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
-                onHover = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
-                onActive = { background = MakeTex(new Color(0.75f, 0.60f, 0.15f, 1f)), textColor = Color.white },
-                padding = new RectOffset(8, 8, 4, 4),
-                stretchWidth = true,
-                fixedHeight = 32
-            };
-
-            _centerStyle = new GUIStyle(GUI.skin.box)
-            {
-                normal = { background = MakeTex(new Color(0.10f, 0.10f, 0.12f, 1f)) },
-                padding = new RectOffset(8, 8, 4, 4),
-                font = TerrainBrush.GameFont(),
-                alignment = TextAnchor.MiddleCenter
-            };
-
-            _centerLabelStyle = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 14,
-                fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter,
-                font = TerrainBrush.GameFont()
-            };
-            _centerLabelStyle.normal.textColor = new Color(0.95f, 0.88f, 0.25f, 1f);
-        }
-    }
-
-    /// <summary>
-    /// One-shot feedback (dust + thud) when the brush writes terrain. Reuses the
-    /// tool's own terrain-hit effect, so no prefab names are needed. Local only,
-    /// throttled while holding, always on discrete applications.
-    /// </summary>
-    internal static class TerrainFx
-    {
-        private static float _last;
-
-        public static void Play(Vector3 pos, bool force)
-        {
-            TerrainForgePlugin p = TerrainForgePlugin.Instance;
-            if (p != null && p.PlayEffects != null && !p.PlayEffects.Value)
-                return;
-            if (!force && Time.time - _last < 0.6f)
-                return;
-            _last = Time.time;
-
-            try
-            {
-                EffectList fx = TerrainTool.Shared != null
-                    ? TerrainTool.Shared.m_hitTerrainEffect
-                    : null;
-                if (fx == null)
-                    return;
-                fx.Create(pos + new Vector3(0f, 0.3f, 0f), Quaternion.identity);
-            }
-            catch
-            {
-                // Feedback must never break an edit.
-            }
-        }
-    }
 }
+
