@@ -4,6 +4,11 @@
 
 ---
 
+
+### TerrainForge 0.3.6 – Änderungen
+
+> Das Q-Rad hat einen eigenen Kopieren/Einfügen-Modus. Rechteck markiert A/B mit Anwenden; Linie markiert zwei Endpunkte; Polygon fügt Eckpunkte hinzu und kopiert bei Doppeldruck ab 3 Punkten; Kreis/Quadrat kopiert den Pinselbereich. Das HUD zeigt den nächsten Schritt. Schnee ist jetzt Farbe > DeepSnow (Shift halten zum Entfernen). F5 hält lokale Bewegung und Kamera an; ESC pausiert die ganze Einzelspielerwelt.
+
 ## Inhaltsverzeichnis
 
 [Overview](Overview) · 1. [Installation](#-installation)
@@ -26,7 +31,6 @@
 
 [Overview](Overview) · ### Anforderungen
 - **BepInEx 5** (x64, Mono) auf Client und Server. Thunderstore-Nutzer haben es bereits.
-- **Jotunn** (`ValheimModding-Jotunn`) — registriert das benutzerdefinierte Werkzeug. Es steht in `manifest.json`; Thunderstore installiert es automatisch.
 
 ### Schritte
 1. Lade `TerrainForge-<version>.zip` von Thunderstore oder GitHub Releases herunter.
@@ -96,7 +100,7 @@
 | **Küste** | Ebnet in Richtung des Wasserspiegels + `ShoreOffset`-Rand (Strände). Weichheit wie bei Einebnen. |
 | **Bemalen** | Typen: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Einstellbare Stärke. |
 | **Wiederherstellen** | Setzt das Gelände in seinen Originalzustand zurück (Höhe + Bemalung). |
-| **Schnee** | Nur-Schnee-Bemalung (gleiche Maske wie das Spiel). `Shift` = entfernt sie und stellt das Original wieder her. |
+| **Kopieren/Einfügen** | Eigener Q-Rad-Modus zum Auswählen und Einfügen von Gelände-Stamps. |
 
 ---
 
@@ -136,10 +140,7 @@
 
 ### Rechteck-Auswahl (empfohlen)
 
-[Overview](Overview) · 1. Stelle die Form auf `Rechteck` (Taste `.`).
-2. Drücke Anwenden (`Mouse1`) **einmal**, um die Ecke **A** zu markieren (dies nimmt **keine** Bearbeitung vor).
-3. Ziele auf die Ecke **B** (bewege einfach die Kamera).
-4. Drücke `Ctrl+Shift+C` → kopiert genau dieses Rechteck, **auf die Auswahl zugeschnitten** (es zieht keine ganzen 64-m-Tiles oder unberührten Boden darum herum mit). Die A-Markierung wird nach einer erfolgreichen Kopie verbraucht.
+Wähle Kopieren/Einfügen im Q-Rad. Anwenden markiert die Auswahl: zwei Ecken für Rechteck, zwei Endpunkte für Linie, Eckpunkte für Polygon (ab 3 Punkten doppelt drücken) oder den Pinselbereich für Kreis/Quadrat. Das HUD zeigt den nächsten Schritt.
 
 ### Workflow
 
@@ -150,7 +151,7 @@
    - `Alt`+Mausrad = kontinuierliche Drehung
    - `Shift`+Mausrad = Skalierung 0,25×–4×
    - `Esc` = abbrechen
-4. **Bestätigen**: Klick (`Mouse1`) → wird als **ein einzelner Rückgängig-Schritt** angewendet.
+4. **Confirm**: Drücke zum Bestätigen erneut die Einfügen-Taste.
 
 > Auswahl-Stamps schreiben **nur innerhalb der kopierten Region**; das Gelände außerhalb bleibt unberührt.
 
@@ -333,7 +334,7 @@ Alle Tastenkürzel sind im TASTEN-Tab neu belegbar. Highlights:
 | **Radial-Mausrad funktioniert nicht** | Behoben in 0.3.2 (`ZInput.GetMouseScrollWheel()`) und 0.3.4 (die Auswahl wird bei zentriertem Cursor nicht mehr gelöscht). Aktualisiere. |
 | **Config wird nicht gespeichert** | Schließe das Menü (F5) zum Auto-Speichern. Oder bearbeite `BepInEx/config/com.terrainforge.valheim.cfg` direkt. |
 | **Mehrspieler-Desync** | Mod auf Client+Server. `UnlockDeltaLimit` auf beiden. Gleiche `MaxUpDelta`/`MaxDownDelta`. |
-| **Build schlägt fehl** | Prüfe die Pfade `ValheimDir`, `BepInExCoreDir`, `JotunnDir` in `.csproj` oder via CLI. .NET SDK 8+ erforderlich. |
+| **Build schlägt fehl** | Prüfe die Pfade `ValheimDir`, `BepInExCoreDir` in `.csproj` oder via CLI. .NET SDK 8+ erforderlich. |
 | **Kompilieren / Paketieren** | `dotnet build -c Release` (DLL in `build/`), `-p:Deploy=true` (installiert ins Profil) oder `-p:Package=true` (Zip in `build/`). |
 
 ---

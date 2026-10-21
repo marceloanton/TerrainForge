@@ -22,7 +22,7 @@ namespace TerrainForge
         private int _capturing = -1;
         private int _tab;
         private Vector2 _mainScroll;
-        private Rect _window = new Rect(40f, 60f, 680f, 720f);
+        private Rect _window = new Rect(40f, 60f, 760f, 620f);
 
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
@@ -66,6 +66,7 @@ namespace TerrainForge
         private Texture2D _texBtnHover;
         private Texture2D _texBtnActive;
         private Texture2D _texCapture;
+        private Texture2D _texBackdrop;
 
         public static bool MenuOpen { get; private set; }
 
@@ -102,6 +103,9 @@ namespace TerrainForge
             _entries.Add(new Entry { Label = Loc.T("key.eyedrop"), Bind = p.EyedropKey });
             _entries.Add(new Entry { Label = Loc.T("key.rampMode"), Bind = p.RampModeKey });
             _entries.Add(new Entry { Label = Loc.T("key.radial"), Bind = p.RadialKey });
+            _entries.Add(new Entry { Label = Loc.T("key.radialTools"), Bind = p.RadialToolsKey });
+            _entries.Add(new Entry { Label = Loc.T("key.radialConfirm"), Bind = p.RadialConfirmKey });
+            _entries.Add(new Entry { Label = Loc.T("key.radialCancel"), Bind = p.RadialCancelKey });
             _entries.Add(new Entry { Label = Loc.T("key.adjust"), Bind = p.AdjustModeKey });
             _entries.Add(new Entry { Label = Loc.T("key.freecam"), Bind = p.FreeCameraKey });
             _entries.Add(new Entry { Label = Loc.T("key.give"), Bind = p.GiveToolKey });
@@ -215,6 +219,12 @@ namespace TerrainForge
 
             if (open)
             {
+                _window.width = Mathf.Clamp(Screen.width * 0.78f, 680f, 980f);
+                _window.height = Mathf.Clamp(Screen.height * 0.82f, 540f, 820f);
+                _window.width = Mathf.Min(_window.width, Screen.width - 24f);
+                _window.height = Mathf.Min(_window.height, Screen.height - 24f);
+                _window.x = (Screen.width - _window.width) * 0.5f;
+                _window.y = (Screen.height - _window.height) * 0.5f;
                 _cursorWasVisible = Cursor.visible;
                 _cursorLock = Cursor.lockState;
                 Cursor.visible = true;
@@ -250,7 +260,18 @@ namespace TerrainForge
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
 
+            _window.width = Mathf.Clamp(_window.width, Mathf.Min(560f, Screen.width - 16f), Mathf.Max(560f, Screen.width - 16f));
+            _window.height = Mathf.Clamp(_window.height, Mathf.Min(440f, Screen.height - 16f), Mathf.Max(440f, Screen.height - 16f));
+            _window.x = Mathf.Clamp(_window.x, 8f, Mathf.Max(8f, Screen.width - _window.width - 8f));
+            _window.y = Mathf.Clamp(_window.y, 8f, Mathf.Max(8f, Screen.height - _window.height - 8f));
+
             EnsureSkin();
+            if (Event.current.type == EventType.Repaint)
+            {
+                GUI.color = new Color(0f, 0f, 0f, 0.58f);
+                GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), _texBackdrop);
+                GUI.color = Color.white;
+            }
             _window = GUILayout.Window(WindowId, _window, DrawWindow, GUIContent.none, _winStyle);
         }
 
@@ -269,21 +290,25 @@ namespace TerrainForge
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Toggle(_tab == 0, Loc.T("tab.tool"), _tabStyle, GUILayout.Height(30f)))
-                _tab = 0;
+                SelectTab(0);
             if (GUILayout.Toggle(_tab == 1, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(30f)))
-                _tab = 1;
+                SelectTab(1);
             if (GUILayout.Toggle(_tab == 2, Loc.T("tab.advanced"), _tabStyle, GUILayout.Height(30f)))
-                _tab = 2;
+                SelectTab(2);
             if (GUILayout.Toggle(_tab == 3, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(30f)))
-                _tab = 3;
+                SelectTab(3);
             if (GUILayout.Toggle(_tab == 4, Loc.T("tab.help"), _tabStyle, GUILayout.Height(30f)))
-                _tab = 4;
+                SelectTab(4);
+            if (GUILayout.Toggle(_tab == 5, Loc.T("tab.stamps"), _tabStyle, GUILayout.Height(30f)))
+                SelectTab(5);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10f);
 
             // Main scroll view for all tab content
-            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _scrollStyle, GUILayout.MinHeight(380f), GUILayout.ExpandHeight(true));
+            _mainScroll = GUILayout.BeginScrollView(_mainScroll, _scrollStyle, GUILayout.MinHeight(240f), GUILayout.ExpandHeight(true));
+
+            DrawTabIntro();
 
             if (_tab == 0)
                 DrawToolTab();
@@ -293,13 +318,15 @@ namespace TerrainForge
                 DrawAdvancedTab();
             else if (_tab == 3)
                 DrawSettingsTabContent();
+            else if (_tab == 5)
+                DrawStampTab();
             else
                 DrawHelpTabContent();
 
             GUILayout.EndScrollView();
 
             GUILayout.Space(6f);
-            if (GUILayout.Button("Invitame un café en Cafecito", _btnStyle, GUILayout.Height(22f)))
+            if (GUILayout.Button(Loc.T("menu.coffee"), _btnStyle, GUILayout.Height(22f)))
             {
                 try { Application.OpenURL("https://cafecito.app/byrka"); } catch { }
             }
@@ -308,6 +335,30 @@ namespace TerrainForge
 
             DrawResizeGrip();
             GUI.DragWindow(new Rect(0f, 0f, 10000f, 34f));
+        }
+
+        private void DrawTabIntro()
+        {
+            string key;
+            switch (_tab)
+            {
+                case 0: key = "tabintro.tool"; break;
+                case 1: key = "tabintro.keys"; break;
+                case 2: key = "tabintro.advanced"; break;
+                case 3: key = "tabintro.settings"; break;
+                case 5: key = "tabintro.stamps"; break;
+                default: key = "tabintro.help"; break;
+            }
+            GUILayout.Label(Loc.T(key), _hintStyle);
+            GUILayout.Space(8f);
+        }
+
+        private void SelectTab(int tab)
+        {
+            if (_tab == tab)
+                return;
+            _tab = tab;
+            _mainScroll = Vector2.zero;
         }
 
         private void DrawResizeGrip()
@@ -382,14 +433,14 @@ namespace TerrainForge
 
             DrawFixedHeight(p);
 
-            SettingHeader(Loc.T("set.profiles"));
-            DrawPresets(p);
         }
 
         private void DrawOpPicker(TerrainForgePlugin p)
         {
             TerrainOperation cur = p.DefaultOperation.Value;
-            var ops = (TerrainOperation[])System.Enum.GetValues(typeof(TerrainOperation));
+            var ops = new[] { TerrainOperation.Flatten, TerrainOperation.Raise, TerrainOperation.Lower,
+                TerrainOperation.Smooth, TerrainOperation.Paint, TerrainOperation.Restore,
+                TerrainOperation.Ramp, TerrainOperation.Shore, TerrainOperation.CopyPaste };
             const int perRow = 5;
             const float cell = 74f;
 
@@ -496,11 +547,59 @@ namespace TerrainForge
             SettingHeader(Loc.T("set.snapshots"));
             DrawSnapshots();
 
-            SettingHeader(Loc.T("set.stamps"));
-            DrawStamps(p);
+            SettingHeader(Loc.T("set.profiles"));
+            DrawPresets(p);
 
             GUILayout.Space(10f);
             DrawHistorySection();
+        }
+
+        private void DrawStampTab()
+        {
+            TerrainForgePlugin p = TerrainForgePlugin.Instance;
+            if (p == null) return;
+
+            SettingHeader(Loc.T("help.stamp.t"));
+            GUILayout.Label(Loc.T("stamp.workflow"), _hintStyle);
+            GUILayout.Space(8f);
+
+            var clipboard = TerrainEngine.GetClipboard();
+            var current = TerrainEngine.GetStamp();
+            string currentName = current != null && !string.IsNullOrEmpty(current.Label)
+                ? current.Label
+                : Loc.T("set.stampnoclip");
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(Loc.T("act.copystamp"), _btnStyle, GUILayout.Height(34f)))
+            {
+                TerrainBrush.RequestCopyStamp();
+                Toggle(false);
+            }
+            if (GUILayout.Button(Loc.T("act.pastestamp"), _btnStyle, GUILayout.Height(34f)))
+            {
+                TerrainBrush.RequestPasteStamp();
+                Toggle(false);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(Loc.F("stamp.clipboard", clipboard.Count, 10), _rowStyle, GUILayout.Height(26f));
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(Loc.T("key.cycleStampBack"), _btnStyle, GUILayout.Width(145f), GUILayout.Height(26f)))
+            {
+                TerrainBrush.RequestCycleStampBack();
+                Toggle(false);
+            }
+            if (GUILayout.Button(Loc.T("key.cycleStamp"), _btnStyle, GUILayout.Width(130f), GUILayout.Height(26f)))
+            {
+                TerrainBrush.RequestCycleStamp();
+                Toggle(false);
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.Label(currentName, _hintStyle);
+            GUILayout.Space(12f);
+
+            SettingHeader(Loc.T("set.stamps"));
+            DrawStamps(p);
         }
 
         private void DrawQuickActions()
@@ -518,16 +617,6 @@ namespace TerrainForge
                 TerrainBrush.RequestRedo();
             if (GUILayout.Button(Loc.T("act.eyedrop"), _btnStyle, GUILayout.Height(26f)))
                 TerrainBrush.RequestEyedrop();
-            GUILayout.EndHorizontal();
-            GUILayout.Space(3f);
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(Loc.T("act.copystamp"), _btnStyle, GUILayout.Height(26f)))
-                TerrainBrush.RequestCopyStamp();
-            if (GUILayout.Button(Loc.T("act.pastestamp"), _btnStyle, GUILayout.Height(26f)))
-                TerrainBrush.RequestPasteStamp();
-            if (GUILayout.Button(Loc.T("act.stampprev"), _btnStyle, GUILayout.Height(26f)))
-                TerrainBrush.RequestCycleStampBack();
             GUILayout.EndHorizontal();
             GUILayout.Space(3f);
 
@@ -1044,6 +1133,7 @@ namespace TerrainForge
             Color valheimTextBright = TerrainTheme.TextBright;
 
             _texPanel = MakeTex(valheimDark);
+            _texBackdrop = MakeTex(Color.white);
             _texHeader = MakeTex(valheimHeader);
             _texPanelBg = MakeTex(valheimPanel);
             _texBtn = MakeTex(valheimBtn);

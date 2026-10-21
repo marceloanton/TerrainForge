@@ -690,7 +690,16 @@ namespace TerrainForge
                     }
                     case TerrainOperation.Paint:
                     {
-                        if (spec.Paint == TerrainPaint.Reset)
+                        if (spec.Paint == TerrainPaint.DeepSnow && spec.SnowClear)
+                        {
+                            if (ModP[idx])
+                            {
+                                if (Rec != null) Rec.Add(idx);
+                                ModP[idx] = false;
+                                Any = true;
+                            }
+                        }
+                        else if (spec.Paint == TerrainPaint.Reset)
                         {
                             if (ModP[idx])
                             {
@@ -1249,6 +1258,7 @@ namespace TerrainForge
             {
                 case TerrainOperation.Paint:
                 case TerrainOperation.Snow:
+                case TerrainOperation.CopyPaste:
                 {
                     float t = 1f - Mathf.Clamp01(d / radiusIdx);
                     return Mathf.Clamp01(Mathf.Pow(t, 0.1f));

@@ -1,14 +1,12 @@
 using System;
-using Jotunn.Entities;
-using Jotunn.Managers;
+using HarmonyLib;
 using UnityEngine;
 
 namespace TerrainForge
 {
     /// <summary>
-    /// Registers a mod-exclusive tool item (a clone of the Hammer) via Jotunn and
-    /// provides helpers to detect, hand out and identify it. The cloned prefab gets
-    /// its own copy of the shared data, so the vanilla Hammer is left untouched.
+    /// Registers a mod-exclusive tool item by cloning the vanilla Hammer and adding
+    /// it to Valheim's ObjectDB and ZNetScene registries.
     /// </summary>
     internal static class TerrainTool
     {
@@ -22,25 +20,65 @@ namespace TerrainForge
         /// <summary>True once the item has been registered into the ObjectDB.</summary>
         public static bool Registered { get; private set; }
 
-        /// <summary>
-        /// Creates and registers the custom item. Must be called from
-        /// <see cref="PrefabManager.OnVanillaPrefabsAvailable"/>.
-        /// </summary>
-        public static void Register()
+        internal static void EnsureRegistered()
         {
-            if (Registered)
+            ObjectDB db = ObjectDB.instance;
+            if (db == null)
                 return;
+
+            if (db.GetItemPrefab(PrefabName) == null)
+                Register(db);
+            else
+                Registered = true;
+
+            TerrainToolNetworkPrefabPatch.EnsureRegistered();
+        }
+
+        internal static void Register(ObjectDB db)
+        {
+            if (db == null)
+                return;
+
+            // ObjectDB can be rebuilt when entering another world. Register against
+            // the specific database instance instead of a process-wide one-time flag.
+            if (db.GetItemPrefab(PrefabName) != null)
+            {
+                Registered = true;
+                return;
+            }
 
             try
             {
-                var custom = new CustomItem(PrefabName, BasePrefabName);
-                if (custom.ItemPrefab == null || custom.ItemDrop == null)
+                GameObject hammer = null;
+                foreach (GameObject item in db.m_items)
                 {
-                    LogWarning("could not clone the '" + BasePrefabName + "' prefab; tool unavailable.");
+                    if (item != null && item.name == BasePrefabName)
+                    {
+                        hammer = item;
+                        break;
+                    }
+                }
+                if (hammer == null)
+                {
+                    LogWarning("could not find the vanilla '" + BasePrefabName + "' prefab; tool unavailable.");
                     return;
                 }
 
-                ItemDrop.ItemData.SharedData shared = custom.ItemDrop.m_itemData.m_shared;
+                GameObject prefab = UnityEngine.Object.Instantiate(hammer);
+                prefab.name = PrefabName;
+                prefab.SetActive(false);
+
+                ItemDrop drop = prefab.GetComponent<ItemDrop>();
+                if (drop == null || drop.m_itemData == null || drop.m_itemData.m_shared == null)
+                {
+                    UnityEngine.Object.Destroy(prefab);
+                    LogWarning("Hammer clone has no valid ItemDrop; tool unavailable.");
+                    return;
+                }
+
+                ItemDrop.ItemData.SharedData shared = CloneSharedData(drop.m_itemData.m_shared);
+                drop.m_itemData.m_shared = shared;
+                drop.m_itemData.m_dropPrefab = prefab;
                 shared.m_name = DisplayName;
                 shared.m_description = "A rod attuned to the earth. Equip it to shape the terrain with TerrainForge.";
                 shared.m_itemType = ItemDrop.ItemData.ItemType.Tool;
@@ -55,29 +93,88 @@ namespace TerrainForge
                 // The brush fires on a held mouse key, so make sure swinging the rod
                 // never costs stamina.
                 if (shared.m_attack != null)
+                {
+                    shared.m_attack = CloneAttack(shared.m_attack);
                     shared.m_attack.m_attackStamina = 0f;
+                }
                 if (shared.m_secondaryAttack != null)
+                {
+                    shared.m_secondaryAttack = CloneAttack(shared.m_secondaryAttack);
                     shared.m_secondaryAttack.m_attackStamina = 0f;
+                }
 
                 Shared = shared;
 
                 ApplyIcon(shared);
-
-                if (!ItemManager.Instance.AddItem(custom))
+                db.m_items.Add(prefab);
+                AccessTools.Method(typeof(ObjectDB), "UpdateRegisters", Type.EmptyTypes)?.Invoke(db, null);
+                Registered = db.GetItemPrefab(PrefabName) != null;
+                if (!Registered)
                 {
-                    LogWarning("ItemManager.AddItem returned false; tool unavailable.");
+                    db.m_items.Remove(prefab);
+                    UnityEngine.Object.Destroy(prefab);
                     Shared = null;
+                    LogWarning("ObjectDB did not index the registered tool; tool unavailable.");
                     return;
                 }
-
-                Registered = true;
-                ApplyTint(custom.ItemPrefab);
+                ApplyTint(prefab);
                 LogInfo("tool registered as '" + PrefabName + "'.");
             }
             catch (Exception e)
             {
                 Shared = null;
+                Registered = false;
                 LogError("registration failed: " + e);
+            }
+        }
+
+        private static ItemDrop.ItemData.SharedData CloneSharedData(ItemDrop.ItemData.SharedData source)
+        {
+            return (ItemDrop.ItemData.SharedData)AccessTools.Method(source.GetType(), "MemberwiseClone")
+                .Invoke(source, null);
+        }
+
+        private static Attack CloneAttack(Attack source)
+        {
+            return (Attack)AccessTools.Method(source.GetType(), "MemberwiseClone")?.Invoke(source, null);
+        }
+
+        internal static GameObject Prefab
+        {
+            get
+            {
+                if (ObjectDB.instance == null)
+                    return null;
+                return ObjectDB.instance.GetItemPrefab(PrefabName);
+            }
+        }
+
+        internal static void RegisterNetworkPrefab(ZNetScene scene)
+        {
+            if (scene == null)
+                return;
+            GameObject prefab = Prefab;
+            if (prefab == null || scene.GetPrefab(PrefabName) != null)
+                return;
+
+            scene.m_prefabs.Add(prefab);
+            try
+            {
+                var namedPrefabs = AccessTools.Field(typeof(ZNetScene), "m_namedPrefabs")?.GetValue(scene);
+                var add = namedPrefabs?.GetType().GetMethod("Add", new[] { typeof(int), typeof(GameObject) });
+                if (add == null)
+                {
+                    scene.m_prefabs.Remove(prefab);
+                    LogWarning("could not find the network prefab index method; tool will not synchronize.");
+                    return;
+                }
+                add.Invoke(namedPrefabs, new object[] { PrefabName.GetStableHashCode(), prefab });
+                LogInfo("network prefab registered as '" + PrefabName + "'.");
+            }
+            catch (Exception e)
+            {
+                scene.m_prefabs.Remove(prefab);
+                LogWarning("network prefab registration failed: " + e.GetBaseException().Message);
             }
         }
 
@@ -93,9 +190,7 @@ namespace TerrainForge
             if (item.m_dropPrefab != null && item.m_dropPrefab.name == PrefabName)
                 return true;
 
-            // Resolve the registered shared data from ObjectDB at check time. This
-            // survives any re-instantiation Jotunn may perform while adding the item,
-            // which would make the cached Shared reference stale.
+            // Resolve the registered shared data from ObjectDB at check time.
             GameObject prefab = ObjectDB.instance != null ? ObjectDB.instance.GetItemPrefab(PrefabName) : null;
             if (prefab != null)
             {
@@ -120,13 +215,13 @@ namespace TerrainForge
         /// <summary>Adds the tool to the player's inventory and equips it.</summary>
         public static void Give(Player player)
         {
-            if (player == null || ObjectDB.instance == null)
+            if (player == null || !Registered || ObjectDB.instance == null)
                 return;
 
             GameObject prefab = ObjectDB.instance.GetItemPrefab(PrefabName);
             if (prefab == null)
             {
-                LogWarning("prefab not found; cannot hand out the tool.");
+                LogWarning("registered tool is missing from the active ObjectDB; skipping handout.");
                 return;
             }
 

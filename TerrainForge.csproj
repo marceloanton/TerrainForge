@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>TerrainForge</AssemblyName>
     <RootNamespace>TerrainForge</RootNamespace>
-    <Version>0.3.5</Version>
+    <Version>0.3.6</Version>
     <Product>TerrainForge</Product>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -23,8 +23,7 @@
   <PropertyGroup>
     <ValheimDir Condition="'$(ValheimDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Valheim</ValheimDir>
     <ManagedDir>$(ValheimDir)\valheim_Data\Managed</ManagedDir>
-    <BepInExCoreDir Condition="'$(BepInExCoreDir)' == ''">$(APPDATA)\Thunderstore Mod Manager\DataFolder\Valheim\profiles\Valheim\BepInEx\core</BepInExCoreDir>
-    <JotunnDir Condition="'$(JotunnDir)' == ''">$(APPDATA)\Thunderstore Mod Manager\DataFolder\Valheim\profiles\Valheim\BepInEx\plugins\ValheimModding-Jotunn</JotunnDir>
+    <BepInExCoreDir Condition="'$(BepInExCoreDir)' == ''">$(APPDATA)\Thunderstore Mod Manager\DataFolder\Valheim\profiles\Vailheim\BepInEx\core</BepInExCoreDir>
     <PluginsDir Condition="'$(PluginsDir)' == ''">$(APPDATA)\Thunderstore Mod Manager\DataFolder\Valheim\profiles\Valheim\BepInEx\plugins\TerrainForge</PluginsDir>
   </PropertyGroup>
 
@@ -59,11 +58,6 @@
     </Reference>
     <Reference Include="assembly_utils">
       <HintPath>$(ManagedDir)\assembly_utils.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-
-    <Reference Include="Jotunn">
-      <HintPath>$(JotunnDir)\Jotunn.dll</HintPath>
       <Private>false</Private>
     </Reference>
 

@@ -4,6 +4,11 @@
 
 ---
 
+
+### TerrainForge 0.3.6 yenilikleri
+
+> Q tekerinde ayrı bir Kopyala/Yapıştır modu var. Dikdörtgen Uygula ile A/B köşelerini, Çizgi iki ucu işaretler; Çokgen 3+ noktadan sonra çift basışla kopyalar; Daire/Kare fırça alanını kopyalar. HUD sonraki adımı gösterir. Kar, Boya > DeepSnow içindedir (kaldırmak için Shift'i basılı tutun). F5 yerel hareketi ve kamerayı dondurur; Esc tek oyunculu dünyayı tamamen duraklatır.
+
 ## İçindekiler
 
 [Overview](Overview) · 1. [Kurulum](#-kurulum)
@@ -26,7 +31,6 @@
 
 [Overview](Overview) · ### Gereksinimler
 - **BepInEx 5** (x64, Mono) istemci ve sunucuda. Thunderstore kullanıcılarında zaten vardır.
-- **Jotunn** (`ValheimModding-Jotunn`) — özel aracı kaydeder. `manifest.json` içinde listelenir; Thunderstore otomatik kurar.
 
 ### Adımlar
 1. `TerrainForge-<version>.zip` dosyasını Thunderstore veya GitHub Releases üzerinden indirin.
@@ -96,7 +100,7 @@
 | **Kıyı** | Su seviyesine + `ShoreOffset` payına doğru düzler (plajlar). Yumuşaklık Düzleştir gibi. |
 | **Boya** | Tipler: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Ayarlanabilir güç. |
 | **Geri Yükle** | Araziyi orijinal durumuna döndürür (yükseklik + boya). |
-| **Kar** | Yalnız kar boyası (oyunla aynı maske). `Shift` = kaldırır ve orijinali geri yükler. |
+| **Kopyala/Yapıştır** | Arazi seçmek ve stamp yerleştirmek için Q tekerinde özel mod. |
 
 ---
 
@@ -136,10 +140,7 @@
 
 ### Dikdörtgen seçimi (önerilir)
 
-[Overview](Overview) · 1. Şekli `Dikdörtgen` olarak ayarlayın (`.` tuşu).
-2. Köşe **A**'yı işaretlemek için Uygula'ya (`Mouse1`) **bir kez** basın (bu **hiçbir** düzenleme yapmaz).
-3. Köşe **B**'ye nişan alın (yalnızca kamerayı hareket ettirin).
-4. `Ctrl+Shift+C` basın → tam olarak o dikdörtgeni kopyalar, **seçime kırpılmış** olarak (çevresindeki 64 m'lik döşemelerin tamamını veya dokunulmamış zemini sürüklemez). A köşe işareti başarılı bir kopyalamadan sonra tüketilir.
+Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtgen için iki köşe, Çizgi için iki uç, Çokgen için köşeler (3+ noktadan sonra çift basış) veya Daire/Kare için fırça alanı. HUD sonraki adımı gösterir.
 
 ### İş akışı
 
@@ -150,7 +151,7 @@
    - `Alt`+Tekerlek = sürekli döndürme
    - `Shift`+Tekerlek = 0.25×–4× ölçekle
    - `Esc` = iptal
-4. **Onayla**: tıklayın (`Mouse1`) → **tek bir Geri Al adımı** olarak uygular.
+4. **Confirm**: Önizlemeyi onaylamak için yapıştırma kısayoluna tekrar basın.
 
 > Seçim stamp'leri **yalnızca kopyalanan bölgenin içine** yazar; dışındaki arazi olduğu gibi bırakılır.
 
@@ -333,7 +334,7 @@ Tüm kısayollar TUŞLAR sekmesinde yeniden atanabilir. Öne çıkanlar:
 | **Radyal tekerlek çalışmıyor** | 0.3.2 (`ZInput.GetMouseScrollWheel()`) ve 0.3.4'te (seçim artık merkezlenmiş imleçle silinmiyor) düzeltildi. Güncelleyin. |
 | **Config kaydedilmiyor** | Otomatik kaydetmek için menüyü kapatın (F5). Veya `BepInEx/config/com.terrainforge.valheim.cfg` dosyasını doğrudan düzenleyin. |
 | **Çok oyunculu desync** | İstemci+sunucuda mod. İkisinde de `UnlockDeltaLimit`. Aynı `MaxUpDelta`/`MaxDownDelta`. |
-| **Derleme başarısız** | `.csproj` veya CLI üzerinden `ValheimDir`, `BepInExCoreDir`, `JotunnDir` yollarını kontrol edin. .NET SDK 8+ gerekir. |
+| **Derleme başarısız** | `.csproj` veya CLI üzerinden `ValheimDir`, `BepInExCoreDir` yollarını kontrol edin. .NET SDK 8+ gerekir. |
 | **Derleme / paketleme** | `dotnet build -c Release` (`build/` içinde DLL), `-p:Deploy=true` (profile kurar) veya `-p:Package=true` (`build/` içinde zip). |
 
 ---

@@ -4,6 +4,11 @@
 
 ---
 
+
+### Nowości TerrainForge 0.3.6
+
+> Koło Q ma osobny tryb Kopiuj/Wklej. Prostokąt wyznacza A/B klawiszem Zastosuj; Linia dwa końce; Wielokąt dodaje wierzchołki i kopiuje po dwukrotnym naciśnięciu przy 3+ punktach; Koło/Kwadrat kopiuje obszar pędzla. HUD pokazuje następny krok. Śnieg jest w Maluj > DeepSnow (przytrzymaj Shift, aby usunąć). F5 blokuje lokalny ruch i kamerę; Esc pauzuje cały świat w trybie jednoosobowym.
+
 ## Spis treści
 
 [Overview](Overview) · 1. [Instalacja](#-instalacja)
@@ -26,7 +31,6 @@
 
 [Overview](Overview) · ### Wymagania
 - **BepInEx 5** (x64, Mono) na kliencie i serwerze. Użytkownicy Thunderstore już go mają.
-- **Jotunn** (`ValheimModding-Jotunn`) — rejestruje niestandardowe narzędzie. Jest wymieniony w `manifest.json`; Thunderstore instaluje go automatycznie.
 
 ### Kroki
 1. Pobierz `TerrainForge-<version>.zip` z Thunderstore lub GitHub Releases.
@@ -96,7 +100,7 @@
 | **Brzeg** | Wyrównuje w stronę poziomu wody + margines `ShoreOffset` (plaże). Miękkość jak Wyrównywanie. |
 | **Maluj** | Typy: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Regulowana siła. |
 | **Przywróć** | Przywraca teren do stanu pierwotnego (wysokość + farba). |
-| **Śnieg** | Farba tylko śnieg (ta sama maska co w grze). `Shift` = usuwa ją i przywraca oryginał. |
+| **Kopiuj/Wklej** | Osobny tryb koła Q do zaznaczania terenu i umieszczania stampów. |
 
 ---
 
@@ -134,12 +138,9 @@
 
 [Overview](Overview) · Potężna funkcja do replikowania struktur terenu.
 
-### Selekcja prostokątem (zalecane)
+### Wybierz obszar do skopiowania
 
-[Overview](Overview) · 1. Ustaw kształt na `Prostokąt` (klawisz `.`).
-2. Naciśnij Zastosuj (`Mouse1`) **raz**, aby zaznaczyć róg **A** (to **nie** wykonuje żadnej edycji).
-3. Wyceluj w róg **B** (wystarczy przesunąć kamerę).
-4. Naciśnij `Ctrl+Shift+C` → kopiuje dokładnie ten prostokąt, **przycięty do zaznaczenia** (nie przeciąga całych kafelków 64 m ani nietkniętego terenu wokół). Znacznik rogu A jest zużywany po udanym kopiowaniu.
+Wybierz Kopiuj/Wklej w kole Q. Zastosuj wyznacza obszar: dwa rogi dla Prostokąta, dwa końce dla Linii, wierzchołki dla Wielokąta (dwuklik po 3+ punktach) lub obszar pędzla dla Koła/Kwadratu. HUD podpowiada następny krok.
 
 ### Przebieg pracy
 
@@ -150,7 +151,7 @@
    - `Alt`+Rolka = ciągły obrót
    - `Shift`+Rolka = skala 0.25×–4×
    - `Esc` = anuluj
-4. **Potwierdź**: kliknięcie (`Mouse1`) → stosuje jako **pojedynczy krok cofania**.
+4. **Potwierdź**: Naciśnij ponownie klawisz wklejania, aby zatwierdzić podgląd.
 
 > Stemple selekcji zapisują **tylko wewnątrz skopiowanego obszaru**; teren poza nim pozostaje nietknięty.
 
@@ -333,7 +334,7 @@ Wszystkie skróty są przypisywalne na zakładce KLAWISZE. Najważniejsze:
 | **Rolka radialna nie działa** | Naprawione w 0.3.2 (`ZInput.GetMouseScrollWheel()`) i 0.3.4 (zaznaczenie nie jest już czyszczone przy wyśrodkowanym kursorze). Zaktualizuj. |
 | **Konfiguracja się nie zapisuje** | Zamknij menu (F5), aby zapisać automatycznie. Albo edytuj `BepInEx/config/com.terrainforge.valheim.cfg` bezpośrednio. |
 | **Desynchronizacja w trybie wieloosobowym** | Mod na kliencie+serwerze. `UnlockDeltaLimit` na obu. Te same `MaxUpDelta`/`MaxDownDelta`. |
-| **Budowanie kończy się niepowodzeniem** | Sprawdź ścieżki `ValheimDir`, `BepInExCoreDir`, `JotunnDir` w `.csproj` lub przez CLI. Wymagany .NET SDK 8+. |
+| **Budowanie kończy się niepowodzeniem** | Sprawdź ścieżki `ValheimDir`, `BepInExCoreDir` w `.csproj` lub przez CLI. Wymagany .NET SDK 8+. |
 | **Kompilacja / pakowanie** | `dotnet build -c Release` (DLL w `build/`), `-p:Deploy=true` (instaluje w profilu) lub `-p:Package=true` (zip w `build/`). |
 
 ---

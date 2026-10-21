@@ -1,7 +1,7 @@
 # TerrainForge Roadmap – Cycle 2
 
-Follow-up to `ROADMAP.md` (all gameplay/visual phases there are DONE; Jotunn
-stays as a dependency by decision). This cycle adds measurement, numeric input,
+Follow-up to `ROADMAP.md` (all gameplay/visual phases there are DONE; the earlier
+decision to keep Jotunn was superseded in 0.3.6). This cycle adds measurement, numeric input,
 path ramps, terrain snapshots, deeper server authority, chunked application and
 the Thunderstore release.
 
@@ -229,8 +229,6 @@ reference incl. `General`/`Presets`/`Performance`).
 ## Notes
 - `Smooth-along-path` and selective smooth are already covered (Line + Smooth,
   `SmoothMode`); no further work planned there.
-- Jotunn stays (decision recorded in Cycle 1); if it ever blocks a game update,
-  the removal plan in `ROADMAP.md` Phase 8 still applies (Harmony prefab clone
-  + one-RPC config sync).
+- Jotunn was removed in 0.3.6; the TerrainForge Rod is registered through Harmony.
 - Anything that writes terrain must record undo and carry `Loc` keys — no
   exceptions this cycle.

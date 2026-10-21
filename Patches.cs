@@ -8,6 +8,61 @@ using UnityEngine.UI;
 
 namespace TerrainForge
 {
+    /// <summary>Keep the player and view still while the non-pausing F5 panel is open.</summary>
+    [HarmonyPatch(typeof(Player), "TakeInput")]
+    internal static class TerrainMenuPlayerInputPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(Player __instance, ref bool __result)
+        {
+            if (!TerrainKeybinds.MenuOpen || __instance != Player.m_localPlayer)
+                return true;
+            __result = false;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(GameCamera), "UpdateCamera")]
+    internal static class TerrainMenuCameraPatch
+    {
+        [HarmonyPrefix]
+        private static bool Prefix()
+        {
+            return !TerrainKeybinds.MenuOpen;
+        }
+    }
+
+    /// <summary>Registers TerrainForge's tool after Valheim copies the populated vanilla database.</summary>
+    [HarmonyPatch(typeof(ObjectDB), "CopyOtherDB")]
+    internal static class TerrainToolObjectDbPatch
+    {
+        [HarmonyPostfix]
+        private static void Postfix(ObjectDB __instance)
+        {
+            TerrainTool.Register(__instance);
+            TerrainToolNetworkPrefabPatch.EnsureRegistered();
+        }
+    }
+
+    /// <summary>Registers the custom tool prefab in Valheim's network prefab table.</summary>
+    [HarmonyPatch(typeof(ZNetScene), "Awake")]
+    internal static class TerrainToolNetworkPrefabPatch
+    {
+        [HarmonyPostfix]
+        private static void Postfix(ZNetScene __instance)
+        {
+            TerrainTool.RegisterNetworkPrefab(__instance);
+        }
+
+        // ZNetScene can initialize before ObjectDB has copied its vanilla items.
+        // Retry after item registration and on every new network scene.
+        internal static void EnsureRegistered()
+        {
+            if (ZNetScene.instance != null)
+                TerrainTool.RegisterNetworkPrefab(ZNetScene.instance);
+        }
+    }
+
     /// <summary>
     /// Replaces the hard-coded +/-8 m TerrainComp clamp with configurable limits so
     /// edits beyond 8 m survive heightmap generation. Must run on the server too,
@@ -370,7 +425,7 @@ namespace TerrainForge
     {
         internal static bool Prefix(ref float __result)
         {
-            if (TerrainBrush.AdjustModeActive || TerrainBrush.FreeFlyWheelBusy)
+            if (TerrainBrush.AdjustModeActive || TerrainBrush.FreeFlyWheelBusy || TerrainRadial.Open)
             {
                 __result = 0f;
                 return false;
@@ -414,6 +469,8 @@ namespace TerrainForge
             if (!TerrainBrush.SuppressFreeFlyLockon)
                 return;
 
+            KeepFreeCameraAboveTerrain();
+
             if (s_lockon == null)
                 s_lockon = AccessTools.Field(typeof(GameCamera), "m_freeFlyLockon");
             if (s_lockon != null && s_lockon.GetValue(__instance) != null)
@@ -423,6 +480,23 @@ namespace TerrainForge
                 s_target = AccessTools.Field(typeof(GameCamera), "m_freeFlyTarget");
             if (s_target != null && s_target.GetValue(__instance) != null)
                 s_target.SetValue(__instance, null);
+        }
+
+        private static void KeepFreeCameraAboveTerrain()
+        {
+            Camera camera = Camera.main;
+            ZoneSystem zones = ZoneSystem.instance;
+            if (camera == null || zones == null)
+                return;
+
+            Vector3 position = camera.transform.position;
+            float ground = zones.GetGroundHeight(position);
+            const float clearance = 1.25f;
+            if (position.y < ground + clearance)
+            {
+                position.y = ground + clearance;
+                camera.transform.position = position;
+            }
         }
     }
 

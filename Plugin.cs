@@ -2,13 +2,11 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using Jotunn.Managers;
 using UnityEngine;
 
 namespace TerrainForge
 {
-    [BepInPlugin(Guid, "TerrainForge", "0.3.5")]
-    [BepInDependency("com.jotunn.jotunn")]
+    [BepInPlugin(Guid, "TerrainForge", "0.3.6")]
     public class TerrainForgePlugin : BaseUnityPlugin
     {
         public const string Guid = "com.terrainforge.valheim";
@@ -62,6 +60,9 @@ namespace TerrainForge
         public ConfigEntry<KeyboardShortcut> EyedropKey;
         public ConfigEntry<KeyboardShortcut> RampModeKey;
         public ConfigEntry<KeyboardShortcut> RadialKey;
+        public ConfigEntry<KeyboardShortcut> RadialToolsKey;
+        public ConfigEntry<KeyboardShortcut> RadialConfirmKey;
+        public ConfigEntry<KeyboardShortcut> RadialCancelKey;
         public ConfigEntry<KeyboardShortcut> AdjustModeKey;
         public ConfigEntry<KeyboardShortcut> FreeCameraKey;
         public ConfigEntry<float> FreeCameraAimDistance;
@@ -155,6 +156,12 @@ namespace TerrainForge
                 "Brush shape selected on startup.");
             Paint = Config.Bind("Brush", "Paint", TerrainPaint.Dirt,
                 "Paint type selected on startup.");
+            // Keep existing configs working while consolidating Snow into Paint.
+            if (DefaultOperation.Value == TerrainOperation.Snow)
+            {
+                DefaultOperation.Value = TerrainOperation.Paint;
+                Paint.Value = TerrainPaint.DeepSnow;
+            }
             RampMode = Config.Bind("Brush", "RampMode", global::TerrainForge.RampMode.TwoPoint,
                 "Ramp mode: TwoPoint joins the heights at A and B; FixedAngle builds " +
                 "from A at a fixed slope (SlopeAngle) toward B.");
@@ -209,6 +216,12 @@ namespace TerrainForge
                 "Toggle ramp mode: two-point / fixed angle.");
             RadialKey = Config.Bind("Input", "RadialKey", new KeyboardShortcut(KeyCode.Q),
                 "Hold to open the operation radial menu (release to confirm, Esc cancels).");
+            RadialToolsKey = Config.Bind("Input", "RadialToolsKey", new KeyboardShortcut(KeyCode.Tab),
+                "Switch between Operations and Tools pages in the radial menu.");
+            RadialConfirmKey = Config.Bind("Input", "RadialConfirmKey", new KeyboardShortcut(KeyCode.Mouse0),
+                "Confirm the selected radial operation or tool.");
+            RadialCancelKey = Config.Bind("Input", "RadialCancelKey", new KeyboardShortcut(KeyCode.Escape),
+                "Cancel the radial selection.");
             AdjustModeKey = Config.Bind("Input", "AdjustModeKey", new KeyboardShortcut(KeyCode.V),
                 "Toggle adjust mode: the mouse wheel changes the brush radius and vanilla " +
                 "scroll uses (camera zoom, hotbar, map) are frozen while active.");
@@ -322,8 +335,6 @@ ShowPreview = Config.Bind("Preview", "ShowPreview", true,
 
             TerrainEngine.Cache();
 
-            PrefabManager.OnVanillaPrefabsAvailable += TerrainTool.Register;
-
             _harmony = new Harmony(Guid);
             _harmony.PatchAll();
 
@@ -378,7 +389,6 @@ ShowPreview = Config.Bind("Preview", "ShowPreview", true,
 
         private void OnDestroy()
         {
-            PrefabManager.OnVanillaPrefabsAvailable -= TerrainTool.Register;
             _harmony?.UnpatchSelf();
         }
 

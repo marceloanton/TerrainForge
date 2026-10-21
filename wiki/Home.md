@@ -4,6 +4,11 @@
 
 ---
 
+
+### TerrainForge 0.3.6 update
+
+> The Q wheel has a dedicated Copy/Paste mode. Rectangle marks corners A/B with Apply; Line marks endpoints; Polygon adds vertices and copies on a double-press after 3+ points; Circle/Square copy the brush footprint. The HUD shows the next step. Snow is Paint > DeepSnow (hold Shift to clear). F5 freezes local movement and camera look; use ESC to pause the whole single-player world.
+
 ## Table of Contents
 
 [Overview](Overview) · 1. [Installation](#-installation)
@@ -25,8 +30,7 @@
 ## 📥 Installation
 
 [Overview](Overview) · ### Requirements
-- **BepInEx 5** (x64, Mono) on client and server. Thunderstore users already have it.
-- **Jotunn** (`ValheimModding-Jotunn`) — registers the custom tool. It is listed in `manifest.json`; Thunderstore installs it automatically.
+- **BepInEx 5** (x64, Mono) on client and server. Thunderstore users already have it. TerrainForge registers its own tool; Jotunn is not required.
 
 ### Steps
 1. Download `TerrainForge-<version>.zip` from Thunderstore or GitHub Releases.
@@ -70,13 +74,13 @@
 | Radial menu | Hold `Q` | Pick an operation with the mouse, release confirms |
 | Adjust mode | `V` | Wheel = radius, freezes zoom/bar/map |
 | Fine adjustment (0.1 m) | Hold `Shift` + wheel/radius | Precise radius adjustment |
-| **Copy Stamp** | `Ctrl+Shift+C` | Copies the marked area to the clipboard |
-| **Paste Stamp** | `Ctrl+Shift+V` | Ghost preview, click confirms |
+| **Copy Stamp** | `Ctrl+Shift+C` | Copies the selected shape in Copy/Paste mode |
+| **Paste Stamp** | `Ctrl+Shift+V` | Starts or confirms the ghost preview |
 | Get Rod | `F8` | Grants the TerrainForge Rod |
-| Open menu | `F5` | Opens the keys/help/settings menu |
+| Open menu | `F5` | Opens the six-tab panel and freezes local camera/player controls |
 
 **Extra keys (no default, assign them in KEYS):**
-- Direct operation: Flatten, Raise, Lower, Smooth, Paint, Restore, Ramp, Shore, Snow
+- Direct operation keys: Flatten, Raise, Lower, Smooth, Paint, Restore, Ramp, Shore. The legacy Snow key selects Paint + DeepSnow; choose Copy/Paste from the Q wheel.
 - Next / previous profile
 - Next / previous stamp (history)
 
@@ -96,7 +100,7 @@
 | **Shore** | Flattens toward the water level + `ShoreOffset` margin (beaches). Softness like Flatten. |
 | **Paint** | Types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Adjustable strength. |
 | **Restore** | Returns the terrain to its original state (height + paint). |
-| **Snow** | Snow-only paint (same mask as the game). `Shift` = removes it and restores the original. |
+| **Copy/Paste** | Dedicated Q wheel mode for selecting terrain to copy and placing stamps. |
 
 ---
 
@@ -134,23 +138,20 @@
 
 [Overview](Overview) · A powerful feature for replicating terrain structures.
 
-### Rectangle selection (recommended)
+### Select the area to copy
 
-[Overview](Overview) · 1. Set the shape to `Rectangle` (key `.`).
-2. Press Apply (`Mouse1`) **once** to mark corner **A** (this makes **no** edit).
-3. Aim at corner **B** (just move the camera).
-4. Press `Ctrl+Shift+C` → copies exactly that rectangle, **cropped to the selection** (it does not drag whole 64 m tiles or untouched ground around it). The corner A mark is consumed after a successful copy.
+Choose `Copy/Paste` in the Q wheel. `Rectangle` marks corners A and B with Apply; `Line` marks two endpoints; `Polygon` adds vertices and copies on a double-press after 3+ points; `Circle`/`Square` copy the aimed brush footprint. The HUD shows the next step. `Ctrl+Shift+C` follows the same selection flow.
 
 ### Workflow
 
-[Overview](Overview) · 1. **Mark the area**: use any shape (Circle, Rect, Line, Poly, Ramp) — or the rectangle selection above.
-2. **Copy**: `Ctrl+Shift+C` → "Stamp copied: X tiles" (RAM clipboard).
+[Overview](Overview) · 1. **Mark the area** with the selected shape as described above.
+2. **Copy**: `Ctrl+Shift+C` or Apply in Copy/Paste mode → "Stamp copied: X tiles" (RAM clipboard).
 3. **Paste preview**: `Ctrl+Shift+V` → ghost wireframe at the crosshair.
    - `Q`/`E` = rotate ±15°
    - `Alt`+Wheel = continuous rotation
    - `Shift`+Wheel = scale 0.25×–4×
    - `Esc` = cancel
-4. **Confirm**: click (`Mouse1`) → applies as **a single Undo step**.
+4. **Confirm**: Use the paste shortcut again to confirm the preview.
 
 > Selection stamps write **only inside the copied region**; terrain outside it is left untouched.
 
@@ -295,7 +296,7 @@ All shortcuts are rebindable in the KEYS tab. Highlights:
 - `ApplyKey` (Mouse1), `RadiusUp/Down` (=/-), `CycleOp/Shape/Paint` (,/.//)
 - `UndoKey` (Ctrl+Z), `RedoKey` (Ctrl+Y), `EyedropKey` (G), `RampModeKey` (H)
 - `RadialKey` (Q), `AdjustModeKey` (V), `GiveToolKey` (F8), `RebindMenuKey` (F5)
-- **Direct op keys** (9, no default): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- **Direct op keys** (9, no default): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow (legacy key selects Paint + DeepSnow); Copy/Paste is selected in the radial menu.
 - `CycleProfileKey`, `CycleStampKey`, `CycleStampBackKey`
 - `RequiredTool`: Any / Pickaxe / TerrainForgeTool (default)
 - `AutoGiveTool`: true (grants the rod on join)
@@ -333,7 +334,7 @@ All shortcuts are rebindable in the KEYS tab. Highlights:
 | **Radial wheel does not work** | Fixed in 0.3.2 (`ZInput.GetMouseScrollWheel()`) and 0.3.4 (the selection is no longer wiped with a centered cursor). Update. |
 | **Config does not save** | Close the menu (F5) to auto-save. Or edit `BepInEx/config/com.terrainforge.valheim.cfg` directly. |
 | **Multiplayer desync** | Mod on client+server. `UnlockDeltaLimit` on both. Same `MaxUpDelta`/`MaxDownDelta`. |
-| **Build fails** | Check the `ValheimDir`, `BepInExCoreDir`, `JotunnDir` paths in `.csproj` or via CLI. .NET SDK 8+ required. |
+| **Build fails** | Check the `ValheimDir` and `BepInExCoreDir` paths in `.csproj` or via CLI. .NET SDK 8+ required. |
 | **Compile / package** | `dotnet build -c Release` (DLL in `build/`), `-p:Deploy=true` (installs into the profile) or `-p:Package=true` (zip in `build/`). |
 
 ---

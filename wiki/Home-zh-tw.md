@@ -4,6 +4,11 @@
 
 ---
 
+
+### TerrainForge 0.3.6 更新
+
+> Q 圓盤新增專用「複製/貼上」模式。矩形用「套用」標記 A/B；直線標記兩端；多邊形標記頂點並在 3 點以上雙擊複製；圓形/正方形複製筆刷範圍。HUD 會提示下一步。雪已整合至塗裝 > DeepSnow（按住 Shift 可移除）。F5 會鎖定本機移動與鏡頭；Esc 會暫停單人世界。
+
 ## 目錄
 
 [Overview](Overview) · 1. [安裝](#-安裝)
@@ -26,7 +31,6 @@
 
 [Overview](Overview) · ### 需求
 - **BepInEx 5**（x64、Mono）安裝於客戶端與伺服器。Thunderstore 使用者已內建。
-- **Jotunn**（`ValheimModding-Jotunn`）— 註冊自訂工具。它列於 `manifest.json`；Thunderstore 會自動安裝。
 
 ### 步驟
 1. 從 Thunderstore 或 GitHub Releases 下載 `TerrainForge-<version>.zip`。
@@ -96,7 +100,7 @@
 | **海岸** | 整平至水位 + `ShoreOffset` 邊距（海灘）。柔和度如同整平。 |
 | **塗裝** | 類型：Dirt、Cultivated、Paved、ClearVegetation、DeepSnow、Reset。可調整強度。 |
 | **還原** | 將地形回復至原始狀態（高度 + 塗裝）。 |
-| **雪地** | 僅雪的塗裝（與遊戲相同的遮罩）。`Shift` = 移除並回復原始狀態。 |
+| **複製/貼上** | Q 圓盤中的專用模式，可選取地形並放置 stamp。 |
 
 ---
 
@@ -136,10 +140,7 @@
 
 ### 矩形選取（推薦）
 
-[Overview](Overview) · 1. 將形狀設為 `矩形`（按鍵 `.`）。
-2. 按一次套用（`Mouse1`）標記角落 **A**（這**不會**進行任何編輯）。
-3. 瞄準角落 **B**（只需移動相機）。
-4. 按 `Ctrl+Shift+C` → 精確複製該矩形，**裁切至選取範圍**（不會拖曳整個 64 m tiles 或周圍未觸及的地面）。成功複製後 A 角標記會被消耗。
+在 Q 圓盤選擇「複製/貼上」。按「套用」標記範圍：矩形選兩個角、直線選兩端、多邊形選頂點（3 點以上雙擊），圓形/正方形則使用目前筆刷範圍。HUD 會提示下一步。
 
 ### 工作流程
 
@@ -150,7 +151,7 @@
    - `Alt`+滾輪 = 連續旋轉
    - `Shift`+滾輪 = 縮放 0.25×–4×
    - `Esc` = 取消
-4. **確認**：點擊（`Mouse1`）→ 套用為**單一步復原**。
+4. **Confirm**: 再次按下貼上快捷鍵以確認預覽。
 
 > 選取印記僅寫入**複製區域內**；其外的地形保持不變。
 
@@ -333,7 +334,7 @@
 | **環形滾輪無作用** | 已於 0.3.2（`ZInput.GetMouseScrollWheel()`）與 0.3.4（游標置中時選取不再被清除）修正。請更新。 |
 | **設定無法儲存** | 關閉選單（F5）以自動儲存。或直接編輯 `BepInEx/config/com.terrainforge.valheim.cfg`。 |
 | **多人遊戲不同步** | 客戶端+伺服器皆安裝模組。兩者皆需 `UnlockDeltaLimit`。相同的 `MaxUpDelta`/`MaxDownDelta`。 |
-| **建置失敗** | 檢查 `.csproj` 中的 `ValheimDir`、`BepInExCoreDir`、`JotunnDir` 路徑或透過 CLI。需要 .NET SDK 8+。 |
+| **建置失敗** | 檢查 `.csproj` 中的 `ValheimDir`、`BepInExCoreDir` 路徑或透過 CLI。需要 .NET SDK 8+。 |
 | **編譯 / 打包** | `dotnet build -c Release`（DLL 位於 `build/`）、`-p:Deploy=true`（安裝至設定檔）或 `-p:Package=true`（zip 位於 `build/`）。 |
 
 ---

@@ -10,9 +10,18 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 
 ---
 
-## What's New in 0.3.5
+## What's New in 0.3.6
 
-- **Terrain stamps — rectangle selection (A→B)** — with the Rectangle shape, mark corner **A** (right-click once), aim at **B** and press `Ctrl+Shift+C` to copy **exactly that rectangle**, cropped to the vertex level (no whole 64 m tiles, no surrounding untouched terrain). Pasting writes **only inside the copied region**.
+- **Unified operation UI** — F5 glyphs now appear in the Q wheel, beside the terrain target, and in a compact HUD card with key brush status.
+- **Dedicated Copy/Paste tab** — copy a marked area, start/confirm a paste preview, cycle clipboard history, and manage saved stamps from one visible place in F5.
+- **Dedicated Copy / Paste brush mode** in the Q wheel; Apply selects the area according to the active shape, and the configured paste shortcut starts or confirms placement. Snow is available as DeepSnow under Paint, including the existing hold-to-clear modifier.
+- Copy/Paste supports precise Rectangle (two corners), Line (two endpoints), Polygon (vertices), and Circle/Square (brush footprint) selection. The HUD shows the next selection step.
+- F5 holds local player controls and camera still, dims the world, and uses a resolution-aware window. The ESC menu still pauses the whole world in single-player.
+- **Free camera safeguard** — flying camera is kept above terrain so descending controls cannot take it underneath the map.
+- TerrainForge now registers and synchronizes its own TerrainForge Rod. **Jotunn is no longer required.**
+- The rod registration is repeated for rebuilt world databases, and network registration is retried after the item database is ready. Plugin, project, and Thunderstore versions are aligned at 0.3.6.
+- The live ObjectDB is also revalidated during gameplay to recover if another mod rebuilds its item index after TerrainForge's initial registration.
+
 - **Free camera (`F`) fixed** — while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments take priority.
 - **Docs & wiki in 14 languages** — README and CHANGELOG in English, and the full manual on the [Wiki](https://github.com/marceloanton/TerrainForge/wiki) (`Home` + 13 translations).
 
@@ -33,7 +42,6 @@ Terrain edits are stored in the world and the server replicates them to every pl
 ## Requirements
 
 - **BepInEx 5** (x64, Mono) on both client and server. Thunderstore users already have it.
-- **Jotunn** (`ValheimModding-Jotunn`) — registers the custom tool. It is listed in `manifest.json`; Thunderstore installs it automatically.
 
 ---
 
@@ -76,13 +84,13 @@ While aiming, a solid ring marks the real brush area, with faint guides in the o
 | Radial operation menu (hold, release to confirm) | `Q` |
 | Adjust mode (wheel = radius, zoom frozen) | `V` |
 | Fine radius steps (0.1 m) | Hold `Shift` + wheel / radius keys |
-| **Copy terrain (Stamp)** | `Ctrl+Shift+C` |
-| **Paste terrain (Stamp)** | `Ctrl+Shift+V` |
+| **Copy terrain (Stamp)** | `Ctrl+Shift+C` or Apply in the Q wheel's Copy/Paste mode |
+| **Paste terrain (Stamp)** | `Ctrl+Shift+V` (start/confirm preview) |
 | Get the TerrainForge Rod | `F8` |
 | Open the keys + help menu | `F5` |
 
 **Extra keys (no default, assign them in KEYS):**
-- Direct operation: Flatten, Raise, Lower, Smooth, Paint, Restore, Ramp, Shore, Snow
+- Direct operation: Flatten, Raise, Lower, Smooth, Paint, Restore, Ramp, Shore; the legacy Snow shortcut selects Paint + DeepSnow.
 - Next / previous profile
 - Next / previous stamp (history)
 
@@ -90,7 +98,7 @@ While aiming, a solid ring marks the real brush area, with faint guides in the o
 
 ## Operations
 
-Operations cycle: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`, `Restore`, `Shore` (flattens toward the water level + margin, for beaches) and `Snow` (paints snow like Paint but snow only; `Shift` removes it and restores the original ground).
+The nine Q wheel modes are `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`, `Restore`, `Shore`, and `Copy/Paste`. Snow is a Paint type (`DeepSnow`); hold `Shift` to remove it and restore the original ground.
 
 ### Details
 
@@ -101,7 +109,6 @@ Operations cycle: `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint`, `Resto
 - **Shore** — flattens toward the water level + margin (beaches/coastlines), with softness blending like Flatten.
 - **Paint** — types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.
 - **Restore** — returns the terrain to its original state.
-- **Snow** — paints snow like Paint but snow only; `Shift` removes it and restores the original ground.
 
 ---
 
@@ -148,8 +155,8 @@ Cycle in SETTINGS → "Raise/Lower falloff":
 
 **STAMPS** tab in SETTINGS.
 
-- **Copy with a rectangle selection:** switch the shape to `Rectangle` (key `.`), press Apply once to mark corner **A** (no edit is made), aim at corner **B**, then press `Ctrl+Shift+C` → copies exactly that rectangle (cropped to the selection, it does not drag whole 64 m tiles or untouched ground around it).
-- `Ctrl+Shift+V` shows a ghost (wireframe) preview at the crosshair; `Q`/`E` rotate, `Alt`+wheel rotates continuously, `Shift`+wheel scales, click confirms.
+- **Copy a selected area:** choose `Copy/Paste` in the Q wheel. `Rectangle` marks corners A and B with Apply; `Line` marks two endpoints; `Polygon` adds vertices and copies on a double-press after 3+ points; `Circle`/`Square` copy the aimed brush footprint. The HUD shows the next step. `Ctrl+Shift+C` follows the same selection flow.
+- `Ctrl+Shift+V` shows a ghost (wireframe) preview at the crosshair; `Q`/`E` rotate, `Alt`+wheel rotates continuously, `Shift`+wheel scales, use the paste shortcut again to confirm.
 - Pasting writes **only inside the copied region**; it does not erase terrain outside it.
 - History of 10 stamps in RAM: "Next stamp" / "Previous stamp" keys cycle them.
 - Save a stamp to disk (`.stamp` in `BepInEx/config/TerrainForge/stamps/`, max 12), load it into the clipboard, list and delete from the UI.
@@ -170,15 +177,18 @@ Cycle in SETTINGS → "Raise/Lower falloff":
 
 ## In-game menu (`F5`)
 
-3 tabs with a **global scroll** (mouse wheel):
+6 tabs with a **global scroll** (mouse wheel):
 
 | Tab | Purpose |
 |-----|---------|
-| **KEYS** | Rebind keys: click → press a key/button; `Esc` cancels. Combos: hold modifiers, then the main key. Mouse buttons supported. |
-| **HELP** | Complete reference of operations, controls, preview, multiplayer and saving. |
-| **SETTINGS** | Everything editable live: sliders, toggles, cycles, profiles, stamps, snapshots, language. Saved on close. |
+| **BRUSH** | Choose the operation and shape, and tune brush parameters. |
+| **CONTROLS** | Rebind keys: click → press a key/button; `Esc` cancels. |
+| **SAVED** | Manage profiles, snapshots, and history. |
+| **OPTIONS** | Configure tool, display, server rules, and language. |
+| **GUIDE** | Reference for operations, controls, preview, multiplayer, and saving. |
+| **COPY/PASTE** | Copy selected terrain, place/confirm paste previews, and manage stamps. |
 
-**ESC button:** the pause menu has a "TerrainForge" button that opens the menu.
+**ESC button:** the pause menu has a "TerrainForge" button that opens the panel. F5 freezes local movement and camera look; it does not pause the multiplayer world.
 
 ---
 

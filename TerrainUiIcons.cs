@@ -69,6 +69,45 @@ namespace TerrainForge
             return t;
         }
 
+        public static Texture2D Tool(string id)
+        {
+            string key = "tool:" + id;
+            if (Cache.TryGetValue(key, out Texture2D cached) && cached != null)
+                return cached;
+            Color c = TerrainTheme.TextGold;
+            var t = NewTex(key);
+            var px = Blank();
+            Disc(px, N / 2f, N / 2f, 19f, Bg);
+            Ring(px, N / 2f, N / 2f, 19f, 2.5f, c);
+            float cx = N / 2f, cy = N / 2f;
+            switch (id)
+            {
+                case "copy":
+                    RectO(px, cx - 9f, cy - 8f, cx + 6f, cy + 9f, 2f, c);
+                    Line(px, cx - 5f, cy + 3f, cx + 2f, cy + 3f, 1.5f, c);
+                    Line(px, cx - 5f, cy - 1f, cx + 2f, cy - 1f, 1.5f, c);
+                    break;
+                case "paste":
+                    RectO(px, cx - 8f, cy - 9f, cx + 8f, cy + 8f, 2f, c);
+                    RectO(px, cx - 4f, cy + 5f, cx + 4f, cy + 11f, 2f, c);
+                    break;
+                case "undo":
+                    Line(px, cx - 9f, cy + 4f, cx + 5f, cy + 4f, 3f, c);
+                    Line(px, cx - 9f, cy + 4f, cx - 3f, cy + 10f, 3f, c);
+                    Line(px, cx - 9f, cy + 4f, cx - 3f, cy - 2f, 3f, c);
+                    break;
+                case "redo":
+                    Line(px, cx + 9f, cy + 4f, cx - 5f, cy + 4f, 3f, c);
+                    Line(px, cx + 9f, cy + 4f, cx + 3f, cy + 10f, 3f, c);
+                    Line(px, cx + 9f, cy + 4f, cx + 3f, cy - 2f, 3f, c);
+                    break;
+                case "prev": Tri(px, cx, cy, 9f, 10f, false, c); break;
+                default: Tri(px, cx, cy, 9f, 10f, true, c); break;
+            }
+            Finish(t, px);
+            return t;
+        }
+
         public static void Clear()
         {
             foreach (Texture2D t in Cache.Values)
@@ -110,6 +149,10 @@ namespace TerrainForge
                     Line(px, cx, cy - 8f, cx, cy + 8f, 2f, c);
                     Line(px, cx - 6f, cy - 6f, cx + 6f, cy + 6f, 2f, c);
                     Line(px, cx - 6f, cy + 6f, cx + 6f, cy - 6f, 2f, c);
+                    break;
+                case TerrainOperation.CopyPaste:
+                    RectO(px, cx - 10f, cy - 8f, cx + 5f, cy + 9f, 2f, c);
+                    RectO(px, cx - 4f, cy - 11f, cx + 11f, cy + 6f, 2f, c);
                     break;
                 case TerrainOperation.Paint:
                     Disc(px, cx - 2f, cy - 2f, 7f, c);

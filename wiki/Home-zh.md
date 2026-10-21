@@ -4,6 +4,11 @@
 
 ---
 
+
+### TerrainForge 0.3.6 更新
+
+> Q 圓盤新增專用「複製/貼上」模式。矩形用「套用」標記 A/B；直線標記兩端；多邊形標記頂點並在 3 點以上雙擊複製；圓形/正方形複製筆刷範圍。HUD 會提示下一步。雪已整合至塗裝 > DeepSnow（按住 Shift 可移除）。F5 會鎖定本機移動與鏡頭；Esc 會暫停單人世界。
+
 ## 目录
 
 [Overview](Overview) · 1. [安装](#-安装)
@@ -26,7 +31,6 @@
 
 [Overview](Overview) · ### 要求
 - **BepInEx 5**（x64，Mono），客户端和服务器均需安装。Thunderstore 用户已自带。
-- **Jotunn**（`ValheimModding-Jotunn`）—— 注册自定义工具。它列在 `manifest.json` 中；Thunderstore 会自动安装。
 
 ### 步骤
 1. 从 Thunderstore 或 GitHub Releases 下载 `TerrainForge-<version>.zip`。
@@ -96,7 +100,7 @@
 | **海岸** | 向水位 + `ShoreOffset` 边距平整（沙滩）。柔和度同平整。 |
 | **涂装** | 类型：Dirt、Cultivated、Paved、ClearVegetation、DeepSnow、Reset。强度可调。 |
 | **恢复** | 将地形恢复到原始状态（高度 + 涂装）。 |
-| **雪** | 仅雪的涂装（与游戏相同的遮罩）。`Shift` = 移除并恢复原始状态。 |
+| **複製/貼上** | Q 圓盤中的專用模式，可選取地形並放置 stamp。 |
 
 ---
 
@@ -136,10 +140,7 @@
 
 ### 矩形选择（推荐）
 
-[Overview](Overview) · 1. 将形状设为 `Rectangle`（键 `.`）。
-2. 按一次应用（`Mouse1`）标记角 **A**（这**不会**进行任何编辑）。
-3. 瞄准角 **B**（只需移动视角）。
-4. 按 `Ctrl+Shift+C` → 精确复制该矩形，**裁剪到所选区域**（不会拖拽整个 64 m 瓦片或周围未触及的地面）。成功复制后 A 角标记会被消耗。
+在 Q 圓盤選擇「複製/貼上」。按「套用」標記範圍：矩形選兩個角、直線選兩端、多邊形選頂點（3 點以上雙擊），圓形/正方形則使用目前筆刷範圍。HUD 會提示下一步。
 
 ### 工作流程
 
@@ -150,7 +151,7 @@
    - `Alt`+滚轮 = 连续旋转
    - `Shift`+滚轮 = 缩放 0.25×–4×
    - `Esc` = 取消
-4. **确认**：点击（`Mouse1`）→ 作为**单个撤销步骤**应用。
+4. **确认**：再次按下贴上快捷键以确认预览。
 
 > 选择图章**只写入复制的区域内**；其外的地形保持不变。
 
@@ -333,7 +334,7 @@
 | **径向滚轮不工作** | 已在 0.3.2（`ZInput.GetMouseScrollWheel()`）和 0.3.4（光标居中时选择不再被清除）修复。请更新。 |
 | **配置无法保存** | 关闭菜单（F5）以自动保存。或直接编辑 `BepInEx/config/com.terrainforge.valheim.cfg`。 |
 | **多人游戏失步** | 客户端+服务器都安装模组。两者都设置 `UnlockDeltaLimit`。`MaxUpDelta`/`MaxDownDelta` 相同。 |
-| **构建失败** | 检查 `.csproj` 中的 `ValheimDir`、`BepInExCoreDir`、`JotunnDir` 路径或通过 CLI。需要 .NET SDK 8+。 |
+| **构建失败** | 检查 `.csproj` 中的 `ValheimDir`、`BepInExCoreDir` 路径或通过 CLI。需要 .NET SDK 8+。 |
 | **编译 / 打包** | `dotnet build -c Release`（DLL 在 `build/`），`-p:Deploy=true`（安装到配置文件）或 `-p:Package=true`（zip 在 `build/`）。 |
 
 ---

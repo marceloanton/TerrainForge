@@ -4,6 +4,11 @@
 
 ---
 
+
+### Novidades do TerrainForge 0.3.6
+
+> A roda Q tem um modo dedicado de Copiar/Colar. Retângulo marca A/B com Aplicar; Linha marca duas pontas; Polígono adiciona vértices e copia com duplo toque após 3+ pontos; Círculo/Quadrado copia a área do pincel. O HUD mostra o próximo passo. Neve fica em Pintar > DeepSnow (segure Shift para remover). F5 congela movimento e câmera locais; Esc pausa o mundo inteiro no modo solo.
+
 ## Índice
 
 [Overview](Overview) · 1. [Instalação](#-instalação)
@@ -26,7 +31,6 @@
 
 [Overview](Overview) · ### Requisitos
 - **BepInEx 5** (x64, Mono) no cliente e no servidor. Usuários do Thunderstore já o possuem.
-- **Jotunn** (`ValheimModding-Jotunn`) — registra a ferramenta personalizada. Está listado em `manifest.json`; o Thunderstore o instala automaticamente.
 
 ### Passos
 1. Baixe `TerrainForge-<version>.zip` do Thunderstore ou do GitHub Releases.
@@ -96,7 +100,7 @@
 | **Costa** | Aplana em direção ao nível da água + margem `ShoreOffset` (praias). Suavidade como Aplanar. |
 | **Pintar** | Tipos: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Força ajustável. |
 | **Restaurar** | Devolve o terreno ao seu estado original (altura + pintura). |
-| **Neve** | Pintura apenas de neve (mesma máscara do jogo). `Shift` = remove e restaura o original. |
+| **Copiar/Colar** | Modo dedicado na roda Q para selecionar terreno e posicionar stamps. |
 
 ---
 
@@ -136,10 +140,7 @@
 
 ### Seleção por retângulo (recomendada)
 
-[Overview](Overview) · 1. Defina a forma como `Retângulo` (tecla `.`).
-2. Pressione Aplicar (`Mouse1`) **uma vez** para marcar o canto **A** (isso **não** faz edição alguma).
-3. Mire no canto **B** (apenas mova a câmera).
-4. Pressione `Ctrl+Shift+C` → copia exatamente aquele retângulo, **recortado à seleção** (não arrasta blocos inteiros de 64 m nem o terreno intocado ao redor). A marca do canto A é consumida após uma cópia bem-sucedida.
+Escolha Copiar/Colar na roda Q. Aplicar marca a seleção: dois cantos no Retângulo, duas pontas na Linha, vértices no Polígono (duplo toque após 3+ pontos), ou a área do pincel no Círculo/Quadrado. O HUD indica o próximo passo.
 
 ### Fluxo de trabalho
 
@@ -150,7 +151,7 @@
    - `Alt`+Roda = rotação contínua
    - `Shift`+Roda = escalar 0.25×–4×
    - `Esc` = cancelar
-4. **Confirmar**: clique (`Mouse1`) → aplica como **um único passo de Desfazer**.
+4. **Confirm**: Pressione o atalho de colar novamente para confirmar a prévia.
 
 > Os stamps de seleção gravam **apenas dentro da região copiada**; o terreno fora dela permanece intocado.
 
@@ -333,7 +334,7 @@ Todos os atalhos são reatribuíveis na aba TECLAS. Destaques:
 | **A roda radial não funciona** | Corrigido em 0.3.2 (`ZInput.GetMouseScrollWheel()`) e 0.3.4 (a seleção não é mais apagada com o cursor centralizado). Atualize. |
 | **A config não salva** | Feche o menu (F5) para salvar automaticamente. Ou edite `BepInEx/config/com.terrainforge.valheim.cfg` diretamente. |
 | **Desync em multijogador** | Mod no cliente+servidor. `UnlockDeltaLimit` em ambos. Mesmos `MaxUpDelta`/`MaxDownDelta`. |
-| **O build falha** | Verifique os caminhos `ValheimDir`, `BepInExCoreDir`, `JotunnDir` em `.csproj` ou via CLI. Requer .NET SDK 8+. |
+| **O build falha** | Verifique os caminhos `ValheimDir`, `BepInExCoreDir` em `.csproj` ou via CLI. Requer .NET SDK 8+. |
 | **Compilar / empacotar** | `dotnet build -c Release` (DLL em `build/`), `-p:Deploy=true` (instala no perfil) ou `-p:Package=true` (zip em `build/`). |
 
 ---

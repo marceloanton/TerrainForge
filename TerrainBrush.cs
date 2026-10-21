@@ -38,6 +38,9 @@ namespace TerrainForge
         private Vector3 _rampA;
 
         private GUIStyle _hud;
+        private GUIStyle _hudTitle;
+        private GUIStyle _hudSmall;
+        private GUIStyle _hudRight;
         private GUIStyle _banner;
         private Texture2D _hudBg;
         private string _flashMsg;
@@ -80,7 +83,7 @@ namespace TerrainForge
         internal static bool FreeFlyWheelBusy { get; private set; }
         private static bool s_clearMarks;
         private static bool s_reqUndo, s_reqRedo, s_reqEyedrop, s_reqGiveTool;
-        private static bool s_reqCopyStamp, s_reqPasteStamp, s_reqCycleStampBack;
+        private static bool s_reqCopyStamp, s_reqPasteStamp, s_reqCycleStampBack, s_reqCycleStamp;
         private static bool s_reqDumpMat;
         private static bool s_reqFreeCam;
         internal static bool SuppressFreeFlyScreenshot;
@@ -94,6 +97,7 @@ namespace TerrainForge
         internal static void RequestCopyStamp() => s_reqCopyStamp = true;
         internal static void RequestPasteStamp() => s_reqPasteStamp = true;
         internal static void RequestCycleStampBack() => s_reqCycleStampBack = true;
+        internal static void RequestCycleStamp() => s_reqCycleStamp = true;
         internal static void RequestDumpMaterial() => s_reqDumpMat = true;
         internal static void RequestFreeCamera() => s_reqFreeCam = true;
 
@@ -132,6 +136,11 @@ namespace TerrainForge
                 return;
             }
 
+            // Other mods may rebuild ObjectDB after CopyOtherDB (Jotunn does this
+            // while adding its items). Revalidate the rod against the live database
+            // before the automatic handout path runs.
+            TerrainTool.EnsureRegistered();
+
             if (TerrainKeybinds.MenuOpen)
             {
                 _preview.Hide();
@@ -163,7 +172,7 @@ namespace TerrainForge
                 Flash(Loc.T("flash.applying"));
             }
 
-            if (p.AutoGiveTool.Value && !_toolGiven)
+            if (p.AutoGiveTool.Value && !_toolGiven && TerrainTool.Registered)
             {
                 if (TerrainTool.Has(player))
                     TerrainTool.Equip(player);
@@ -310,9 +319,10 @@ namespace TerrainForge
                 if (s_reqRedo) { s_reqRedo = false; DoRedo(); }
                 if (s_reqEyedrop) { s_reqEyedrop = false; ToggleEyedrop(groundCenter); }
                 if (s_reqGiveTool) { s_reqGiveTool = false; TerrainTool.Give(player); }
-                if (s_reqCopyStamp) { s_reqCopyStamp = false; HandleCopyStamp(p, groundCenter); }
+                if (s_reqCopyStamp) { s_reqCopyStamp = false; CopyCurrentSelection(p, groundCenter); }
                 if (s_reqPasteStamp) { s_reqPasteStamp = false; HandlePasteStamp(p, groundCenter, canEdit, why); }
                 if (s_reqCycleStampBack) { s_reqCycleStampBack = false; HandleCycleStamp(p, -1); }
+                if (s_reqCycleStamp) { s_reqCycleStamp = false; HandleCycleStamp(p, 1); }
                 if (s_reqDumpMat) { s_reqDumpMat = false; DumpTerrainMaterial(groundCenter); }
                 if (s_reqFreeCam) { s_reqFreeCam = false; ToggleFreeCamera(); }
             }
@@ -321,7 +331,7 @@ namespace TerrainForge
             if (!blocked && active)
             {
                 if (p.CopyStampKey.Value.IsDown())
-                    HandleCopyStamp(p, groundCenter);
+                    CopyCurrentSelection(p, groundCenter);
                 if (p.PasteStampKey.Value.IsDown())
                     HandlePasteStamp(p, groundCenter, canEdit, why);
                 if (p.CycleStampKey.Value.IsDown())
@@ -353,6 +363,11 @@ namespace TerrainForge
                         else
                             Flash(why);
                     }
+                }
+                else if (op == TerrainOperation.CopyPaste)
+                {
+                    if (p.ApplyKey.Value.IsDown())
+                        HandleCopySelectionPress(p, groundCenter);
                 }
                 else if (p.Shape.Value == TerrainShape.Line ||
                          p.Shape.Value == TerrainShape.Rect ||
@@ -686,7 +701,9 @@ namespace TerrainForge
                 Power = p.FalloffPower.Value,
                 RaiseDelta = p.RaiseDelta.Value,
                 TargetWorld = p.UseFixedHeight.Value ? p.FixedHeight.Value : (ownHeight ? playerGround : center.y),
-                SnowClear = p.DefaultOperation.Value == TerrainOperation.Snow && Held(p.AimHeightModifierKey.Value),
+                SnowClear = (p.DefaultOperation.Value == TerrainOperation.Snow ||
+                    p.DefaultOperation.Value == TerrainOperation.Paint && p.Paint.Value == TerrainPaint.DeepSnow) &&
+                    Held(p.AimHeightModifierKey.Value),
                 PaintStrength = p.PaintStrength.Value,
                 MaxUp = EffectiveMaxUp(p),
                 MaxDown = EffectiveMaxDown(p),
@@ -721,7 +738,7 @@ namespace TerrainForge
             else if (p.OpRestoreKey.Value.IsDown()) SetOp(p, TerrainOperation.Restore);
             else if (p.OpRampKey.Value.IsDown()) SetOp(p, TerrainOperation.Ramp);
             else if (p.OpShoreKey.Value.IsDown()) SetOp(p, TerrainOperation.Shore);
-            else if (p.OpSnowKey.Value.IsDown()) SetOp(p, TerrainOperation.Snow);
+            else if (p.OpSnowKey.Value.IsDown()) { SetOp(p, TerrainOperation.Paint); p.Paint.Value = TerrainPaint.DeepSnow; }
         }
 
         private void SetOp(TerrainForgePlugin p, TerrainOperation op)
@@ -781,6 +798,61 @@ namespace TerrainForge
             else
             {
                 Flash(Loc.T("flash.stamp.empty"));
+            }
+        }
+
+        private void CopyCurrentSelection(TerrainForgePlugin p, Vector3 point)
+        {
+            HandleCopySelectionPress(p, point);
+        }
+
+        private void HandleCopySelectionPress(TerrainForgePlugin p, Vector3 point)
+        {
+            switch (p.Shape.Value)
+            {
+                case TerrainShape.Rect:
+                    if (!_rectHasA)
+                    {
+                        _rectA = point;
+                        _rectHasA = true;
+                        TerrainForgePlugin.Message(Loc.T("msg.rect.markA"));
+                        return;
+                    }
+                    HandleCopyStamp(p, point);
+                    return;
+                case TerrainShape.Line:
+                    if (!_lineHasA)
+                    {
+                        _lineA = point;
+                        _lineHasA = true;
+                        TerrainForgePlugin.Message(Loc.T("msg.line.markA"));
+                        return;
+                    }
+                    if ((point - _lineA).sqrMagnitude < 1f)
+                    {
+                        TerrainForgePlugin.Message(Loc.T("msg.line.close"));
+                        return;
+                    }
+                    HandleCopyStamp(p, point);
+                    _lineHasA = false;
+                    return;
+                case TerrainShape.Poly:
+                    if (_polyPoints.Count >= 3 && Time.time - _polyLastClick < 0.5f)
+                    {
+                        HandleCopyStamp(p, point);
+                        _polyPoints.Clear();
+                        return;
+                    }
+                    if (_polyPoints.Count == 0 || (_polyPoints[_polyPoints.Count - 1] - point).sqrMagnitude > 0.25f)
+                    {
+                        _polyPoints.Add(point);
+                        TerrainForgePlugin.Message(Loc.F("msg.poly.point", _polyPoints.Count));
+                    }
+                    _polyLastClick = Time.time;
+                    return;
+                default:
+                    HandleCopyStamp(p, point);
+                    return;
             }
         }
 
@@ -1057,7 +1129,11 @@ namespace TerrainForge
 
         private static void CycleOperation(TerrainForgePlugin p)
         {
-            p.DefaultOperation.Value = (TerrainOperation)(((int)p.DefaultOperation.Value + 1) % 9);
+            TerrainOperation[] ops = { TerrainOperation.Flatten, TerrainOperation.Raise, TerrainOperation.Lower,
+                TerrainOperation.Smooth, TerrainOperation.Paint, TerrainOperation.Restore,
+                TerrainOperation.Ramp, TerrainOperation.Shore, TerrainOperation.CopyPaste };
+            int index = System.Array.IndexOf(ops, p.DefaultOperation.Value);
+            p.DefaultOperation.Value = ops[(index + 1 + ops.Length) % ops.Length];
         }
 
         private static void CycleShape(TerrainForgePlugin p)
@@ -1228,10 +1304,12 @@ namespace TerrainForge
                 case TerrainOperation.Shore:
                     return string.Format("{0} {1:0.0} m", Loc.T("hud.shore"),
                         TerrainEngine.WaterLevel() + p.ShoreOffset.Value);
-                case TerrainOperation.Snow:
-                    return Loc.T(Held(p.AimHeightModifierKey.Value) ? "hud.snow.clear" : "hud.snow.put");
                 case TerrainOperation.Paint:
+                    if (p.Paint.Value == TerrainPaint.DeepSnow)
+                        return Loc.T(Held(p.AimHeightModifierKey.Value) ? "hud.snow.clear" : "hud.snow.put");
                     return p.Paint.Value + " " + (p.PaintStrength.Value * 100f).ToString("0") + "%";
+                case TerrainOperation.CopyPaste:
+                    return Loc.T("hud.stampReady");
                 case TerrainOperation.Restore:
                     return Loc.T("hud.original");
                 case TerrainOperation.Ramp:
@@ -1545,10 +1623,27 @@ namespace TerrainForge
             return true;
         }
 
+        internal static bool Pressed(KeyboardShortcut shortcut)
+        {
+            KeyCode main = shortcut.MainKey;
+            if (main == KeyCode.None) return false;
+            bool down = main == KeyCode.Mouse0 ? Input.GetMouseButtonDown(0)
+                : main == KeyCode.Mouse1 ? Input.GetMouseButtonDown(1)
+                : main == KeyCode.Mouse2 ? Input.GetMouseButtonDown(2)
+                : Input.GetKeyDown(main);
+            if (!down) return false;
+            var mods = shortcut.Modifiers;
+            if (mods != null)
+                foreach (KeyCode m in mods)
+                    if (!Input.GetKey(m)) return false;
+            return true;
+        }
+
         internal static Color BrushColor(TerrainForgePlugin p)
         {
-            bool snowClear = p.DefaultOperation.Value == TerrainOperation.Snow &&
-                             Held(p.AimHeightModifierKey.Value);
+            bool snowClear = (p.DefaultOperation.Value == TerrainOperation.Snow ||
+                p.DefaultOperation.Value == TerrainOperation.Paint && p.Paint.Value == TerrainPaint.DeepSnow) &&
+                Held(p.AimHeightModifierKey.Value);
             return OpColor(p.DefaultOperation.Value, p.Paint.Value, snowClear);
         }
 
@@ -1605,164 +1700,163 @@ namespace TerrainForge
             // the held item), so the banner is drawn before anything else.
             if (freeCam)
                 DrawFreeCamBanner();
+            DrawBrushHud(p, player);
+            DrawAimBadge(p);
+        }
 
-            float er = EffectiveRadius(p);
-            string rtxt = er.ToString("0.#") + " m" +
-                (er < p.Radius.Value - 0.001f ? " (" + Loc.T("hud.capped") + ")" : "");
-            string status = string.Format("TerrainForge   {0}   |   {1} {2}   |   {3}   |   {4}",
-                p.DefaultOperation.Value, Loc.T("hud.radius"), rtxt, p.Shape.Value, p.Paint.Value);
-            if (p.DefaultOperation.Value == TerrainOperation.Ramp)
-            {
-                if (p.RampMode.Value == RampMode.Path)
-                    status += "   |   " + (_rampPath.Count > 0
-                        ? Loc.F("hud.path.mark", _rampPath.Count)
-                        : Loc.T("hud.path.idle"));
-                else if (_rampHasA)
-                    status += "   |   " + Loc.T("hud.rampA");
-            }
-            if (p.DefaultOperation.Value != TerrainOperation.Ramp)
-            {
-                switch (p.Shape.Value)
-                {
-                    case TerrainShape.Line:
-                        if (_lineHasA)
-                        {
-                            float len = HorizDist(_lineA, _aimPoint);
-                            float rise = _aimPoint.y - _lineA.y;
-                            status += "   |   " + Loc.T("hud.line.mark") + string.Format(" ({0}, {1}, {2})",
-                                M(len), Rise(rise), Deg(PathAngle(len, rise)));
-                        }
-                        else
-                            status += "   |   " + Loc.T("hud.line.idle");
-                        break;
-                    case TerrainShape.Rect:
-                        if (_rectHasA)
-                        {
-                            float wdt = Mathf.Abs(_aimPoint.x - _rectA.x);
-                            float dep = Mathf.Abs(_aimPoint.z - _rectA.z);
-                            status += "   |   " + Loc.T("hud.rect.mark") + string.Format(" ({0}×{1} m, {2} m²)",
-                                wdt.ToString("0.#"), dep.ToString("0.#"), (wdt * dep).ToString("0.#"));
-                        }
-                        else
-                            status += "   |   " + Loc.T("hud.rect.idle");
-                        break;
-                    case TerrainShape.Poly:
-                        if (_polyPoints.Count > 0)
-                        {
-                            float perim = ChainLength(_polyPoints, _aimPoint, false);
-                            float area = PolyArea(_polyPoints, _aimPoint, true);
-                            status += "   |   " + Loc.F("hud.poly.mark", _polyPoints.Count) +
-                                string.Format(" ({0}, {1} m²)", M(perim), area.ToString("0.#"));
-                        }
-                        else
-                            status += "   |   " + Loc.T("hud.poly.idle");
-                        break;
-                }
-            }
-            status += string.Format("   |   {0} {1} / {2} {3}",
-                Loc.T("hud.undo"), TerrainEngine.UndoCount, Loc.T("hud.redo"), TerrainEngine.RedoCount);
+        private void DrawBrushHud(TerrainForgePlugin p, Player player)
+        {
+            const float margin = 18f;
+            float width = Mathf.Min(370f, Screen.width - margin * 2f);
+            float x = Screen.width - width - margin;
+            float bottom = Screen.height - margin;
+            var clipboard = TerrainEngine.GetClipboard();
+            bool hasStamp = clipboard.Count > 0;
+            bool showMode = p.DefaultOperation.Value == TerrainOperation.Ramp ||
+                p.DefaultOperation.Value == TerrainOperation.Paint || p.DefaultOperation.Value == TerrainOperation.CopyPaste;
+            bool showContext = _adjustMode || !_serverAllowed || !_wardOk ||
+                (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil) ||
+                _pastePreview || hasStamp || p.DefaultOperation.Value == TerrainOperation.Ramp &&
+                    (p.RampMode.Value == RampMode.Path ? _rampPath.Count > 0 : _rampHasA) ||
+                p.DefaultOperation.Value != TerrainOperation.Ramp &&
+                    (p.Shape.Value == TerrainShape.Line && _lineHasA || p.Shape.Value == TerrainShape.Rect && _rectHasA ||
+                     p.Shape.Value == TerrainShape.Poly && _polyPoints.Count > 0);
+            float height = 126f + (showMode ? 22f : 0f) + (showContext ? 24f : 0f);
+            var panel = new Rect(x, bottom - height, width, height);
+            DrawHudSurface(panel, BrushColor(p));
 
-            // Stamp (copy/paste) status line — always visible in edit mode so the
-            // feature is discoverable even before anything is copied.
-            string stampLine;
-            Color stampColor;
+            TerrainOperation op = p.DefaultOperation.Value;
+            GUI.color = Color.white;
+            GUI.DrawTexture(new Rect(x + 15f, panel.y + 15f, 42f, 42f), TerrainUiIcons.Op(op), ScaleMode.ScaleToFit, true);
+            _hudTitle.normal.textColor = _applying ? TerrainTheme.GoldBright : TerrainTheme.TextWhite;
+            GUI.Label(new Rect(x + 66f, panel.y + 15f, width - 156f, 25f), Loc.OpName(op).ToUpperInvariant(), _hudTitle);
+            _hudSmall.normal.textColor = TerrainTheme.TextDim;
+            GUI.Label(new Rect(x + 66f, panel.y + 39f, width - 82f, 18f), _applying ? Loc.T("flash.applying") : "TERRAINFORGE", _hudSmall);
+
+            float radius = EffectiveRadius(p);
+            string radiusText = radius.ToString("0.#") + " m" + (radius < p.Radius.Value - 0.001f ? "  ·  " + Loc.T("hud.capped") : "");
+            _hudRight.normal.textColor = TerrainTheme.GoldBright;
+            GUI.Label(new Rect(x + width - 112f, panel.y + 18f, 96f, 24f), radiusText, _hudRight);
+
+            GUI.color = new Color(1f, 1f, 1f, 0.18f);
+            GUI.DrawTexture(new Rect(x + 14f, panel.y + 64f, width - 28f, 1f), _hudBg);
+            GUI.color = Color.white;
+
+            _hud.normal.textColor = TerrainTheme.TextWhite;
+            string shape = Loc.T("set.shape") + "  " + ShapeLabel(p.Shape.Value);
+            string aimed = Loc.T("hud.aimed") + "  " + _aimY.ToString("0.0") + " m";
+            GUI.Label(new Rect(x + 16f, panel.y + 68f, width * 0.52f, 22f), shape, _hud);
+            _hudRight.normal.textColor = TerrainTheme.TextWhite;
+            GUI.Label(new Rect(x + width * 0.52f, panel.y + 68f, width * 0.43f, 22f), aimed, _hudRight);
+
+            float footerY = panel.y + 95f;
+            if (showMode)
             {
-                Player localPlayer = Player.m_localPlayer;
-                ItemDrop.ItemData weapon = localPlayer != null ? GetHeldItem(localPlayer) : null;
-                bool stampToolOk = IsStampToolEquipped(p, weapon);
-                var clipboard = TerrainEngine.GetClipboard();
-                if (clipboard.Count == 0)
-                {
-                    stampLine = Loc.T("hud.stampEmpty");
-                    stampColor = TerrainTheme.TextDim;
-                }
-                else if (!stampToolOk)
-                {
-                    stampLine = string.Format("{0} [{1}]   |   {2}",
-                        Loc.T("hud.stampReady"), clipboard.Count, Loc.T("hud.stampNoTool"));
-                    stampColor = TerrainTheme.Danger;
-                }
-                else
-                {
-                    var current = TerrainEngine.GetStamp();
-                    int idx = current != null ? clipboard.Count - clipboard.ToList().IndexOf(current) : 1;
-                    stampLine = string.Format("{0} [{1}/{2}]   |   {3}",
-                        Loc.T("hud.stampReady"), idx, clipboard.Count, Loc.T("hud.stampPasteHint"));
-                    stampColor = TerrainTheme.GoldBright;
-                }
+                string mode = p.DefaultOperation.Value == TerrainOperation.Ramp
+                    ? Loc.T("set.rampmode") + "  " + p.RampMode.Value
+                    : p.DefaultOperation.Value == TerrainOperation.CopyPaste
+                        ? Loc.T("tab.stamps")
+                        : Loc.T("set.paint") + "  " + p.Paint.Value;
+                _hudSmall.normal.textColor = TerrainTheme.TextDim;
+                GUI.Label(new Rect(x + 16f, panel.y + 92f, width - 32f, 19f), mode, _hudSmall);
+                footerY += 22f;
             }
 
-            if (_adjustMode)
-                status += "   |   " + Loc.T("hud.adjust");
-            if (!_serverAllowed)
-                status += "   |   " + Loc.T("hud.blocked");
-            if (!_wardOk)
-                status += "   |   " + Loc.T("hud.ward");
-            if (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil)
-                status += "   |   " + _flashMsg;
-
-            Color prev = GUI.color;
-            Color c = BrushColor(p);
-            Color mainColor = _applying ? new Color(1f, 0.85f, 0.4f) : c;
-            string prefix = _applying ? "\u25B6  " : "\u2022  ";
-
-            string line2 = string.Format("{0} {1:0.0} m   |   {2}   |   {3} {4:0}\u00B0",
-                Loc.T("hud.aimed"), _aimY, _targetTxt, Loc.T("hud.slope"), _slopeDeg);
-
-            // In the free-fly camera the brush can sit far from the player, so show
-            // how far the target is — otherwise edits look like they do nothing.
+            string footer = Loc.T("hud.undo") + " " + TerrainEngine.UndoCount + "     " +
+                Loc.T("hud.redo") + " " + TerrainEngine.RedoCount;
             if (GameCamera.InFreeFly())
             {
                 Camera cam = Camera.main;
                 if (cam != null)
-                    line2 += "   |   " + Loc.F("hud.freecam.dist",
-                        Vector3.Distance(cam.transform.position, _aimPoint).ToString("0"));
+                    footer += "     ·     " + Loc.F("hud.freecam.dist", Vector3.Distance(cam.transform.position, _aimPoint).ToString("0"));
             }
+            _hudSmall.normal.textColor = TerrainTheme.TextDim;
+            GUI.Label(new Rect(x + 16f, footerY, width - 32f, 20f), footer, _hudSmall);
 
-            // Stacked bottom-right block, drawn from the bottom up.
-            var lines = new List<string> { prefix + status, stampLine, line2 };
-            const int stampIdx = 1;
-            string infoLine = BuildInfoLine();
-            if (!string.IsNullOrEmpty(infoLine))
-                lines.Add(infoLine);
-
-            // The free-fly mode has its own top banner, so only the idle nudge
-            // (encouraging F while marking/copying a stamp) stays in the block.
-            int freeCamIdx = -1;
-            if (!GameCamera.InFreeFly() && (_pastePreview || Time.time - _clipFxStart < 4f))
+            if (showContext)
             {
-                freeCamIdx = lines.Count;
-                lines.Add(Loc.T("hud.freecamHint"));
+                string context = BuildHudContext(p, player, hasStamp, clipboard.Count);
+                Color contextColor = (!_serverAllowed || !_wardOk) ? TerrainTheme.Danger :
+                    _adjustMode || hasStamp || _pastePreview ? TerrainTheme.GoldBright : TerrainTheme.TextDim;
+                _hudSmall.normal.textColor = contextColor;
+                GUI.Label(new Rect(x + 16f, panel.y + height - 27f, width - 32f, 20f), context, _hudSmall);
             }
+            _hud.normal.textColor = Color.white;
+            _hudTitle.normal.textColor = TerrainTheme.TextWhite;
+            _hudSmall.normal.textColor = TerrainTheme.TextDim;
+            _hudRight.normal.textColor = TerrainTheme.GoldBright;
+        }
 
-            float margin = 12f;
-            float bottom = Screen.height - margin;
-            Color prevText = _hud.normal.textColor;
-            for (int li = lines.Count - 1; li >= 0; li--)
+        private string BuildHudContext(TerrainForgePlugin p, Player player, bool hasStamp, int stampCount)
+        {
+            if (!_serverAllowed) return Loc.T("hud.blocked");
+            if (!_wardOk) return Loc.T("hud.ward");
+            if (!string.IsNullOrEmpty(_flashMsg) && Time.time < _flashUntil) return _flashMsg;
+            if (_adjustMode) return Loc.T("hud.adjust");
+            if (_pastePreview) return Loc.T("hud.stampPasteHint");
+            if (p.DefaultOperation.Value == TerrainOperation.CopyPaste)
             {
-                string txt = lines[li];
-                if (li == 0)
-                    _hud.normal.textColor = mainColor;
-                else if (li == stampIdx)
-                    _hud.normal.textColor = stampColor;
-                else if (li == freeCamIdx)
-                    _hud.normal.textColor = TerrainTheme.GoldBright;
-                else
-                    _hud.normal.textColor = Color.white;
-
-                Vector2 sz = _hud.CalcSize(new GUIContent(txt));
-                float w = Mathf.Min(Mathf.Max(320f, sz.x + 28f), Mathf.Max(200f, Screen.width - 24f));
-                float h = Mathf.Max(30f, sz.y + 12f);
-                var rect = new Rect(Screen.width - w - margin, bottom - h, w, h);
-
-                GUI.color = new Color(0f, 0f, 0f, 0.55f);
-                GUI.DrawTexture(rect, _hudBg);
-                GUI.color = prev;
-
-                GUI.Label(new Rect(rect.x + 8f, rect.y, rect.width - 20f, rect.height), txt, _hud);
-                bottom = rect.y - 4f;
+                switch (p.Shape.Value)
+                {
+                    case TerrainShape.Rect: return Loc.T(_rectHasA ? "hud.copy.rectB" : "hud.copy.rectA");
+                    case TerrainShape.Line: return Loc.T(_lineHasA ? "hud.copy.lineB" : "hud.copy.lineA");
+                    case TerrainShape.Poly: return Loc.F("hud.copy.poly", _polyPoints.Count);
+                    default: return Loc.T("hud.copy.circle");
+                }
             }
-            _hud.normal.textColor = prevText;
+            if (hasStamp) return Loc.T("hud.stampReady") + "  ·  " + stampCount;
+            if (p.DefaultOperation.Value == TerrainOperation.Ramp)
+                return p.RampMode.Value == RampMode.Path ? Loc.F("hud.path.mark", _rampPath.Count) : Loc.T("hud.rampA");
+            switch (p.Shape.Value)
+            {
+                case TerrainShape.Line: return Loc.T("hud.line.mark");
+                case TerrainShape.Rect: return Loc.T("hud.rect.mark");
+                case TerrainShape.Poly: return Loc.F("hud.poly.mark", _polyPoints.Count);
+                default: return Loc.T("hud.freecamHint");
+            }
+        }
+
+        private static string ShapeLabel(TerrainShape shape)
+        {
+            switch (shape)
+            {
+                case TerrainShape.Circle: return Loc.T("shape.circle");
+                case TerrainShape.Square: return Loc.T("shape.square");
+                case TerrainShape.Line: return Loc.T("shape.line");
+                case TerrainShape.Rect: return Loc.T("shape.rect");
+                case TerrainShape.Poly: return Loc.T("shape.poly");
+                default: return shape.ToString();
+            }
+        }
+
+        private void DrawAimBadge(TerrainForgePlugin p)
+        {
+            Camera cam = Camera.main;
+            if (cam == null || _aimPoint == Vector3.zero) return;
+            Vector3 screen = cam.WorldToScreenPoint(_aimPoint);
+            if (screen.z <= 0f) return;
+            float x = Mathf.Clamp(screen.x + 22f, 8f, Screen.width - 150f);
+            float y = Mathf.Clamp(Screen.height - screen.y - 48f, 8f, Screen.height - 48f);
+            var rect = new Rect(x, y, 142f, 34f);
+            GUI.color = Color.white;
+            GUI.DrawTexture(rect, _hudBg);
+            GUI.color = BrushColor(p);
+            GUI.DrawTexture(new Rect(x + 5f, y + 3f, 28f, 28f), TerrainUiIcons.Op(p.DefaultOperation.Value), ScaleMode.ScaleToFit, true);
+            GUI.color = Color.white;
+            _hud.normal.textColor = TerrainTheme.TextWhite;
+            GUI.Label(new Rect(x + 38f, y, 98f, 34f), Loc.OpName(p.DefaultOperation.Value), _hud);
+            _hud.normal.textColor = Color.white;
+        }
+
+        private void DrawHudSurface(Rect rect, Color accent)
+        {
+            GUI.color = new Color(0f, 0f, 0f, 0.68f);
+            GUI.DrawTexture(new Rect(rect.x + 3f, rect.y + 4f, rect.width, rect.height), _hudBg);
+            GUI.color = new Color(TerrainTheme.PanelDark.r, TerrainTheme.PanelDark.g, TerrainTheme.PanelDark.b, 0.96f);
+            GUI.DrawTexture(rect, _hudBg);
+            GUI.color = accent;
+            GUI.DrawTexture(new Rect(rect.x, rect.y, 3f, rect.height), _hudBg);
+            GUI.color = Color.white;
         }
 
         private string BuildInfoLine()
@@ -1805,12 +1899,11 @@ namespace TerrainForge
             Font font = GameFont();
 
             // Valheim HUD colors
-            Color valheimDark = new Color(0.05f, 0.05f, 0.06f, 0.9f);
             Color valheimGold = new Color(0.95f, 0.82f, 0.25f, 1f);
             Color valheimTextWhite = new Color(0.92f, 0.90f, 0.85f, 1f);
 
             _hudBg = new Texture2D(1, 1);
-            _hudBg.SetPixel(0, 0, valheimDark);
+            _hudBg.SetPixel(0, 0, Color.white);
             _hudBg.Apply();
             _hudBg.hideFlags = HideFlags.HideAndDontSave;
 
@@ -1818,10 +1911,29 @@ namespace TerrainForge
             {
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleRight,
+                alignment = TextAnchor.MiddleLeft,
                 font = font
             };
             _hud.normal.textColor = valheimTextWhite;
+
+            _hudTitle = new GUIStyle(_hud)
+            {
+                fontSize = 17,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleLeft
+            };
+            _hudSmall = new GUIStyle(_hud)
+            {
+                fontSize = 11,
+                fontStyle = FontStyle.Normal,
+                alignment = TextAnchor.MiddleLeft
+            };
+            _hudRight = new GUIStyle(_hud)
+            {
+                fontSize = 15,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleRight
+            };
 
             _banner = new GUIStyle(GUI.skin.label)
             {

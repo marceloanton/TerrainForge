@@ -9,12 +9,13 @@ Planned direction for TerrainForge. Order and scope may change; done items ship 
 ## Done
 
 ### 0.3.x — Brush & UI foundation
-- Free-form terrain brush (Flatten, Raise, Lower, Smooth, Ramp, Shore, Paint, Restore, Snow) beyond the vanilla ±8 m limit.
+- Free-form terrain brush (Flatten, Raise, Lower, Smooth, Ramp, Shore, Paint, Restore) beyond the vanilla ±8 m limit; Snow is a Paint type (`DeepSnow`).
 - 5 brush shapes: Circle, Square, Line, Rect, Polygon.
 - 3 falloff modes (Two-point, Fixed-angle, Path) and configurable Shore falloff.
 - Undo / Redo and terrain **snapshots** (full backup / restore).
 - **Terrain stamps** (copy / paste) with an on-disk library and preview.
-- **Rectangle selection stamp (A→B)** — copy exactly the marked rectangle, cropped to the vertex level.
+- **Dedicated Copy/Paste Q-wheel mode** — select a rectangle, line, polygon, circle, or square footprint, then preview and place terrain stamps.
+- **F5 menu improvements** — six-tab layout, responsive sizing, dimmed background, and frozen local player/camera controls while open.
 - Valheim-native UI (Averia typeface, Valheim palette), radial menu (`Q`), keybind remapping (`F5`), persistent HUD.
 - Slope heatmap (`H`) and height heatmap (`J`).
 - Brush profiles and presets.

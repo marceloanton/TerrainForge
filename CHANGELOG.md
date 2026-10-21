@@ -2,11 +2,32 @@
 
 ---
 
+## [0.3.6] - 2026-10-17
+
+### UI
+- Opening the F5 panel now freezes local player input and camera look, dims the game behind the panel, and opens at a larger resolution-aware size.
+- Added a dedicated **Copy / Paste** brush mode to the Q wheel; Apply selects the area according to the active shape, while the configured paste shortcut opens or confirms the placement preview. Its HUD identifies the mode separately from Paint.
+- Copy mode now honors the selected shape: mark two corners for Rectangle, endpoints for Line, or vertices for Polygon; Circle/Square copy the aimed brush footprint. The HUD shows the next selection step.
+- Folded Snow into Paint as the DeepSnow paint type; the existing height modifier still removes snow. Existing configs that selected Snow migrate to Paint + DeepSnow.
+- Added a dedicated Copy/Paste tab with visible terrain copy, paste-preview/confirm, clipboard history, and saved-stamp controls; copy/paste buttons close the menu so the requested world action can run immediately.
+- Reused the F5 operation glyphs in the Q radial wheel, selected-operation hub, and an in-world aim badge.
+- Replaced the long, crowded status text with a compact TerrainForge card showing operation, radius, shape, target height, undo/redo, and only relevant contextual status.
+- Kept permission and server warnings visible with a distinct alert color.
+- Free camera now clamps its height above sampled terrain, preventing downward flight through the world while preserving aim toward lower terrain.
+
+### Changed
+- TerrainForge now registers its own TerrainForge Rod prefab with Harmony. Jotunn is no longer required.
+- Removed Jotunn from the Thunderstore dependencies; BepInEx is the only required mod dependency.
+- Fixed plugin metadata to report version 0.3.6 consistently.
+- Re-register the rod for each ObjectDB instance and retry network-prefab registration after ObjectDB is populated, covering startup-order and world reloads.
+- Verify ObjectDB indexing and network-prefab insertion; report failures instead of silently claiming registration succeeded.
+- Revalidate the rod against the live ObjectDB during gameplay so later database rebuilds by other mods cannot leave auto-give using a stale registration state.
+
 ## [0.3.5] - 2026-10-17
 
 ### Added
 
-- **Terrain stamps — rectangle selection copy**: mark corner A with the Rectangle shape, aim at corner B and press `Ctrl+Shift+C` to copy exactly that rectangle, cropped to the vertex level (no whole-tile blocks or surrounding untouched terrain). Pasting only writes inside the copied region.
+- **Terrain stamps — dedicated shape selection**: select Circle, Square, Line, Rectangle, or Polygon in the Q-wheel Copy/Paste mode; the HUD guides the selection. Paste uses a movable preview and explicit confirmation.
 - **Free camera (`F`) reworked**: while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments keep priority over free-fly input; on-screen banner shows the fly distance.
 
 ### Changed
@@ -116,7 +137,7 @@
 
 ### Added
 - Free brush: **Flatten**, **Raise**, **Lower**, **Smooth**, **Ramp**, **Paint**, **Restore** under the crosshair. Flatten follows the aimed height (Shift = level at your feet); Smooth averages neighbours.
-- **TerrainForge Rod** (Hammer clone): auto-given/equipped on join, give key `F8`. Registered via Jotunn.
+- **TerrainForge Rod** (Hammer clone): auto-given/equipped on join, give key `F8`.
 - **Two-point ramp**: click A, click B → a straight slope joins both heights (radius = ramp width). A wide, flat corridor with a soft edge (softness = lateral blend).
 - Configurable brush radius (60 m), **shape** (circle/square), **paint** cyclable in-game.
 - **Live preview**: a solid ring = the real area; faint guides in the operation color = full-strength zone, max radius, max aim distance. For Ramp: the real A–B corridor (both edges). Guides toggleable via `Preview > ShowGuides`. Top-left HUD (op, radius, shape, paint).
@@ -128,4 +149,3 @@
 
 ### Notes
 - Edits persist via the `TerrainComp` ZDO and replicate through the server → **required on both client and server**.
-- Principle: minimal dependencies. The tool uses Jotunn for now; a future version will register the prefab via Harmony so Jotunn is not needed.

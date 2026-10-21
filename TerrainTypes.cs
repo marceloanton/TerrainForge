@@ -14,7 +14,8 @@ namespace TerrainForge
         Restore,
         Ramp,
         Shore,
-        Snow
+        Snow,
+        CopyPaste
     }
 
     public enum SmoothMode
