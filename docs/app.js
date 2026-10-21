@@ -39,3 +39,26 @@ try {
 const browserLanguage = navigator.language?.toLowerCase() || '';
 const initialLanguage = savedLanguage || (browserLanguage.startsWith('en') ? 'en' : 'es');
 setLanguage(initialLanguage);
+
+const imageViewer = document.querySelector('#image-viewer');
+if (imageViewer) {
+  const viewerImage = imageViewer.querySelector('img');
+  const viewerCaption = imageViewer.querySelector('p');
+  const closeViewer = imageViewer.querySelector('.image-viewer-close');
+
+  document.querySelectorAll('.screenshot-open').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const language = document.documentElement.lang === 'en' ? 'en' : 'es';
+      viewerImage.src = link.href;
+      viewerImage.alt = link.querySelector('img')?.alt || '';
+      viewerCaption.textContent = link.dataset[`caption${language === 'en' ? 'En' : 'Es'}`] || '';
+      imageViewer.showModal();
+    });
+  });
+
+  closeViewer.addEventListener('click', () => imageViewer.close());
+  imageViewer.addEventListener('click', (event) => {
+    if (event.target === imageViewer) imageViewer.close();
+  });
+}
