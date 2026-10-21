@@ -7,7 +7,16 @@
 
 ### Novedades de TerrainForge 0.3.6
 
-> El wheel Q tiene un modo propio de Copiar/Pegar. Rectángulo marca A y B con Aplicar; Línea marca dos extremos; Polígono suma vértices y copia con doble pulso tras 3+ puntos; Círculo/Cuadrado copian la huella de la brocha. El HUD indica el paso siguiente. Nieve está en Pintar > DeepSnow (mantener Shift para quitarla). F5 congela el movimiento y la cámara local; Esc pausa todo el mundo en una partida individual. 0.3.6: F5 organiza las pestañas en dos filas y muestra controles según la operación. Ramp expone Dos Puntos, Ángulo Fijo y Conectada; la rampa circular queda planificada para 0.4.0.
+- **Menú F5:** pestañas organizadas en dos filas, tamaño adaptable a la pantalla y controles contextuales según la operación.
+- **Rampa:** panel propio con Dos Puntos, Ángulo Fijo y Rampa Conectada, además de ancho, suavidad y ángulo donde corresponde.
+- **Copiar/Pegar:** modo exclusivo en el wheel Q. Permite seleccionar con Rectángulo, Línea, Polígono, Círculo o Cuadrado y luego previsualizar y colocar el stamp. El HUD indica el paso siguiente.
+- **Pintura y cámara:** la nieve está en Pintar > DeepSnow; la cámara libre se mantiene sobre el terreno al descender.
+- **Dependencias:** TerrainForge registra su propia varita; ya no requiere Jotunn.
+
+### Roadmap de la 0.4.0
+
+- Estamos explorando rampas circulares en dos variantes: un anillo o terraza a nivel, y una espiral conectada que sube o baja alrededor de un centro.
+- También están previstos un fantasma de colocación de blueprints con ajuste a grilla, una vista de contornos mejorada para stamps y un HUD de medición de distancia, área y pendiente. Los detalles pueden cambiar después de prototipar.
 
 ## Índice
 
@@ -80,7 +89,7 @@
 | Abrir menú | `F5` | Abre el menú de teclas/ayuda/ajustes |
 
 **Teclas extra (sin default, asígnalas en TECLAS):**
-- Operación directa: Aplanar, Subir, Bajar, Suavizar, Pintar, Restaurar, Rampa, Costa, Nieve
+- Operación directa: Aplanar, Subir, Bajar, Suavizar, Pintar, Restaurar, Rampa, Costa. La tecla heredada de Nieve selecciona Pintar + DeepSnow.
 - Siguiente / anterior perfil
 - Siguiente / anterior stamp (historial)
 
@@ -96,7 +105,7 @@
 | **Subir** | Eleva el terreno `RaiseDelta` por aplicación. El modo de caída le da forma. |
 | **Bajar** | Baja el terreno `RaiseDelta` por aplicación. El modo de caída le da forma. |
 | **Suavizar** | Blur real: promedia cada vértice con sus 8 vecinos. Mantén para progresivo. **Modos:** Completo (ambos), Solo Lomos (baja), Solo Hoyos (sube). Forma Línea = suaviza un camino. |
-| **Rampa** | **3 modos** (cicla `H`):<br>• **Dos Puntos**: marca A y B → una pendiente recta une las alturas.<br>• **Ángulo Fijo**: B = dirección/largo; altura = `SlopeAngle` (sube/baja según la mira). Ajusta con `Alt`+radio.<br>• **Senda**: marca una curva A→B→C… (doble-pulso con 3+ cierra) → Catmull-Rom suave.<br>Ancho = radio de la brocha. Suavidad = blend solo en los bordes laterales. Preview: corredor relleno + anillos de altura en A/B. |
+| **Rampa** | **3 modos** (cicla `H`):<br>• **Dos Puntos**: marca A y B → una pendiente recta une las alturas.<br>• **Ángulo Fijo**: B = dirección/largo; altura = `SlopeAngle` (sube/baja según la mira). Ajusta con `Alt`+radio.<br>• **Conectada**: marca 3+ puntos A→B→C… para crear una rampa continua y suave.<br>Ancho = radio de la brocha. Suavidad = blend solo en los bordes laterales. Preview: corredor relleno + anillos de altura en A/B. |
 | **Costa** | Aplana hacia el nivel del agua + margen `ShoreOffset` (playas). Suavidad como Aplanar. |
 | **Pintar** | Tipos: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Fuerza ajustable. |
 | **Restaurar** | Devuelve el terreno a su estado original (altura + pintura). |

@@ -5,9 +5,18 @@
 ---
 
 
-### TerrainForge 0.3.6 update
+### What's new in TerrainForge 0.3.6
 
-> The Q wheel has a dedicated Copy/Paste mode. Rectangle marks corners A/B with Apply; Line marks endpoints; Polygon adds vertices and copies on a double-press after 3+ points; Circle/Square copy the brush footprint. The HUD shows the next step. Snow is Paint > DeepSnow (hold Shift to clear). F5 freezes local movement and camera look; use ESC to pause the whole single-player world. 0.3.6: F5 now groups tabs into two rows and shows controls for the selected operation. Ramp exposes Two-Point, Fixed-Angle, and Connected; circular ramps are planned for 0.4.0.
+- **F5 menu:** reorganized into two tab rows, adapts to screen size, and shows controls for the selected operation.
+- **Ramp:** the dedicated panel exposes Two-Point, Fixed-Angle, and Connected Path modes with width, softness, and angle controls.
+- **Copy/Paste:** a dedicated Q-wheel mode lets you select terrain with Rectangle, Line, Polygon, Circle, or Square, then preview and place a stamp. The HUD shows the next selection step.
+- **Paint and camera:** Snow is available as Paint > DeepSnow, and the free camera stays above terrain while descending.
+- **Dependencies:** TerrainForge registers its own rod; Jotunn is no longer required.
+
+### Roadmap for 0.4.0
+
+- Circular ramps are being explored as a level ring/terrace or a connected spiral that gains or loses height around a center.
+- Other planned tools include a blueprint placement ghost with grid snapping, improved stamp contour previews, and a live distance/area/slope measurement HUD. Details may change after prototyping.
 
 ## Table of Contents
 
@@ -96,7 +105,7 @@
 | **Raise** | Raises terrain by `RaiseDelta` per application. The falloff mode shapes it. |
 | **Lower** | Lowers terrain by `RaiseDelta` per application. The falloff mode shapes it. |
 | **Smooth** | Real blur: averages each vertex with its 8 neighbours. Hold for progressive. **Modes:** Full (both), Ridges only (lowers), Dips only (raises). Line shape = smooth a path. |
-| **Ramp** | **3 modes** (cycle `H`):<br>• **Two-Point**: mark A and B → a straight slope joins the heights.<br>• **Fixed-Angle**: B = direction/length; height = `SlopeAngle` (up/down according to the crosshair). Adjust with `Alt`+radius.<br>• **Path**: mark a curve A→B→C… (double-press with 3+ closes) → smooth Catmull-Rom.<br>Width = brush radius. Softness = blend on the side edges only. Preview: filled corridor + height rings at A/B. |
+| **Ramp** | **3 modes** (cycle `H`):<br>• **Two-Point**: mark A and B → a straight slope joins the heights.<br>• **Fixed-Angle**: B = direction/length; height = `SlopeAngle` (up/down according to the crosshair). Adjust with `Alt`+radius.<br>• **Connected Path**: mark 3+ points A→B→C… to build one continuous smooth ramp.<br>Width = brush radius. Softness = blend on the side edges only. Preview: filled corridor + height rings at A/B. |
 | **Shore** | Flattens toward the water level + `ShoreOffset` margin (beaches). Softness like Flatten. |
 | **Paint** | Types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Adjustable strength. |
 | **Restore** | Returns the terrain to its original state (height + paint). |
