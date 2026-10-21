@@ -7,7 +7,7 @@
 
 ### Nouveautés TerrainForge 0.3.6
 
-> La roue Q propose un mode Copier/Coller dédié. Rectangle marque A/B avec Appliquer ; Ligne marque deux extrémités ; Polygone ajoute des sommets et copie par double pression après 3 points ; Cercle/Carré copie l’empreinte du pinceau. Le HUD indique l’étape suivante. La neige est dans Peinture > DeepSnow (maintenez Maj pour l’enlever). F5 bloque les déplacements et la caméra locale ; Échap met en pause tout le monde en solo.
+> La roue Q propose un mode Copier/Coller dédié. Rectangle marque A/B avec Appliquer ; Ligne marque deux extrémités ; Polygone ajoute des sommets et copie par double pression après 3 points ; Cercle/Carré copie l’empreinte du pinceau. Le HUD indique l’étape suivante. La neige est dans Peinture > DeepSnow (maintenez Maj pour l’enlever). F5 bloque les déplacements et la caméra locale ; Échap met en pause tout le monde en solo. 0.3.6 : F5 répartit les onglets sur deux lignes et n’affiche que les commandes utiles à l’opération. Ramp propose Deux points, Angle fixe et Connectée ; la rampe circulaire est prévue pour la 0.4.0.
 
 ## Sommaire
 

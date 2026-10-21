@@ -12,6 +12,9 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 
 ## What's New in 0.3.6
 
+- **F5 layout refined** — six tabs use two clear rows; the window opens larger and adapts to the screen. Controls are grouped by the selected operation.
+- **Ramp tools surfaced** — the Ramp panel puts Two-Point, Fixed-Angle, and Connected Path modes up front, with width, softness, and fixed-angle controls where relevant. The Connected mode marks a continuous ramp through 3+ points.
+- **Circular ramp planned for 0.4.0** — the roadmap tracks a level circular ring and a height-changing spiral as candidate designs.
 - **Unified operation UI** — F5 glyphs now appear in the Q wheel, beside the terrain target, and in a compact HUD card with key brush status.
 - **Dedicated Copy/Paste tab** — copy a marked area, start/confirm a paste preview, cycle clipboard history, and manage saved stamps from one visible place in F5.
 - **Dedicated Copy / Paste brush mode** in the Q wheel; Apply selects the area according to the active shape, and the configured paste shortcut starts or confirms placement. Snow is available as DeepSnow under Paint, including the existing hold-to-clear modifier.
@@ -19,7 +22,7 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 - F5 holds local player controls and camera still, dims the world, and uses a resolution-aware window. The ESC menu still pauses the whole world in single-player.
 - **Free camera safeguard** — flying camera is kept above terrain so descending controls cannot take it underneath the map.
 - TerrainForge now registers and synchronizes its own TerrainForge Rod. **Jotunn is no longer required.**
-- The rod registration is repeated for rebuilt world databases, and network registration is retried after the item database is ready. Plugin, project, and Thunderstore versions are aligned at 0.3.6.
+- The rod registration is repeated for rebuilt world databases, and network registration is retried after the item database is ready. Plugin, project, and Thunderstore versions were aligned at 0.3.6.
 - The live ObjectDB is also revalidated during gameplay to recover if another mod rebuilds its item index after TerrainForge's initial registration.
 
 - **Free camera (`F`) fixed** — while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments take priority.
@@ -79,7 +82,7 @@ While aiming, a solid ring marks the real brush area, with faint guides in the o
 | Undo last stroke | `Ctrl+Z` |
 | Redo undone stroke | `Ctrl+Y` |
 | Fix / release Flatten height (eyedropper) | `G` |
-| Cycle ramp mode (two-point / fixed-angle / path) | `H` |
+| Cycle ramp mode (two-point / fixed-angle / connected path) | `H` |
 | Adjust fixed-ramp angle (with Ramp selected) | Hold `Alt` + radius keys / wheel |
 | Radial operation menu (hold, release to confirm) | `Q` |
 | Adjust mode (wheel = radius, zoom frozen) | `V` |
@@ -105,7 +108,7 @@ The nine Q wheel modes are `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint
 - **Flatten** — follows the ground **under the crosshair** by default and adapts to what you aim at (e.g. a ramp). Hold `Left Shift` to level at your feet.
 - **Raise / Lower** — raise or lower terrain according to the falloff mode and power.
 - **Smooth** — averages each point with its neighbours (a real blur), smoothing ridges, steps and noise. Hold to smooth progressively. Modes: `Full` (both ways), `Ridges only` (lowers only), `Dips only` (fills only). Shape Line + Smooth = smooth along a path.
-- **Ramp** — three modes (`H`): **two-point** (mark **A** and **B**, joins both heights with a straight slope), **fixed-angle** (**B** gives direction and length, height follows `Ramp angle`, adjustable with `Alt` + radius), and **path** (mark a curve **A→B→C…**, double-press to close). The brush radius sets the ramp width and softness only softens the side edges. Preview: filled semi-transparent corridor + height rings at A and B.
+- **Ramp** — three modes (`H`): **two-point** (mark **A** and **B**, joins both heights with a straight slope), **fixed-angle** (**B** gives direction and length, height follows `Ramp angle`, adjustable with `Alt` + radius), and **connected path** (mark 3+ points for one continuous curve **A→B→C…**, then double-press to build it). The brush radius sets the ramp width and softness only softens the side edges. Preview: filled semi-transparent corridor + height rings at A and B.
 - **Shore** — flattens toward the water level + margin (beaches/coastlines), with softness blending like Flatten.
 - **Paint** — types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.
 - **Restore** — returns the terrain to its original state.

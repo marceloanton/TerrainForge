@@ -22,7 +22,7 @@ namespace TerrainForge
         private int _capturing = -1;
         private int _tab;
         private Vector2 _mainScroll;
-        private Rect _window = new Rect(40f, 60f, 760f, 620f);
+        private Rect _window = new Rect(40f, 60f, 900f, 720f);
 
         private bool _cursorWasVisible;
         private CursorLockMode _cursorLock;
@@ -219,10 +219,8 @@ namespace TerrainForge
 
             if (open)
             {
-                _window.width = Mathf.Clamp(Screen.width * 0.78f, 680f, 980f);
-                _window.height = Mathf.Clamp(Screen.height * 0.82f, 540f, 820f);
-                _window.width = Mathf.Min(_window.width, Screen.width - 24f);
-                _window.height = Mathf.Min(_window.height, Screen.height - 24f);
+                _window.width = Mathf.Min(Mathf.Clamp(Screen.width * 0.9f, 720f, 1100f), Screen.width - 24f);
+                _window.height = Mathf.Min(Mathf.Clamp(Screen.height * 0.9f, 600f, 900f), Screen.height - 24f);
                 _window.x = (Screen.width - _window.width) * 0.5f;
                 _window.y = (Screen.height - _window.height) * 0.5f;
                 _cursorWasVisible = Cursor.visible;
@@ -260,8 +258,8 @@ namespace TerrainForge
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
 
-            _window.width = Mathf.Clamp(_window.width, Mathf.Min(560f, Screen.width - 16f), Mathf.Max(560f, Screen.width - 16f));
-            _window.height = Mathf.Clamp(_window.height, Mathf.Min(440f, Screen.height - 16f), Mathf.Max(440f, Screen.height - 16f));
+            _window.width = Mathf.Clamp(_window.width, Mathf.Min(620f, Screen.width - 16f), Mathf.Max(620f, Screen.width - 16f));
+            _window.height = Mathf.Clamp(_window.height, Mathf.Min(500f, Screen.height - 16f), Mathf.Max(500f, Screen.height - 16f));
             _window.x = Mathf.Clamp(_window.x, 8f, Mathf.Max(8f, Screen.width - _window.width - 8f));
             _window.y = Mathf.Clamp(_window.y, 8f, Mathf.Max(8f, Screen.height - _window.height - 8f));
 
@@ -288,20 +286,9 @@ namespace TerrainForge
 
             GUILayout.Space(8f);
 
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_tab == 0, Loc.T("tab.tool"), _tabStyle, GUILayout.Height(30f)))
-                SelectTab(0);
-            if (GUILayout.Toggle(_tab == 1, Loc.T("tab.keys"), _tabStyle, GUILayout.Height(30f)))
-                SelectTab(1);
-            if (GUILayout.Toggle(_tab == 2, Loc.T("tab.advanced"), _tabStyle, GUILayout.Height(30f)))
-                SelectTab(2);
-            if (GUILayout.Toggle(_tab == 3, Loc.T("tab.settings"), _tabStyle, GUILayout.Height(30f)))
-                SelectTab(3);
-            if (GUILayout.Toggle(_tab == 4, Loc.T("tab.help"), _tabStyle, GUILayout.Height(30f)))
-                SelectTab(4);
-            if (GUILayout.Toggle(_tab == 5, Loc.T("tab.stamps"), _tabStyle, GUILayout.Height(30f)))
-                SelectTab(5);
-            GUILayout.EndHorizontal();
+            DrawTabRow(0, 1, 2);
+            GUILayout.Space(4f);
+            DrawTabRow(3, 4, 5);
 
             GUILayout.Space(10f);
 
@@ -361,6 +348,22 @@ namespace TerrainForge
             _mainScroll = Vector2.zero;
         }
 
+        private void DrawTabRow(int first, int second, int third)
+        {
+            int[] tabs = { first, second, third };
+            string[] keys = { "tab.tool", "tab.keys", "tab.advanced", "tab.settings", "tab.help", "tab.stamps" };
+            float width = Mathf.Max(80f, (_window.width - 52f) / 3f);
+            GUILayout.BeginHorizontal();
+            for (int i = 0; i < tabs.Length; i++)
+            {
+                int tab = tabs[i];
+                if (GUILayout.Toggle(_tab == tab, Loc.T(keys[tab]), _tabStyle,
+                    GUILayout.Width(width), GUILayout.Height(32f)))
+                    SelectTab(tab);
+            }
+            GUILayout.EndHorizontal();
+        }
+
         private void DrawResizeGrip()
         {
             var grip = new Rect(_window.width - 22f, _window.height - 22f, 22f, 22f);
@@ -377,8 +380,8 @@ namespace TerrainForge
             }
             else if (_resizing && e.type == EventType.MouseDrag)
             {
-                _window.width = Mathf.Clamp(_window.width + e.delta.x, 560f, Screen.width - 30f);
-                _window.height = Mathf.Clamp(_window.height + e.delta.y, 440f, Screen.height - 30f);
+                _window.width = Mathf.Clamp(_window.width + e.delta.x, Mathf.Min(620f, Screen.width - 30f), Screen.width - 30f);
+                _window.height = Mathf.Clamp(_window.height + e.delta.y, Mathf.Min(500f, Screen.height - 30f), Screen.height - 30f);
                 e.Use();
             }
             else if (_resizing && e.type == EventType.MouseUp)
@@ -397,41 +400,98 @@ namespace TerrainForge
             SettingHeader(Loc.T("set.operation"));
             DrawOpPicker(p);
 
+            if (p.DefaultOperation.Value == TerrainOperation.Ramp)
+            {
+                DrawRampToolControls(p);
+                return;
+            }
+
+            if (p.DefaultOperation.Value == TerrainOperation.CopyPaste)
+            {
+                DrawCopyPasteToolControls(p);
+                return;
+            }
+
             SettingHeader(Loc.T("set.shape"));
             DrawShapePicker(p);
 
-            SettingHeader(Loc.T("set.paint"));
-            CycleRow(Loc.T("set.paint"), p.Paint.Value.ToString(), () =>
+            if (p.DefaultOperation.Value == TerrainOperation.Paint)
             {
-                p.Paint.Value = (TerrainPaint)(((int)p.Paint.Value + 1) % 6);
-            });
-            SegmentedRow(Loc.T("set.rampmode"),
-                new[] { Loc.T("rampmode.two"), Loc.T("rampmode.fixed"), Loc.T("rampmode.path") },
-                (int)p.RampMode.Value,
-                i => { p.RampMode.Value = (RampMode)i; TerrainBrush.RequestClearMarks(); });
-            CycleRow(Loc.T("set.smoothmode"), SmoothModeText(p.SmoothMode.Value), () =>
+                SettingHeader(Loc.T("set.paint"));
+                CycleRow(Loc.T("set.paint"), p.Paint.Value.ToString(), () =>
+                {
+                    p.Paint.Value = (TerrainPaint)(((int)p.Paint.Value + 1) % 6);
+                });
+            }
+            else if (p.DefaultOperation.Value == TerrainOperation.Smooth)
             {
-                p.SmoothMode.Value = (SmoothMode)(((int)p.SmoothMode.Value + 1) % 3);
-            });
-            CycleRow(Loc.T("set.falloff"), FalloffModeText(p.FalloffMode.Value), () =>
-            {
-                p.FalloffMode.Value = (FalloffMode)(((int)p.FalloffMode.Value + 1) % 4);
-            });
+                CycleRow(Loc.T("set.smoothmode"), SmoothModeText(p.SmoothMode.Value), () =>
+                {
+                    p.SmoothMode.Value = (SmoothMode)(((int)p.SmoothMode.Value + 1) % 3);
+                });
+            }
 
             SettingHeader(Loc.T("set.sizes"));
             FloatSlider(Loc.T("set.radius"), p.Radius, 1f, 100f, "0.#");
             FloatSlider(Loc.T("set.softness"), p.Softness, 0f, 100f, "0");
-            FloatSlider(Loc.T("set.angle"), p.SlopeAngle, 5f, 60f, "0");
-            FloatSlider(Loc.T("set.raisedelta"), p.RaiseDelta, 0.5f, 10f, "0.#");
-            FloatSlider(Loc.T("set.paintstrength"), p.PaintStrength, 0f, 1f, "0.00");
-            FloatSlider(Loc.T("set.falloff"), p.FalloffPower, 1f, 5f, "0.#");
-            FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
-            CycleRow(Loc.T("set.shorefalloff"), ShoreFalloffModeText(p.ShoreFalloffMode.Value), () =>
-            {
-                p.ShoreFalloffMode.Value = (ShoreFalloffMode)(((int)p.ShoreFalloffMode.Value + 1) % 4);
-            });
 
-            DrawFixedHeight(p);
+            if (p.DefaultOperation.Value == TerrainOperation.Flatten)
+                DrawFixedHeight(p);
+            else if (p.DefaultOperation.Value == TerrainOperation.Raise ||
+                     p.DefaultOperation.Value == TerrainOperation.Lower)
+            {
+                CycleRow(Loc.T("set.falloff"), FalloffModeText(p.FalloffMode.Value), () =>
+                {
+                    p.FalloffMode.Value = (FalloffMode)(((int)p.FalloffMode.Value + 1) % 4);
+                });
+                FloatSlider(Loc.T("set.raisedelta"), p.RaiseDelta, 0.5f, 10f, "0.#");
+                FloatSlider(Loc.T("set.falloffpower"), p.FalloffPower, 1f, 5f, "0.#");
+            }
+            else if (p.DefaultOperation.Value == TerrainOperation.Shore)
+            {
+                FloatSlider(Loc.T("set.shoreoffset"), p.ShoreOffset, -2f, 5f, "0.#");
+                CycleRow(Loc.T("set.shorefalloff"), ShoreFalloffModeText(p.ShoreFalloffMode.Value), () =>
+                {
+                    p.ShoreFalloffMode.Value = (ShoreFalloffMode)(((int)p.ShoreFalloffMode.Value + 1) % 4);
+                });
+            }
+        }
+
+        private void DrawRampToolControls(TerrainForgePlugin p)
+        {
+            SettingHeader(Loc.T("set.rampmode"));
+            var modes = new[] { RampMode.TwoPoint, RampMode.FixedAngle, RampMode.Path };
+            string[] labels = { Loc.T("rampmode.two"), Loc.T("rampmode.fixed"), Loc.T("rampmode.path") };
+            float modeWidth = Mathf.Max(100f, (_window.width - 52f) / modes.Length);
+            GUILayout.BeginHorizontal();
+            for (int i = 0; i < modes.Length; i++)
+            {
+                int index = i;
+                if (GUILayout.Toggle(p.RampMode.Value == modes[i], labels[i], _tabStyle,
+                    GUILayout.Width(modeWidth), GUILayout.Height(38f)) && p.RampMode.Value != modes[i])
+                {
+                    p.RampMode.Value = modes[index];
+                    TerrainBrush.RequestClearMarks();
+                }
+            }
+            GUILayout.EndHorizontal();
+
+            SettingHeader(Loc.T("set.ramp.tools"));
+            if (p.RampMode.Value == RampMode.FixedAngle)
+                FloatSlider(Loc.T("set.angle"), p.SlopeAngle, 5f, 60f, "0");
+            FloatSlider(Loc.T("set.ramp.width"), p.Radius, 1f, 100f, "0.#");
+            FloatSlider(Loc.T("set.softness"), p.Softness, 0f, 100f, "0");
+            GUILayout.Label(Loc.T("set.ramp.hint"), _hintStyle);
+        }
+
+        private void DrawCopyPasteToolControls(TerrainForgePlugin p)
+        {
+            SettingHeader(Loc.T("set.shape"));
+            DrawShapePicker(p);
+            SettingHeader(Loc.T("set.sizes"));
+            FloatSlider(Loc.T("set.radius"), p.Radius, 1f, 100f, "0.#");
+            FloatSlider(Loc.T("set.softness"), p.Softness, 0f, 100f, "0");
+            GUILayout.Label(Loc.T("set.copy.hint"), _hintStyle);
 
         }
 

@@ -2,11 +2,20 @@
 
 ---
 
-## [0.3.6] - 2026-10-17
+## [0.3.6] - 2026-10-21
+
+### Fixed
+- Reworked the F5 panel layout: tabs are split into two rows, window sizing follows screen dimensions, and each operation only shows the controls it uses.
+- Ramp now has a dedicated panel that keeps Two-Point, Fixed-Angle, and Connected Path visible, with width, softness, and fixed-angle controls grouped together.
+- Circle and Square are hidden while Ramp is selected because ramp placement uses its own line/path geometry; both shapes remain available for brush and Copy/Paste selection.
+- Renamed the Path ramp option to **Connected** in English and Spanish and clarified that 3+ marked points create one continuous ramp.
+
+### Planned
+- Added **Circular ramps** to the 0.4.0 roadmap: prototype both a level ring/annular terrace and a connected spiral that rises or descends around a center.
 
 ### UI
 - Opening the F5 panel now freezes local player input and camera look, dims the game behind the panel, and opens at a larger resolution-aware size.
-- Added a dedicated **Copy / Paste** brush mode to the Q wheel; Apply copies the aimed area, while the configured paste shortcut opens the placement preview. Its HUD identifies the mode separately from Paint.
+- Added a dedicated **Copy / Paste** brush mode to the Q wheel; Apply selects the area according to the active shape, while the configured paste shortcut opens or confirms the placement preview. Its HUD identifies the mode separately from Paint.
 - Copy mode now honors the selected shape: mark two corners for Rectangle, endpoints for Line, or vertices for Polygon; Circle/Square copy the aimed brush footprint. The HUD shows the next selection step.
 - Folded Snow into Paint as the DeepSnow paint type; the existing height modifier still removes snow. Existing configs that selected Snow migrate to Paint + DeepSnow.
 - Added a dedicated Copy/Paste tab with visible terrain copy, paste-preview/confirm, clipboard history, and saved-stamp controls; copy/paste buttons close the menu so the requested world action can run immediately.
@@ -27,7 +36,7 @@
 
 ### Added
 
-- **Terrain stamps — rectangle selection copy**: mark corner A with the Rectangle shape, aim at corner B and press `Ctrl+Shift+C` to copy exactly that rectangle, cropped to the vertex level (no whole-tile blocks or surrounding untouched terrain). Pasting only writes inside the copied region.
+- **Terrain stamps — dedicated shape selection**: select Circle, Square, Line, Rectangle, or Polygon in the Q-wheel Copy/Paste mode; the HUD guides the selection. Paste uses a movable preview and explicit confirmation.
 - **Free camera (`F`) reworked**: while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments keep priority over free-fly input; on-screen banner shows the fly distance.
 
 ### Changed

@@ -2,7 +2,16 @@
 
 ---
 
-## [0.3.6] - 2026-10-17
+## [0.3.6] - 2026-10-21
+
+### Fixed
+- Reworked the F5 panel layout: tabs are split into two rows, window sizing follows screen dimensions, and each operation only shows the controls it uses.
+- Ramp now has a dedicated panel that keeps Two-Point, Fixed-Angle, and Connected Path visible, with width, softness, and fixed-angle controls grouped together.
+- Circle and Square are hidden while Ramp is selected because ramp placement uses its own line/path geometry; both shapes remain available for brush and Copy/Paste selection.
+- Renamed the Path ramp option to **Connected** in English and Spanish and clarified that 3+ marked points create one continuous ramp.
+
+### Planned
+- Added **Circular ramps** to the 0.4.0 roadmap: prototype both a level ring/annular terrace and a connected spiral that rises or descends around a center.
 
 ### UI
 - Opening the F5 panel now freezes local player input and camera look, dims the game behind the panel, and opens at a larger resolution-aware size.

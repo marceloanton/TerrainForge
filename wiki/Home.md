@@ -7,7 +7,7 @@
 
 ### TerrainForge 0.3.6 update
 
-> The Q wheel has a dedicated Copy/Paste mode. Rectangle marks corners A/B with Apply; Line marks endpoints; Polygon adds vertices and copies on a double-press after 3+ points; Circle/Square copy the brush footprint. The HUD shows the next step. Snow is Paint > DeepSnow (hold Shift to clear). F5 freezes local movement and camera look; use ESC to pause the whole single-player world.
+> The Q wheel has a dedicated Copy/Paste mode. Rectangle marks corners A/B with Apply; Line marks endpoints; Polygon adds vertices and copies on a double-press after 3+ points; Circle/Square copy the brush footprint. The HUD shows the next step. Snow is Paint > DeepSnow (hold Shift to clear). F5 freezes local movement and camera look; use ESC to pause the whole single-player world. 0.3.6: F5 now groups tabs into two rows and shows controls for the selected operation. Ramp exposes Two-Point, Fixed-Angle, and Connected; circular ramps are planned for 0.4.0.
 
 ## Table of Contents
 
@@ -69,7 +69,7 @@
 | Undo | `Ctrl+Z` | Undoes the last stroke |
 | Redo | `Ctrl+Y` | Redoes the undone stroke |
 | Eyedropper | `G` | Fixes the Flatten height at the crosshair (again = release) |
-| Ramp mode | `H` | Cycles: Two-Point → Fixed-Angle → Path (or pick with 3 buttons in SETTINGS) |
+| Ramp mode | `H` | Cycles: Two-Point → Fixed-Angle → Connected Path (or pick in the F5 Ramp panel) |
 | Fixed ramp angle | Hold `Alt` + radius/wheel | Adjusts the angle in fixed mode |
 | Radial menu | Hold `Q` | Pick an operation with the mouse, release confirms |
 | Adjust mode | `V` | Wheel = radius, freezes zoom/bar/map |

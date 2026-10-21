@@ -7,7 +7,7 @@
 
 ### Nowości TerrainForge 0.3.6
 
-> Koło Q ma osobny tryb Kopiuj/Wklej. Prostokąt wyznacza A/B klawiszem Zastosuj; Linia dwa końce; Wielokąt dodaje wierzchołki i kopiuje po dwukrotnym naciśnięciu przy 3+ punktach; Koło/Kwadrat kopiuje obszar pędzla. HUD pokazuje następny krok. Śnieg jest w Maluj > DeepSnow (przytrzymaj Shift, aby usunąć). F5 blokuje lokalny ruch i kamerę; Esc pauzuje cały świat w trybie jednoosobowym.
+> Koło Q ma osobny tryb Kopiuj/Wklej. Prostokąt wyznacza A/B klawiszem Zastosuj; Linia dwa końce; Wielokąt dodaje wierzchołki i kopiuje po dwukrotnym naciśnięciu przy 3+ punktach; Koło/Kwadrat kopiuje obszar pędzla. HUD pokazuje następny krok. Śnieg jest w Maluj > DeepSnow (przytrzymaj Shift, aby usunąć). F5 blokuje lokalny ruch i kamerę; Esc pauzuje cały świat w trybie jednoosobowym. 0.3.6: F5 układa karty w dwóch rzędach i pokazuje ustawienia wybranej operacji. Ramp udostępnia tryby Dwa punkty, Stały kąt i Połączona ścieżka; rampy kołowe są planowane na 0.4.0.
 
 ## Spis treści
 

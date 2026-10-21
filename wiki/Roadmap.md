@@ -26,6 +26,7 @@ Planned direction for TerrainForge. Order and scope may change; done items ship 
 ## Planned
 
 ### 0.4.0 — "Advanced Tools"
+- **Circular ramps** — explore two variants: a level ring/annular terrace and a connected spiral that gains or loses height around a center. Final controls and behavior to be chosen after prototyping.
 - Blueprint ghost system: translucent preview with a snap grid (1 m / 2 m / 4 m) and rotation steps (90° / 45° / 15°).
 - Stamp Preview Pro: real contour lines drawn over the terrain.
 - Live measurement HUD while marking (distance / area / slope).

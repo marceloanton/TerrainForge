@@ -7,7 +7,7 @@
 
 ### TerrainForge 0.3.6 yenilikleri
 
-> Q tekerinde ayrı bir Kopyala/Yapıştır modu var. Dikdörtgen Uygula ile A/B köşelerini, Çizgi iki ucu işaretler; Çokgen 3+ noktadan sonra çift basışla kopyalar; Daire/Kare fırça alanını kopyalar. HUD sonraki adımı gösterir. Kar, Boya > DeepSnow içindedir (kaldırmak için Shift'i basılı tutun). F5 yerel hareketi ve kamerayı dondurur; Esc tek oyunculu dünyayı tamamen duraklatır.
+> Q tekerinde ayrı bir Kopyala/Yapıştır modu var. Dikdörtgen Uygula ile A/B köşelerini, Çizgi iki ucu işaretler; Çokgen 3+ noktadan sonra çift basışla kopyalar; Daire/Kare fırça alanını kopyalar. HUD sonraki adımı gösterir. Kar, Boya > DeepSnow içindedir (kaldırmak için Shift'i basılı tutun). F5 yerel hareketi ve kamerayı dondurur; Esc tek oyunculu dünyayı tamamen duraklatır. 0.3.6: F5 sekmeleri iki sıraya yerleştirir ve seçili işleme uygun ayarları gösterir. Ramp; İki Nokta, Sabit Açı ve Bağlantılı Yol modlarını sunar; dairesel rampalar 0.4.0 için planlandı.
 
 ## İçindekiler
 

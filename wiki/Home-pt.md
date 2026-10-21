@@ -7,7 +7,7 @@
 
 ### Novidades do TerrainForge 0.3.6
 
-> A roda Q tem um modo dedicado de Copiar/Colar. Retângulo marca A/B com Aplicar; Linha marca duas pontas; Polígono adiciona vértices e copia com duplo toque após 3+ pontos; Círculo/Quadrado copia a área do pincel. O HUD mostra o próximo passo. Neve fica em Pintar > DeepSnow (segure Shift para remover). F5 congela movimento e câmera locais; Esc pausa o mundo inteiro no modo solo.
+> A roda Q tem um modo dedicado de Copiar/Colar. Retângulo marca A/B com Aplicar; Linha marca duas pontas; Polígono adiciona vértices e copia com duplo toque após 3+ pontos; Círculo/Quadrado copia a área do pincel. O HUD mostra o próximo passo. Neve fica em Pintar > DeepSnow (segure Shift para remover). F5 congela movimento e câmera locais; Esc pausa o mundo inteiro no modo solo. 0.3.6: o F5 organiza as abas em duas linhas e mostra os controles da operação selecionada. Ramp inclui Dois Pontos, Ângulo Fixo e Conectada; rampas circulares estão planejadas para a 0.4.0.
 
 ## Índice
 

@@ -7,7 +7,7 @@
 
 ### TerrainForge 0.3.6 – Änderungen
 
-> Das Q-Rad hat einen eigenen Kopieren/Einfügen-Modus. Rechteck markiert A/B mit Anwenden; Linie markiert zwei Endpunkte; Polygon fügt Eckpunkte hinzu und kopiert bei Doppeldruck ab 3 Punkten; Kreis/Quadrat kopiert den Pinselbereich. Das HUD zeigt den nächsten Schritt. Schnee ist jetzt Farbe > DeepSnow (Shift halten zum Entfernen). F5 hält lokale Bewegung und Kamera an; ESC pausiert die ganze Einzelspielerwelt.
+> Das Q-Rad hat einen eigenen Kopieren/Einfügen-Modus. Rechteck markiert A/B mit Anwenden; Linie markiert zwei Endpunkte; Polygon fügt Eckpunkte hinzu und kopiert bei Doppeldruck ab 3 Punkten; Kreis/Quadrat kopiert den Pinselbereich. Das HUD zeigt den nächsten Schritt. Schnee ist jetzt Farbe > DeepSnow (Shift halten zum Entfernen). F5 hält lokale Bewegung und Kamera an; ESC pausiert die ganze Einzelspielerwelt. 0.3.6: F5 ordnet die Register in zwei Reihen und zeigt passende Werkzeuge je Operation. Ramp bietet Zwei Punkte, Festwinkel und Verbundener Pfad; kreisförmige Rampen sind für 0.4.0 geplant.
 
 ## Inhaltsverzeichnis
 

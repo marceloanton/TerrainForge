@@ -12,11 +12,14 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 
 ## What's New in 0.3.6
 
+- F5 now uses a two-row tab layout and operation-specific controls. Ramp mode keeps Two-Point, Fixed-Angle, and Connected Path visible with the relevant width, softness, and angle settings.
+- The connected ramp mode is a continuous path through 3+ marked points; choose **Connected** in the F5 Ramp panel or cycle with `H`.
+- Circular ramps (level ring or height-changing spiral) are proposed for 0.4.0; final behavior remains to be prototyped.
 - **Unified operation UI** — F5 glyphs also appear in the Q radial wheel and next to the terrain target, with a compact status card replacing the old long HUD text.
 - **Dedicated Copy/Paste tab** — F5 now has visible copy, paste-preview/confirm, clipboard-history, and saved-stamp controls in one place.
 - Q wheel now includes a separate Copy/Paste mode. Rectangle uses two corners, Line two endpoints, Polygon vertices, and Circle/Square the brush footprint; the HUD prompts for each selection step.
 - Snow is grouped under Paint as `DeepSnow` (hold the height modifier to remove it). F5 freezes local movement/camera look, dims the background, and adapts to screen size.
-- Plugin metadata now matches version 0.3.6. Rod registration supports rebuilt world databases, revalidates the live item index during gameplay, and retries network registration after item initialization.
+- Plugin metadata was aligned at version 0.3.6. Rod registration supports rebuilt world databases, revalidates the live item index during gameplay, and retries network registration after item initialization.
 
 - **Free camera (`F`) fixed** — while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments take priority.
 - **Docs & wiki in 14 languages** — README and CHANGELOG in English, and the full manual on the [Wiki](https://github.com/marceloanton/TerrainForge/wiki) (`Home` + 13 translations).
@@ -75,7 +78,7 @@ While aiming, a solid ring marks the real brush area, with faint guides in the o
 | Undo last stroke | `Ctrl+Z` |
 | Redo undone stroke | `Ctrl+Y` |
 | Fix / release Flatten height (eyedropper) | `G` |
-| Cycle ramp mode (two-point / fixed-angle / path) | `H` |
+| Cycle ramp mode (two-point / fixed-angle / connected path) | `H` |
 | Adjust fixed-ramp angle (with Ramp selected) | Hold `Alt` + radius keys / wheel |
 | Radial operation menu (hold, release to confirm) | `Q` |
 | Adjust mode (wheel = radius, zoom frozen) | `V` |
@@ -101,7 +104,7 @@ The nine Q wheel modes are `Flatten`, `Raise`, `Lower`, `Smooth`, `Ramp`, `Paint
 - **Flatten** — follows the ground **under the crosshair** by default and adapts to what you aim at (e.g. a ramp). Hold `Left Shift` to level at your feet.
 - **Raise / Lower** — raise or lower terrain according to the falloff mode and power.
 - **Smooth** — averages each point with its neighbours (a real blur), smoothing ridges, steps and noise. Hold to smooth progressively. Modes: `Full` (both ways), `Ridges only` (lowers only), `Dips only` (fills only). Shape Line + Smooth = smooth along a path.
-- **Ramp** — three modes (`H`): **two-point** (mark **A** and **B**, joins both heights with a straight slope), **fixed-angle** (**B** gives direction and length, height follows `Ramp angle`, adjustable with `Alt` + radius), and **path** (mark a curve **A→B→C…**, double-press to close). The brush radius sets the ramp width and softness only softens the side edges. Preview: filled semi-transparent corridor + height rings at A and B.
+- **Ramp** — three modes (`H`): **two-point** (mark **A** and **B**, joins both heights with a straight slope), **fixed-angle** (**B** gives direction and length, height follows `Ramp angle`, adjustable with `Alt` + radius), and **connected path** (mark 3+ points for one continuous curve **A→B→C…**, then double-press to build it). The brush radius sets the ramp width and softness only softens the side edges. Preview: filled semi-transparent corridor + height rings at A and B.
 - **Shore** — flattens toward the water level + margin (beaches/coastlines), with softness blending like Flatten.
 - **Paint** — types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.
 - **Restore** — returns the terrain to its original state.

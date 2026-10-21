@@ -7,7 +7,7 @@
 
 ### Novedades de TerrainForge 0.3.6
 
-> El wheel Q tiene un modo propio de Copiar/Pegar. Rectángulo marca A y B con Aplicar; Línea marca dos extremos; Polígono suma vértices y copia con doble pulso tras 3+ puntos; Círculo/Cuadrado copian la huella de la brocha. El HUD indica el paso siguiente. Nieve está en Pintar > DeepSnow (mantener Shift para quitarla). F5 congela el movimiento y la cámara local; Esc pausa todo el mundo en una partida individual.
+> El wheel Q tiene un modo propio de Copiar/Pegar. Rectángulo marca A y B con Aplicar; Línea marca dos extremos; Polígono suma vértices y copia con doble pulso tras 3+ puntos; Círculo/Cuadrado copian la huella de la brocha. El HUD indica el paso siguiente. Nieve está en Pintar > DeepSnow (mantener Shift para quitarla). F5 congela el movimiento y la cámara local; Esc pausa todo el mundo en una partida individual. 0.3.6: F5 organiza las pestañas en dos filas y muestra controles según la operación. Ramp expone Dos Puntos, Ángulo Fijo y Conectada; la rampa circular queda planificada para 0.4.0.
 
 ## Índice
 
@@ -69,7 +69,7 @@
 | Deshacer | `Ctrl+Z` | Deshace el último trazo |
 | Rehacer | `Ctrl+Y` | Rehace el trazo deshecho |
 | Cuentagotas | `G` | Fija la altura de Aplanar en la mira (otra vez = libera) |
-| Modo de rampa | `H` | Cicla: Dos Puntos → Ángulo Fijo → Senda (o elige con 3 botones en AJUSTES) |
+| Modo de rampa | `H` | Cicla: Dos Puntos → Ángulo Fijo → Conectada (o elige en la pestaña Ramp de F5) |
 | Ángulo de rampa fija | Mantener `Alt` + radio/rueda | Ajusta el ángulo en modo fijo |
 | Menú radial | Mantener `Q` | Elige operación con el mouse, soltar confirma |
 | Modo ajuste | `V` | Rueda = radio, congela zoom/barra/mapa |

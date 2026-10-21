@@ -5,6 +5,9 @@ decision to keep Jotunn was superseded in 0.3.6). This cycle adds measurement, n
 path ramps, terrain snapshots, deeper server authority, chunked application and
 the Thunderstore release.
 
+## Ideas for 0.4.0
+- **Circular ramp:** prototype both a level annular ramp/terrace and a connected spiral ramp that changes height around a center; settle the exact behavior after an in-game prototype.
+
 ## Quick orientation (same touch points)
 
 | File | Role in this cycle |
