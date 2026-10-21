@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Roadmap · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="roadmap">Roadmap</h1>
+<p><em>This page is currently available in English only.</em></p>
+<p>Planned direction for TerrainForge. Order and scope may change; done items ship in the listed release.</p>
+<hr>
+<h2 id="done">Done</h2>
+<h3 id="03x-brush-ui-foundation">0.3.x — Brush &amp; UI foundation</h3>
+<ul>
+<li>Free-form terrain brush (Flatten, Raise, Lower, Smooth, Ramp, Shore, Paint, Restore) beyond the vanilla ±8 m limit; Snow is a Paint type (<code>DeepSnow</code>).</li>
+<li>5 brush shapes: Circle, Square, Line, Rect, Polygon.</li>
+<li>3 falloff modes (Two-point, Fixed-angle, Path) and configurable Shore falloff.</li>
+<li>Undo / Redo and terrain <strong>snapshots</strong> (full backup / restore).</li>
+<li><strong>Terrain stamps</strong> (copy / paste) with an on-disk library and preview.</li>
+<li><strong>Dedicated Copy/Paste Q-wheel mode</strong> — select a rectangle, line, polygon, circle, or square footprint, then preview and place terrain stamps.</li>
+<li><strong>F5 menu improvements</strong> — six-tab layout, responsive sizing, dimmed background, and frozen local player/camera controls while open.</li>
+<li>Valheim-native UI (Averia typeface, Valheim palette), radial menu (<code>Q</code>), keybind remapping (<code>F5</code>), persistent HUD.</li>
+<li>Slope heatmap (<code>H</code>) and height heatmap (<code>J</code>).</li>
+<li>Brush profiles and presets.</li>
+<li><strong>14 in-game languages</strong> with auto-detect, plus a full wiki manual in 14 languages.</li>
+</ul>
+<hr>
+<h2 id="planned">Planned</h2>
+<h3 id="040-advanced-tools">0.4.0 — "Advanced Tools"</h3>
+<ul>
+<li><strong>Circular ramps</strong> — explore two variants: a level ring/annular terrace and a connected spiral that gains or loses height around a center. Final controls and behavior to be chosen after prototyping.</li>
+<li>Blueprint ghost system: translucent preview with a snap grid (1 m / 2 m / 4 m) and rotation steps (90° / 45° / 15°).</li>
+<li>Stamp Preview Pro: real contour lines drawn over the terrain.</li>
+<li>Live measurement HUD while marking (distance / area / slope).</li>
+</ul>
+<h3 id="050-world-building">0.5.0 — "World Building"</h3>
+<ul>
+<li>Non-biome textures + a per-biome / custom selector.</li>
+<li>Complete blueprint system (save / load / place).</li>
+<li>Multiplayer: stamp sync between clients and per-rank permissions.</li>
+</ul>
+<h3 id="060-world-builder">0.6.0 — "World Builder"</h3>
+<ul>
+<li>Blueprint library (save / load / share).</li>
+<li>Terrain prefabs (templates) and a biome painter.</li>
+<li>River / road tool driven by a spline.</li>
+<li>Performance: chunk streaming, LOD for large stamps, multithreading.</li>
+</ul>
+<hr>
+<h2 id="under-evaluation">Under evaluation</h2>
+<ul>
+<li><strong>Non-biome textures</strong>: the terrain uses a single material per heightmap with a mask that only picks dirt / cultivated / paved / snow inside the biome palette. There is no exposed biome → material map, so this is a client-side, fragile hack. A shader/texture-slot diagnostic has been added to the log to assess feasibility.</li>
+</ul></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

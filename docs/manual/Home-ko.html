@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>한국어 · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="terrainforge">TerrainForge 위키</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <em>한국어</em> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-037">TerrainForge 0.3.8 — 0.3.7 핫픽스</h3>
+<blockquote>
+<p>Q 휠에 전용 복사/붙여넣기 모드가 추가되었습니다. 사각형은 적용으로 A/B, 선은 양 끝점, 다각형은 꼭짓점을 지정하고 3개 이상에서 두 번 눌러 복사하며, 원/정사각형은 브러시 범위를 복사합니다. HUD가 다음 단계를 안내합니다. 눈은 페인트 &gt; DeepSnow에 통합되었습니다(Shift를 누르면 제거). F5에서는 로컬 이동과 카메라가 고정되며, Esc는 싱글 플레이 세계 전체를 일시 정지합니다. 0.3.6: F5 탭을 두 줄로 정리하고 선택한 작업에 필요한 설정만 표시합니다. Ramp에는 두 점, 고정 각도, 연결 경로 모드가 있으며 원형 램프는 0.4.0 계획에 포함되었습니다.</p>
+</blockquote>
+<h2 id="_1">목차</h2>
+<ol>
+<li><a href="#-설치">설치</a></li>
+<li><a href="#-빠른-시작">빠른 시작</a></li>
+<li><a href="#-조작">조작</a></li>
+<li><a href="#-작업">작업</a></li>
+<li><a href="#-모양">모양</a></li>
+<li><a href="#-감쇠-모드-올리기내리기">감쇠 모드</a></li>
+<li><a href="#-스탬프-복사붙여넣기">스탬프 (복사/붙여넣기)</a></li>
+<li><a href="#-스냅샷-백업">스냅샷 (백업)</a></li>
+<li><a href="#-프로필">프로필</a></li>
+<li><a href="#-언어">언어</a></li>
+<li><a href="#-멀티플레이어">멀티플레이어</a></li>
+<li><a href="#-설정">설정</a></li>
+<li><a href="#-문제-해결">문제 해결</a></li>
+</ol>
+<hr>
+<h2 id="_2">📥 설치</h2>
+<h3 id="_3">요구 사항</h3>
+<ul>
+<li><strong>BepInEx 5</strong> (x64, Mono) — 클라이언트와 서버 모두. Thunderstore 사용자는 이미 설치되어 있습니다.</li>
+</ul>
+<h3 id="_4">단계</h3>
+<ol>
+<li>Thunderstore 또는 GitHub Releases에서 <code>TerrainForge-&lt;version&gt;.zip</code>을 다운로드합니다.</li>
+<li>압축을 풀고 <code>TerrainForge.dll</code>을 다음 위치에 놓습니다:
+   - <strong>클라이언트:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>서버:</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>게임 / 서버를 재시작합니다.</li>
+</ol>
+<blockquote>
+<p>⚠️ ±8 m를 초과하는 편집과 올바른 복제를 위해서는 <strong>클라이언트와 서버 모두에 설치해야 합니다</strong>.</p>
+</blockquote>
+<hr>
+<h2 id="_5">🚀 빠른 시작</h2>
+<ol>
+<li>월드에 접속합니다. <strong>TerrainForge 막대기</strong>(망치 복제품)가 자동으로 지급되고 장착됩니다.</li>
+<li><code>F5</code>를 눌러 메뉴를 엽니다 (<code>ESC</code> 일시정지 메뉴의 <strong>TerrainForge</strong> 버튼을 클릭해도 됩니다).</li>
+<li>막대기가 장착되어 있지 않다면 장착합니다.</li>
+<li>지형을 조준하고 <strong>오른쪽 클릭</strong>(<code>Mouse1</code>)을 길게 눌러 조형합니다.</li>
+<li><code>,</code>로 작업을, <code>.</code>로 모양을, <code>/</code>로 페인트를 순환합니다.</li>
+<li><code>Q</code>를 길게 누르면 → 방사형 메뉴가 열리고, 놓으면 확정됩니다.</li>
+<li><code>Ctrl+Z</code> / <code>Ctrl+Y</code>로 실행 취소/다시 실행합니다.</li>
+</ol>
+<hr>
+<h2 id="_6">⌨️ 조작</h2>
+<table>
+<thead>
+<tr>
+<th>동작</th>
+<th>기본 키</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>브러시 적용</td>
+<td><code>Mouse1</code> (오른쪽 클릭) 길게</td>
+<td>크로스헤어 아래의 지형을 조형합니다</td>
+</tr>
+<tr>
+<td>반경 +</td>
+<td><code>=</code> 또는 <code>Ctrl</code>+휠</td>
+<td>브러시 반경을 늘립니다</td>
+</tr>
+<tr>
+<td>반경 −</td>
+<td><code>-</code> 또는 <code>Ctrl</code>+휠</td>
+<td>브러시 반경을 줄입니다</td>
+</tr>
+<tr>
+<td>작업 순환</td>
+<td><code>,</code></td>
+<td>9가지 작업을 순환합니다</td>
+</tr>
+<tr>
+<td>모양 순환</td>
+<td><code>.</code></td>
+<td>원 → 사각형 → 선 → Rect → 다각형</td>
+</tr>
+<tr>
+<td>페인트 순환</td>
+<td><code>/</code></td>
+<td>6가지 페인트 유형을 순환합니다</td>
+</tr>
+<tr>
+<td>발 높이로 평탄화</td>
+<td><code>Left Shift</code> 길게</td>
+<td>평탄화가 플레이어 높이를 사용합니다</td>
+</tr>
+<tr>
+<td>실행 취소</td>
+<td><code>Ctrl+Z</code></td>
+<td>마지막 획을 취소합니다</td>
+</tr>
+<tr>
+<td>다시 실행</td>
+<td><code>Ctrl+Y</code></td>
+<td>취소한 획을 다시 실행합니다</td>
+</tr>
+<tr>
+<td>스포이트</td>
+<td><code>G</code></td>
+<td>크로스헤어 지점에서 평탄화 높이를 고정합니다 (다시 누르면 해제)</td>
+</tr>
+<tr>
+<td>램프 모드</td>
+<td><code>H</code></td>
+<td>순환: 두 점 → 고정 각도 → 경로 (또는 SETTINGS의 3개 버튼으로 선택)</td>
+</tr>
+<tr>
+<td>고정 램프 각도</td>
+<td><code>Alt</code> 길게 + 반경/휠</td>
+<td>고정 모드에서 각도를 조정합니다</td>
+</tr>
+<tr>
+<td>방사형 메뉴</td>
+<td><code>Q</code> 길게</td>
+<td>마우스로 작업을 고르고, 놓으면 확정됩니다</td>
+</tr>
+<tr>
+<td>조정 모드</td>
+<td><code>V</code></td>
+<td>휠 = 반경, 줌/바/지도를 고정합니다</td>
+</tr>
+<tr>
+<td>미세 조정 (0.1 m)</td>
+<td><code>Shift</code> 길게 + 휠/반경</td>
+<td>정밀한 반경 조정</td>
+</tr>
+<tr>
+<td><strong>스탬프 복사</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>표시한 영역을 클립보드로 복사합니다</td>
+</tr>
+<tr>
+<td><strong>스탬프 붙여넣기</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>고스트 미리보기, 클릭으로 확정</td>
+</tr>
+<tr>
+<td>막대기 받기</td>
+<td><code>F8</code></td>
+<td>TerrainForge 막대기를 지급합니다</td>
+</tr>
+<tr>
+<td>메뉴 열기</td>
+<td><code>F5</code></td>
+<td>키/도움말/설정 메뉴를 엽니다</td>
+</tr>
+</tbody>
+</table>
+<p><strong>추가 키 (기본값 없음, KEYS에서 지정하세요):</strong>
+- 직접 작업: 평탄화, 올리기, 내리기, 부드럽게, 페인트, 복원, 램프, 해안, 눈
+- 다음 / 이전 프로필
+- 다음 / 이전 스탬프 (기록)</p>
+<p><strong>"Quick actions" 섹션 (KEYS 탭):</strong> 필수 단축키가 없는 기능을 위한 버튼 — 실행 취소, 다시 실행, 높이 고정, 스탬프 복사/붙여넣기, 이전 스탬프, 표시 지우기, 히트맵, 그리고 재질 진단(셰이더 + 텍스처 슬롯을 로그에 덤프).</p>
+<hr>
+<h2 id="_7">🔄 작업</h2>
+<table>
+<thead>
+<tr>
+<th>작업</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>평탄화</strong></td>
+<td>조준한 높이로 평탄화합니다 (Shift = 발 위치). 스포이트(<code>G</code>) 또는 SETTINGS 텍스트박스로 고정 높이를 지정합니다.</td>
+</tr>
+<tr>
+<td><strong>올리기</strong></td>
+<td>적용할 때마다 지형을 <code>RaiseDelta</code>만큼 올립니다. 감쇠 모드가 형태를 결정합니다.</td>
+</tr>
+<tr>
+<td><strong>내리기</strong></td>
+<td>적용할 때마다 지형을 <code>RaiseDelta</code>만큼 내립니다. 감쇠 모드가 형태를 결정합니다.</td>
+</tr>
+<tr>
+<td><strong>부드럽게</strong></td>
+<td>실제 블러: 각 정점을 8개 이웃과 평균냅니다. 길게 누르면 점진적으로 적용됩니다. <strong>모드:</strong> 전체(양쪽), 능선만(내림), 움푹한 곳만(올림). 선 모양 = 경로를 스무딩합니다.</td>
+</tr>
+<tr>
+<td><strong>램프</strong></td>
+<td><strong>3가지 모드</strong> (<code>H</code> 순환):<br>• <strong>두 점</strong>: A와 B를 표시 → 직선 경사가 높이를 연결합니다.<br>• <strong>고정 각도</strong>: B = 방향/길이; 높이 = <code>SlopeAngle</code> (크로스헤어에 따라 위/아래). <code>Alt</code>+반경으로 조정합니다.<br>• <strong>경로</strong>: 곡선 A→B→C… 를 표시 (3개 이상에서 두 번 누르면 닫힘) → 부드러운 Catmull-Rom.<br>너비 = 브러시 반경. 부드러움 = 측면 가장자리에서만 블렌드. 미리보기: 채워진 회랑 + A/B의 높이 링.</td>
+</tr>
+<tr>
+<td><strong>해안</strong></td>
+<td>수면 높이 + <code>ShoreOffset</code> 여백을 향해 평탄화합니다 (해변). 부드러움은 평탄화와 동일합니다.</td>
+</tr>
+<tr>
+<td><strong>페인트</strong></td>
+<td>유형: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. 강도 조절 가능.</td>
+</tr>
+<tr>
+<td><strong>복원</strong></td>
+<td>지형을 원래 상태로 되돌립니다 (높이 + 페인트).</td>
+</tr>
+<tr>
+<td><strong>복사/붙여넣기</strong></td>
+<td>지형을 선택하고 스탬프를 놓는 Q 휠 전용 모드입니다.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_8">📐 모양</h2>
+<p><code>.</code> 키로 순환합니다. 모두 실행 취소를 지원합니다.</p>
+<table>
+<thead>
+<tr>
+<th>모양</th>
+<th>표시</th>
+<th>용도</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>원</strong></td>
+<td>단일 클릭 (브러시 중심)</td>
+<td>일반 조형</td>
+</tr>
+<tr>
+<td><strong>사각형</strong></td>
+<td>단일 클릭 (중심)</td>
+<td>플랫폼, 기초</td>
+</tr>
+<tr>
+<td><strong>선</strong></td>
+<td>2회 클릭 (A → B)</td>
+<td>경로, 벽, 오솔길. 반너비 = 반경.</td>
+</tr>
+<tr>
+<td><strong>직사각형</strong></td>
+<td>2회 클릭 (반대쪽 모서리)</td>
+<td>기초, 농장, 플랫폼. 부드러운 가장자리.</td>
+</tr>
+<tr>
+<td><strong>다각형</strong></td>
+<td>정점마다 클릭, 더블 클릭으로 닫기 (정점 3개 이상)</td>
+<td>복잡한 모양, 커스텀 영역</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>비원형 모양은 <strong>표시한 윤곽만</strong> 보여줍니다 (원형 링 없음).</li>
+<li>부드러움은 모든 모양에서 가장자리 블렌드에 영향을 줍니다.</li>
+</ul>
+<hr>
+<h2 id="_9">⚙️ 감쇠 모드 (올리기/내리기)</h2>
+<p>SETTINGS → "Raise/Lower falloff"에서 구성합니다:</p>
+<table>
+<thead>
+<tr>
+<th>모드</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>뾰족</strong></td>
+<td>중앙 피크. "Falloff power" 슬라이더(1–5)로 제어됩니다.</td>
+</tr>
+<tr>
+<td><strong>평면</strong></td>
+<td>균일한 원판 — 전체 반경에 걸쳐 동일한 가중치.</td>
+</tr>
+<tr>
+<td><strong>부드러움</strong></td>
+<td>코사인 종 — 부드러운 전환, 딱딱한 경계 없음.</td>
+</tr>
+<tr>
+<td><strong>선형</strong></td>
+<td>중심에서 가장자리로 직선 테이퍼.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_10">🧱 스탬프 (복사/붙여넣기)</h2>
+<p>지형 구조를 복제하는 강력한 기능입니다.</p>
+<h3 id="_11">사각형 선택 (권장)</h3>
+<p>Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 지정합니다. 사각형은 두 모서리, 선은 양 끝점, 다각형은 꼭짓점(3개 이상에서 두 번 누름), 원/정사각형은 현재 브러시 범위를 사용합니다. HUD가 다음 단계를 표시합니다.</p>
+<h3 id="_12">워크플로</h3>
+<ol>
+<li><strong>영역 표시</strong>: 아무 모양이나 사용합니다 (원, Rect, 선, 다각형, 램프) — 또는 위의 사각형 선택.</li>
+<li><strong>복사</strong>: <code>Ctrl+Shift+C</code> → "스탬프 복사됨: X tiles" (RAM 클립보드).</li>
+<li><strong>붙여넣기 미리보기</strong>: <code>Ctrl+Shift+V</code> → 크로스헤어에 고스트 와이어프레임.
+   - <code>Q</code>/<code>E</code> = ±15° 회전
+   - <code>Alt</code>+휠 = 연속 회전
+   - <code>Shift</code>+휠 = 0.25×–4× 크기 조절
+   - <code>Esc</code> = 취소</li>
+<li><strong>확정</strong>: 붙여넣기 키를 다시 누르면 미리보기를 확정합니다.</li>
+</ol>
+<blockquote>
+<p>선택 스탬프는 <strong>복사한 영역 내부에만</strong> 기록합니다; 그 밖의 지형은 손대지 않습니다.</p>
+</blockquote>
+<h3 id="_13">기록</h3>
+<ul>
+<li>RAM에 최대 <strong>10개 스탬프</strong> (최근 순).</li>
+<li><code>다음 스탬프</code> / <code>이전 스탬프</code> 키(재지정 가능)로 순환합니다.</li>
+<li>플래시: "스탬프 기록: Copy: 3 tiles [2/5]"</li>
+</ul>
+<h3 id="_14">영속성</h3>
+<ul>
+<li><strong>SETTINGS → STAMPS</strong>:</li>
+<li>현재 스탬프를 디스크에 저장합니다 (<code>BepInEx/config/TerrainForge/stamps/</code>의 <code>.stamp</code>, 최대 12개).</li>
+<li>스탬프를 클립보드로 불러옵니다.</li>
+<li>저장된 스탬프를 나열/삭제합니다.</li>
+</ul>
+<h3 id="_15">스탬프 도구</h3>
+<ul>
+<li>SETTINGS → "Stamp tool" (4가지 옵션):</li>
+<li><code>Same as brush</code> (기본값) — 브러시와 동일한 도구를 사용합니다</li>
+<li><code>Any</code> — 요구 사항 없음</li>
+<li><code>Pickaxe</code> — 곡괭이 장착 필요</li>
+<li><code>TerrainForge Rod</code> — 모드의 막대기 필요</li>
+<li>도구가 장착되어 있고 클립보드에 스탬프가 있으면 HUD가 <code>STAMP READY [2/5]</code>를 표시합니다.</li>
+<li>도구가 없으면: <code>Stamp: tool not equipped</code>, 복사/붙여넣기가 차단됩니다.</li>
+</ul>
+<hr>
+<h2 id="_16">💾 스냅샷 (백업)</h2>
+<p>전체 지형 백업/복원.</p>
+<h3 id="_17">저장</h3>
+<ol>
+<li>SETTINGS → <strong>SNAPSHOTS</strong>.</li>
+<li>이름 (비우면 자동 날짜/시간).</li>
+<li><strong>Save</strong> → 편집한 타일을 <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code>에 저장합니다 (최대 12개).</li>
+</ol>
+<h3 id="_18">불러오기</h3>
+<ol>
+<li>스냅샷을 선택합니다.</li>
+<li><strong>Load</strong> → 소유권과 함께 타일을 복원합니다, <strong>1 실행 취소 단계</strong>.</li>
+<li>로드되지 않은 타일은 깔끔하게 경고합니다 — 원래 위치 근처에서 가져오세요.</li>
+</ol>
+<h3 id="_19">기능</h3>
+<ul>
+<li>버전이 관리되는 이진 형식 (<code>.dat</code>).</li>
+<li>높이 + smooth + 페인트 + 소유권을 복원합니다.</li>
+<li>가져오기는 실행 취소할 수 있습니다 (<code>Ctrl+Z</code>로 가져오기를 되돌립니다).</li>
+<li>로드되지 않은 타일은 깔끔하게 경고합니다.</li>
+</ul>
+<hr>
+<h2 id="_20">💾 프로필</h2>
+<p>완전한 브러시 구성을 저장/불러옵니다.</p>
+<ul>
+<li>SETTINGS → <strong>PROFILES</strong>.</li>
+<li>이름 + <strong>Save</strong> → 반경, 부드러움, 작업, 모양, 페인트, 램프 모드, 각도, 스무딩 모드, 올리기 델타, 페인트 강도, 감쇠, 해안 오프셋.</li>
+<li><strong>Load</strong> → 즉시 적용됩니다.</li>
+<li>최대 12개 프로필 (<code>Presets &gt; Slots</code>의 culture-invariant 형식).</li>
+<li>키 바인딩: <code>Next Profile</code> (KEYS에서 지정) 로 순환합니다.</li>
+</ul>
+<hr>
+<h2 id="_21">🌐 언어</h2>
+<p><strong>15가지 옵션:</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> — 기본값 <code>Auto</code>.</p>
+<h3 id="_22">자동 감지</h3>
+<ul>
+<li>기본값 <code>Auto</code>는 리플렉션을 통해 게임 언어를 감지합니다: <code>Localization.instance.GetSelectedLanguage()</code>.</li>
+<li>Valheim 언어 → 내부 인덱스로 매핑합니다.</li>
+<li>언어에 완전한 번역이 없으면 → English로 대체됩니다.</li>
+<li>SETTINGS → "Language"에서 구성할 수 있습니다 (15가지 옵션 순환).</li>
+<li>메뉴를 열 때 키 레이블이 다시 만들어집니다.</li>
+</ul>
+<h3 id="_23">번역 상태</h3>
+<ul>
+<li><strong>완료:</strong> English, Español</li>
+<li><strong>English 대체:</strong> Français, Deutsch, Русский, 中文, 繁體中文, 日本語, 한국어, Polski, Português, Türkçe, Українська, Italiano</li>
+<li>커뮤니티 번역은 PR로 환영합니다.</li>
+</ul>
+<h3 id="_24">이 문서</h3>
+<p>번역된 위키 페이지: <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>.</p>
+<hr>
+<h2 id="_25">🌍 멀티플레이어</h2>
+<h3 id="_26">요구 사항</h3>
+<ul>
+<li>±8 m를 초과하는 편집과 올바른 복제를 위해서는 <strong>클라이언트와 서버 모두에 모드</strong>가 필요합니다.</li>
+<li>서버에도 <code>UnlockDeltaLimit</code>를 설정해야 합니다, 그렇지 않으면 서버가 지형을 제한합니다.</li>
+</ul>
+<h3 id="config-sync">서버 권한 (Config Sync)</h3>
+<p>서버가 모드를 실행하면 서버의 <code>Server</code> 섹션이 우선합니다:
+- <code>AllowTerrainEdits</code> (기본값 <code>true</code>) — 마스터 스위치; <code>false</code>이면 클라이언트는 적용/실행 취소/다시 실행할 수 없습니다.
+- <code>AdminOnlyEdits</code> (기본값 <code>false</code>) — 관리자/호스트만 편집할 수 있습니다.
+- <code>RespectWards</code> (기본값 <code>true</code>) — 다른 사람의 ward 내부 편집을 차단합니다.
+- <code>RadiusCap</code> / <code>DeltaCap</code> (0 = off) — 서버가 강제하는 상한, HUD+미리보기에 표시됩니다.</p>
+<blockquote>
+<p>모드가 <strong>없는</strong> 서버는 이 섹션을 무시합니다 → 클라이언트는 테스트용으로 작동합니다.</p>
+</blockquote>
+<h3 id="_27">디싱크 방지</h3>
+<ul>
+<li>서버 + 클라이언트에서 <code>MaxUpDelta</code> / <code>MaxDownDelta</code>를 일관되게 유지하세요.</li>
+<li>큰 반경은 모드가 없는 클라이언트를 디싱크시킬 수 있습니다.</li>
+</ul>
+<hr>
+<h2 id="_28">⚙️ 설정</h2>
+<p>파일: <code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="_29">일반</h3>
+<table>
+<thead>
+<tr>
+<th>설정</th>
+<th>기본값</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>마스터 스위치</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>적용 시 먼지 + 타격</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>TerrainForge 막대기(망치 복제품)에 색을 입혀 바닐라 망치와 쉽게 구분할 수 있게 합니다</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>막대기 헥스 색상 (모델 + 아이콘). 예: <code>#FFC400</code> 금색, <code>#8BC34A</code> 초록</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_30">브러시</h3>
+<table>
+<thead>
+<tr>
+<th>설정</th>
+<th>기본값</th>
+<th>범위</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>브러시 반경 (m)</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>조정 시 최소 반경</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>조정 시 최대 반경</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>키/휠당 반경 변화량</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>가장자리 부드러움 (0 = 딱딱, 100 = 매우 부드러움)</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>감쇠 지수 (뾰족 모드 전용)</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>올리기/내리기 적용당 미터</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>페인트 강도</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>시작 작업</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>시작 모양</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>시작 페인트</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>고정 램프 각도 (도)</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>수면 위 해안 여백 (m)</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>고정 높이 사용 (스포이트 상태)</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>정확한 평탄화 높이 (m)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_31">바닐라 / 통합</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false — 막대기를 장착하면 바닐라 괭이/경작기의 지형 편집을 무시합니다. SETTINGS에도 토글이 있습니다.</li>
+</ul>
+<h3 id="_32">입력</h3>
+<p>모든 단축키는 KEYS 탭에서 재지정할 수 있습니다. 주요 항목:
+- <code>ApplyKey</code> (Mouse1), <code>RadiusUp/Down</code> (=/-), <code>CycleOp/Shape/Paint</code> (,/.//)
+- <code>UndoKey</code> (Ctrl+Z), <code>RedoKey</code> (Ctrl+Y), <code>EyedropKey</code> (G), <code>RampModeKey</code> (H)
+- <code>RadialKey</code> (Q), <code>AdjustModeKey</code> (V), <code>GiveToolKey</code> (F8), <code>RebindMenuKey</code> (F5)
+- <strong>직접 작업 키</strong> (9개, 기본값 없음): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>, <code>CycleStampKey</code>, <code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool (기본값)
+- <code>AutoGiveTool</code>: true (접속 시 막대기 지급)</p>
+<h3 id="stamps">Stamps</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool (기본값 Same as Brush)</li>
+</ul>
+<h3 id="preview">Preview</h3>
+<ul>
+<li><code>ShowPreview</code>: true, <code>ShowGuides</code>: true (도달 가이드, 경사 틴트, 레벨 링)</li>
+</ul>
+<h3 id="history">History</h3>
+<ul>
+<li><code>UndoDepth</code>: 50 (0–500, 0은 기록 비활성화)</li>
+</ul>
+<h3 id="server-config-sync">Server (Config Sync를 통한 권한 부여)</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true (마스터 스위치)</li>
+<li><code>AdminOnlyEdits</code>: false (관리자만)</li>
+<li><code>RespectWards</code>: true (다른 사람의 ward 차단)</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0 (off) — 서버가 강제하는 상한</li>
+</ul>
+<h3 id="_33">성능</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4 (1–32 타일/프레임)</li>
+</ul>
+<hr>
+<h2 id="_34">🐛 문제 해결</h2>
+<table>
+<thead>
+<tr>
+<th>문제</th>
+<th>해결 방법</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>메뉴가 나타나지 않음 / 커서가 보이지 않음</strong></td>
+<td>게임을 종료합니다. <code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\</code> 및 <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code>를 삭제합니다. TMM을 재시작하고 업데이트를 확인합니다.</td>
+</tr>
+<tr>
+<td><strong>TMM에 업데이트가 표시되지 않음</strong></td>
+<td>TMM → Settings → "Refresh mod list" (Ctrl+R). TMM을 닫았다 다시 엽니다. 올바른 프로필인지 확인합니다.</td>
+</tr>
+<tr>
+<td><strong>Thunderstore 버전 충돌</strong></td>
+<td><code>.csproj</code>, <code>Plugin.cs</code>, <code>manifest.json</code>에서 버전을 올립니다 (0.3.3 → 0.3.4). 다시 빌드 + 다시 업로드합니다.</td>
+</tr>
+<tr>
+<td><strong>스탬프 복사/붙여넣기가 아무것도 하지 않음</strong></td>
+<td>HUD: <code>STAMP READY [X/Y]</code> = 준비됨. "tool not equipped"라고 나오면 도구를 장착합니다 (SETTINGS → Stamp tool).</td>
+</tr>
+<tr>
+<td><strong>물속에서 미리보기가 보이지 않음</strong></td>
+<td>0.3.2에서 수정됨 — 미리보기가 수면에 떠 있습니다. 업데이트하세요.</td>
+</tr>
+<tr>
+<td><strong>선/Rect/Poly에 원이 표시됨</strong></td>
+<td>0.3.2에서 수정됨 — 표시한 윤곽만 표시됩니다. 업데이트하세요.</td>
+</tr>
+<tr>
+<td><strong>방사형 휠이 작동하지 않음</strong></td>
+<td>0.3.2 (<code>ZInput.GetMouseScrollWheel()</code>) 및 0.3.4 (커서가 중앙에 있어도 선택이 더 이상 지워지지 않음)에서 수정됨. 업데이트하세요.</td>
+</tr>
+<tr>
+<td><strong>Config가 저장되지 않음</strong></td>
+<td>메뉴를 닫으면(F5) 자동 저장됩니다. 또는 <code>BepInEx/config/com.terrainforge.valheim.cfg</code>를 직접 편집합니다.</td>
+</tr>
+<tr>
+<td><strong>멀티플레이어 디싱크</strong></td>
+<td>클라이언트+서버에 모드. 둘 다 <code>UnlockDeltaLimit</code>. 동일한 <code>MaxUpDelta</code>/<code>MaxDownDelta</code>.</td>
+</tr>
+<tr>
+<td><strong>빌드 실패</strong></td>
+<td><code>.csproj</code>의 <code>ValheimDir</code>, <code>BepInExCoreDir</code> 경로를 확인하거나 CLI로 확인합니다. .NET SDK 8+가 필요합니다.</td>
+</tr>
+<tr>
+<td><strong>컴파일 / 패키징</strong></td>
+<td><code>dotnet build -c Release</code> (<code>build/</code>의 DLL), <code>-p:Deploy=true</code> (프로필에 설치) 또는 <code>-p:Package=true</code> (<code>build/</code>의 zip).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_35">🔗 링크</h2>
+<ul>
+<li><strong>Thunderstore 페이지:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>GitHub 저장소:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>후원:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>Changelog:</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge — 한계 없이 Valheim을 조형하세요.</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

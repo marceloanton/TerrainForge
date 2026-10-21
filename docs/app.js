@@ -4,6 +4,9 @@ const translatable = document.querySelectorAll('[data-es][data-en]');
 function setLanguage(language) {
   const selected = language === 'en' ? 'en' : 'es';
   document.documentElement.lang = selected;
+  document.querySelectorAll('[data-manual-link]').forEach((link) => {
+    link.href = selected === 'en' ? 'manual/Home.html' : 'manual/Home-es.html';
+  });
   translatable.forEach((element) => {
     element.innerHTML = element.dataset[selected];
   });

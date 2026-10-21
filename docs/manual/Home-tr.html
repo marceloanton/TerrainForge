@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Türkçe · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="terrainforge-wiki">TerrainForge Wiki</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <em>Türkçe</em> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-037-duzeltmesi">TerrainForge 0.3.8 — 0.3.7 düzeltmesi</h3>
+<blockquote>
+<p>Q tekerinde ayrı bir Kopyala/Yapıştır modu var. Dikdörtgen Uygula ile A/B köşelerini, Çizgi iki ucu işaretler; Çokgen 3+ noktadan sonra çift basışla kopyalar; Daire/Kare fırça alanını kopyalar. HUD sonraki adımı gösterir. Kar, Boya &gt; DeepSnow içindedir (kaldırmak için Shift'i basılı tutun). F5 yerel hareketi ve kamerayı dondurur; Esc tek oyunculu dünyayı tamamen duraklatır. 0.3.6: F5 sekmeleri iki sıraya yerleştirir ve seçili işleme uygun ayarları gösterir. Ramp; İki Nokta, Sabit Açı ve Bağlantılı Yol modlarını sunar; dairesel rampalar 0.4.0 için planlandı.</p>
+</blockquote>
+<h2 id="icindekiler">İçindekiler</h2>
+<ol>
+<li><a href="#-kurulum">Kurulum</a></li>
+<li><a href="#-hızlı-başlangıç">Hızlı Başlangıç</a></li>
+<li><a href="#-kontroller">Kontroller</a></li>
+<li><a href="#-işlemler">İşlemler</a></li>
+<li><a href="#-şekiller">Şekiller</a></li>
+<li><a href="#-düşüş-modları">Düşüş Modları</a></li>
+<li><a href="#-stamps-kopyalayapıştır">Stamps (Kopyala/Yapıştır)</a></li>
+<li><a href="#-snapshots-yedekler">Snapshots (Yedekler)</a></li>
+<li><a href="#-profiller">Profiller</a></li>
+<li><a href="#-diller">Diller</a></li>
+<li><a href="#-çok-oyunculu">Çok Oyunculu</a></li>
+<li><a href="#-ayarlar">Ayarlar</a></li>
+<li><a href="#-sorun-giderme">Sorun Giderme</a></li>
+</ol>
+<hr>
+<h2 id="kurulum">📥 Kurulum</h2>
+<h3 id="gereksinimler">Gereksinimler</h3>
+<ul>
+<li><strong>BepInEx 5</strong> (x64, Mono) istemci ve sunucuda. Thunderstore kullanıcılarında zaten vardır.</li>
+</ul>
+<h3 id="admlar">Adımlar</h3>
+<ol>
+<li><code>TerrainForge-&lt;version&gt;.zip</code> dosyasını Thunderstore veya GitHub Releases üzerinden indirin.</li>
+<li>Çıkartın ve <code>TerrainForge.dll</code> dosyasını şuraya yerleştirin:
+   - <strong>İstemci:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>Sunucu:</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>Oyunu / sunucuyu yeniden başlatın.</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>İstemci VE sunucuda kurulu olmalıdır</strong> ±8 m'den büyük düzenlemeler ve doğru replikasyon için.</p>
+</blockquote>
+<hr>
+<h2 id="hzl-baslangc">🚀 Hızlı Başlangıç</h2>
+<ol>
+<li>Bir dünyaya katılın. <strong>TerrainForge Asası</strong> (Çekicin bir klonu) otomatik olarak verilir ve kuşanılır.</li>
+<li>Menüyü açmak için <code>F5</code> tuşuna basın (veya <code>ESC</code> duraklatma menüsündeki <strong>TerrainForge</strong> düğmesine tıklayın).</li>
+<li>Kuşanılı değilse asayı kuşanın.</li>
+<li>Araziye nişan alın ve şekillendirmek için <strong>sağ tık</strong> (<code>Mouse1</code>) tuşunu basılı tutun.</li>
+<li>İşlemleri değiştirmek için <code>,</code>, şekiller için <code>.</code>, boyalar için <code>/</code>.</li>
+<li><code>Q</code> tuşunu basılı tutun → radyal menü, onaylamak için bırakın.</li>
+<li>Geri al/yinele için <code>Ctrl+Z</code> / <code>Ctrl+Y</code>.</li>
+</ol>
+<hr>
+<h2 id="kontroller">⌨️ Kontroller</h2>
+<table>
+<thead>
+<tr>
+<th>Eylem</th>
+<th>Varsayılan tuş</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fırçayı uygula</td>
+<td><code>Mouse1</code> basılı tut (Sağ Tık)</td>
+<td>Nişangah altındaki araziyi şekillendirir</td>
+</tr>
+<tr>
+<td>Yarıçap +</td>
+<td><code>=</code> veya <code>Ctrl</code>+Tekerlek</td>
+<td>Fırça yarıçapını artırır</td>
+</tr>
+<tr>
+<td>Yarıçap −</td>
+<td><code>-</code> veya <code>Ctrl</code>+Tekerlek</td>
+<td>Fırça yarıçapını azaltır</td>
+</tr>
+<tr>
+<td>İşlemi değiştir</td>
+<td><code>,</code></td>
+<td>9 işlem arasında geçiş yapar</td>
+</tr>
+<tr>
+<td>Şekli değiştir</td>
+<td><code>.</code></td>
+<td>Daire → Kare → Çizgi → Dikt → Çokgen</td>
+</tr>
+<tr>
+<td>Boyayı değiştir</td>
+<td><code>/</code></td>
+<td>6 boya tipi arasında geçiş yapar</td>
+</tr>
+<tr>
+<td>Ayaklara düzle</td>
+<td><code>Left Shift</code> basılı tut</td>
+<td>Düzleştirme, oyuncunun yüksekliğini kullanır</td>
+</tr>
+<tr>
+<td>Geri al</td>
+<td><code>Ctrl+Z</code></td>
+<td>Son vuruşu geri alır</td>
+</tr>
+<tr>
+<td>Yinele</td>
+<td><code>Ctrl+Y</code></td>
+<td>Geri alınan vuruşu yineler</td>
+</tr>
+<tr>
+<td>Damlalık</td>
+<td><code>G</code></td>
+<td>Düzleştirme yüksekliğini nişangahta sabitler (tekrar = bırak)</td>
+</tr>
+<tr>
+<td>Rampa modu</td>
+<td><code>H</code></td>
+<td>Geçiş: İki Nokta → Sabit Açı → Yol (veya AYARLAR'da 3 düğmeyle seç)</td>
+</tr>
+<tr>
+<td>Sabit rampa açısı</td>
+<td><code>Alt</code> + yarıçap/tekerlek basılı tut</td>
+<td>Sabit modda açıyı ayarlar</td>
+</tr>
+<tr>
+<td>Radyal menü</td>
+<td><code>Q</code> basılı tut</td>
+<td>Fareyle bir işlem seç, bırakınca onaylar</td>
+</tr>
+<tr>
+<td>Ayar modu</td>
+<td><code>V</code></td>
+<td>Tekerlek = yarıçap, zoom/çubuğu/haritayı dondurur</td>
+</tr>
+<tr>
+<td>İnce ayar (0.1 m)</td>
+<td><code>Shift</code> + tekerlek/yarıçap basılı tut</td>
+<td>Hassas yarıçap ayarı</td>
+</tr>
+<tr>
+<td><strong>Stamp Kopyala</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>İşaretli alanı panoya kopyalar</td>
+</tr>
+<tr>
+<td><strong>Stamp Yapıştır</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>Hayalet önizleme, tıklama onaylar</td>
+</tr>
+<tr>
+<td>Asa Al</td>
+<td><code>F8</code></td>
+<td>TerrainForge Asasını verir</td>
+</tr>
+<tr>
+<td>Menüyü aç</td>
+<td><code>F5</code></td>
+<td>Tuşlar/yardım/ayarlar menüsünü açar</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ekstra tuşlar (varsayılan yok, TUŞLAR'da atayın):</strong>
+- Doğrudan işlem: Düzleştir, Yükselt, Alçalt, Yumuşat, Boya, Geri Yükle, Rampa, Kıyı, Kar
+- Sonraki / önceki profil
+- Sonraki / önceki stamp (geçmiş)</p>
+<p><strong>"Hızlı eylemler" bölümü (TUŞLAR sekmesi):</strong> zorunlu kısayolu olmayan işlevler için düğmeler — Geri Al, Yinele, Yüksekliği sabitle, Stamp kopyala/yapıştır, Önceki stamp, İşaretleri temizle, ısı haritaları ve Malzeme tanılaması (shader + doku yuvalarını loga döker).</p>
+<hr>
+<h2 id="islemler">🔄 İşlemler</h2>
+<table>
+<thead>
+<tr>
+<th>İşlem</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Düzleştir</strong></td>
+<td>Hedeflenen yüksekliğe düzler (Shift = ayaklarınızda). Damlalık (<code>G</code>) veya AYARLAR metin kutusu üzerinden sabit yükseklik.</td>
+</tr>
+<tr>
+<td><strong>Yükselt</strong></td>
+<td>Araziyi uygulama başına <code>RaiseDelta</code> kadar yükseltir. Düşüş modu şeklini verir.</td>
+</tr>
+<tr>
+<td><strong>Alçalt</strong></td>
+<td>Araziyi uygulama başına <code>RaiseDelta</code> kadar alçaltır. Düşüş modu şeklini verir.</td>
+</tr>
+<tr>
+<td><strong>Yumuşat</strong></td>
+<td>Gerçek bulanıklık (blur): her köşeyi komşu 8 noktasıyla ortalar. Aşamalı için basılı tutun. <strong>Modlar:</strong> Tamamı (ikisi), Yalnız Sırtlar (alçaltır), Yalnız Çukurlar (yükseltir). Çizgi şekli = bir yolu yumuşatır.</td>
+</tr>
+<tr>
+<td><strong>Rampa</strong></td>
+<td><strong>3 mod</strong> (<code>H</code> ile geçiş):<br>• <strong>İki Nokta</strong>: A ve B'yi işaretle → yükseklikleri düz bir eğim birleştirir.<br>• <strong>Sabit Açı</strong>: B = yön/uzunluk; yükseklik = <code>SlopeAngle</code> (nişangaha göre yukarı/aşağı). <code>Alt</code>+yarıçap ile ayarla.<br>• <strong>Yol</strong>: A→B→C… eğrisi işaretle (3+ ile çift basış kapatır) → düzgün Catmull-Rom.<br>Genişlik = fırça yarıçapı. Yumuşaklık = yalnız yan kenarlarda karışım. Önizleme: dolu koridor + A/B'de yükseklik halkaları.</td>
+</tr>
+<tr>
+<td><strong>Kıyı</strong></td>
+<td>Su seviyesine + <code>ShoreOffset</code> payına doğru düzler (plajlar). Yumuşaklık Düzleştir gibi.</td>
+</tr>
+<tr>
+<td><strong>Boya</strong></td>
+<td>Tipler: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Ayarlanabilir güç.</td>
+</tr>
+<tr>
+<td><strong>Geri Yükle</strong></td>
+<td>Araziyi orijinal durumuna döndürür (yükseklik + boya).</td>
+</tr>
+<tr>
+<td><strong>Kopyala/Yapıştır</strong></td>
+<td>Arazi seçmek ve stamp yerleştirmek için Q tekerinde özel mod.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="sekiller">📐 Şekiller</h2>
+<p><code>.</code> tuşuyla geçiş yapın. Hepsi geri almayı destekler.</p>
+<table>
+<thead>
+<tr>
+<th>Şekil</th>
+<th>İşaretleme</th>
+<th>Kullanım alanı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Daire</strong></td>
+<td>Tek tıklama (fırça merkezi)</td>
+<td>Genel şekillendirme</td>
+</tr>
+<tr>
+<td><strong>Kare</strong></td>
+<td>Tek tıklama (merkez)</td>
+<td>Platformlar, temeller</td>
+</tr>
+<tr>
+<td><strong>Çizgi</strong></td>
+<td>2 tıklama (A → B)</td>
+<td>Yollar, duvarlar, patikalar. Yarım genişlik = yarıçap.</td>
+</tr>
+<tr>
+<td><strong>Dikdörtgen</strong></td>
+<td>2 tıklama (karşıt köşeler)</td>
+<td>Temeller, çiftlikler, platformlar. Yumuşak kenarlar.</td>
+</tr>
+<tr>
+<td><strong>Çokgen</strong></td>
+<td>Köşe başına tıklama, çift tıklama kapatır (3+ köşe)</td>
+<td>Karmaşık şekiller, özel alanlar</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Dairesel olmayan şekiller <strong>yalnızca işaretli dış çizgiyi</strong> gösterir (dairesel halkalar yok).</li>
+<li>Yumuşaklık, tüm şekillerde kenar karışımını etkiler.</li>
+</ul>
+<hr>
+<h2 id="dusus-modlar-yukseltalcalt">⚙️ Düşüş Modları (Yükselt/Alçalt)</h2>
+<p>AYARLAR → "Yükselt/Alçalt düşüşü" içinde yapılandırma:</p>
+<table>
+<thead>
+<tr>
+<th>Mod</th>
+<th>Davranış</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sivri</strong></td>
+<td>Merkezi tepe. "Düşüş gücü" kaydırıcısıyla kontrol edilir (1–5).</td>
+</tr>
+<tr>
+<td><strong>Düz</strong></td>
+<td>Tekdüze disk — tüm yarıçap boyunca aynı ağırlık.</td>
+</tr>
+<tr>
+<td><strong>Pürüzsüz</strong></td>
+<td>Kosinüs çanı — pürüzsüz geçiş, sert kenar yok.</td>
+</tr>
+<tr>
+<td><strong>Doğrusal</strong></td>
+<td>Merkezden kenara düz daralma.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="stamps-kopyalayapstr">🧱 Stamps (Kopyala/Yapıştır)</h2>
+<p>Arazi yapılarını çoğaltmak için güçlü bir özellik.</p>
+<h3 id="dikdortgen-secimi-onerilir">Dikdörtgen seçimi (önerilir)</h3>
+<p>Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtgen için iki köşe, Çizgi için iki uç, Çokgen için köşeler (3+ noktadan sonra çift basış) veya Daire/Kare için fırça alanı. HUD sonraki adımı gösterir.</p>
+<h3 id="is-aks">İş akışı</h3>
+<ol>
+<li><strong>Alanı işaretleyin</strong>: herhangi bir şekil kullanın (Daire, Dikt, Çizgi, Çokgen, Rampa) — ya da yukarıdaki dikdörtgen seçimi.</li>
+<li><strong>Kopyala</strong>: <code>Ctrl+Shift+C</code> → "Stamp kopyalandı: X döşeme" (RAM panosu).</li>
+<li><strong>Yapıştırma önizlemesi</strong>: <code>Ctrl+Shift+V</code> → nişangahta hayalet tel kafes.
+   - <code>Q</code>/<code>E</code> = ±15° döndür
+   - <code>Alt</code>+Tekerlek = sürekli döndürme
+   - <code>Shift</code>+Tekerlek = 0.25×–4× ölçekle
+   - <code>Esc</code> = iptal</li>
+<li><strong>Confirm</strong>: Önizlemeyi onaylamak için yapıştırma kısayoluna tekrar basın.</li>
+</ol>
+<blockquote>
+<p>Seçim stamp'leri <strong>yalnızca kopyalanan bölgenin içine</strong> yazar; dışındaki arazi olduğu gibi bırakılır.</p>
+</blockquote>
+<h3 id="gecmis">Geçmiş</h3>
+<ul>
+<li>RAM'de en fazla <strong>10 stamp</strong> (en yenisi önce).</li>
+<li><code>Sonraki stamp</code> / <code>Önceki stamp</code> tuşları (yeniden atanabilir) aralarında geçiş yapar.</li>
+<li>Flaş: "Stamp geçmişi: Kopyala: 3 döşeme [2/5]"</li>
+</ul>
+<h3 id="kalclk">Kalıcılık</h3>
+<ul>
+<li><strong>AYARLAR → STAMPS</strong>:</li>
+<li>Mevcut stamp'i diske kaydedin (<code>.stamp</code>, <code>BepInEx/config/TerrainForge/stamps/</code> içinde, en çok 12).</li>
+<li>Bir stamp'i panoya yükleyin.</li>
+<li>Kayıtlı stamp'leri listeleyin/silin.</li>
+</ul>
+<h3 id="stamp-arac">Stamp aracı</h3>
+<ul>
+<li>AYARLAR → "Stamp aracı" (4 seçenek):</li>
+<li><code>Same as brush</code> (varsayılan) — fırçayla aynı aracı kullanır</li>
+<li><code>Any</code> — gereksinim yok</li>
+<li><code>Pickaxe</code> — bir kazma kuşanılmış olmalı</li>
+<li><code>TerrainForge Rod</code> — modun asasını gerektirir</li>
+<li>Araç kuşanılı + panoda stamp varken HUD <code>STAMP READY [2/5]</code> gösterir.</li>
+<li>Araç olmadan: <code>Stamp: tool not equipped</code>, kopyala/yapıştır engellenir.</li>
+</ul>
+<hr>
+<h2 id="snapshots-yedekler">💾 Snapshots (Yedekler)</h2>
+<p>Tam arazi yedekleme/geri yükleme.</p>
+<h3 id="kaydet">Kaydet</h3>
+<ol>
+<li>AYARLAR → <strong>SNAPSHOTS</strong>.</li>
+<li>Ad (boş = otomatik tarih/saat).</li>
+<li><strong>Kaydet</strong> → düzenlenen döşemeler <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code> içine (en çok 12).</li>
+</ol>
+<h3 id="yukle">Yükle</h3>
+<ol>
+<li>Bir snapshot seçin.</li>
+<li><strong>Yükle</strong> → döşemeleri sahiplikle geri yükler, <strong>1 geri alma adımı</strong>.</li>
+<li>Yüklenmemiş döşemeler temiz şekilde uyarır — orijinal konuma yakın içe aktarın.</li>
+</ol>
+<h3 id="ozellikler">Özellikler</h3>
+<ul>
+<li>Sürümlenmiş ikili biçim (<code>.dat</code>).</li>
+<li>Yükseklik + yumuşatma + boya + sahiplik geri yükler.</li>
+<li>İçe aktarma geri alınabilir (<code>Ctrl+Z</code> içe aktarmayı geri alır).</li>
+<li>Yüklenmemiş döşemeler temiz şekilde uyarır.</li>
+</ul>
+<hr>
+<h2 id="profiller">💾 Profiller</h2>
+<p>Eksiksiz fırça yapılandırmalarını kaydedin/yükleyin.</p>
+<ul>
+<li>AYARLAR → <strong>PROFILES</strong>.</li>
+<li>Ad + <strong>Kaydet</strong> → yarıçap, yumuşaklık, işlem, şekil, boya, rampa modu, açı, yumuşatma modu, yükseltme deltası, boya gücü, düşüş, kıyı payı.</li>
+<li><strong>Yükle</strong> → anında uygular.</li>
+<li>En çok 12 profil (<code>Presets &gt; Slots</code> içinde kültürden bağımsız biçim).</li>
+<li>Tuş ataması: geçiş yapmak için <code>Next Profile</code> (TUŞLAR'da atayın).</li>
+</ul>
+<hr>
+<h2 id="diller">🌐 Diller</h2>
+<p><strong>15 seçenek:</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> — varsayılan <code>Auto</code>.</p>
+<h3 id="otomatik-alglama">Otomatik Algılama</h3>
+<ul>
+<li>Varsayılan <code>Auto</code>, oyun dilini yansıma (reflection) ile algılar: <code>Localization.instance.GetSelectedLanguage()</code>.</li>
+<li>Valheim dilini → dahili dizine eşler.</li>
+<li>Bir dilin tam çevirisi yoksa → English'e geri döner.</li>
+<li>AYARLAR → "Dil" içinde yapılandırılabilir (15 seçenek arasında geçiş yapar).</li>
+<li>Menü açıldığında tuş etiketleri yeniden oluşturulur.</li>
+</ul>
+<h3 id="ceviri-durumu">Çeviri durumu</h3>
+<ul>
+<li><strong>Tamamlandı:</strong> English, Español</li>
+<li><strong>English'e geri dönüş:</strong> Français, Deutsch, Русский, 中文, 繁體中文, 日本語, 한국어, Polski, Português, Türkçe, Українська, Italiano</li>
+<li>Topluluk çevirileri PR yoluyla memnuniyetle karşılanır.</li>
+</ul>
+<h3 id="bu-dokumantasyon">Bu dokümantasyon</h3>
+<p>Çevrilmiş wiki sayfaları: <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>.</p>
+<hr>
+<h2 id="cok-oyunculu">🌍 Çok Oyunculu</h2>
+<h3 id="gereksinimler_1">Gereksinimler</h3>
+<ul>
+<li><strong>İstemci VE sunucuda mod</strong> ±8 m'den büyük düzenlemeler ve doğru replikasyon için.</li>
+<li>Sunucuda da <code>UnlockDeltaLimit</code>, aksi halde sunucu araziyi kısıtlar.</li>
+</ul>
+<h3 id="sunucu-yetkisi-config-sync">Sunucu Yetkisi (Config Sync)</h3>
+<p>Sunucu modu çalıştırdığında, <code>Server</code> bölümü kazanır:
+- <code>AllowTerrainEdits</code> (varsayılan <code>true</code>) — ana anahtar; <code>false</code> ise istemciler uygulayamaz/geri alamaz/yineleyemez.
+- <code>AdminOnlyEdits</code> (varsayılan <code>false</code>) — yalnızca yöneticiler/sunucu sahibi düzenleyebilir.
+- <code>RespectWards</code> (varsayılan <code>true</code>) — yabancı ward'lar içindeki düzenlemeleri engeller.
+- <code>RadiusCap</code> / <code>DeltaCap</code> (0 = kapalı) — sunucu tarafından uygulanan üst sınırlar, HUD+önizlemede görünür.</p>
+<blockquote>
+<p>Modu <strong>olmayan</strong> sunucular bu bölümü yok sayar → istemci test için çalışır.</p>
+</blockquote>
+<h3 id="desync-onleme">Desync Önleme</h3>
+<ul>
+<li><code>MaxUpDelta</code> / <code>MaxDownDelta</code> değerlerini sunucu + istemcilerde tutarlı tutun.</li>
+<li>Büyük yarıçaplar, modu olmayan istemcilerin senkronsuz kalmasına neden olabilir.</li>
+</ul>
+<hr>
+<h2 id="ayarlar">⚙️ Ayarlar</h2>
+<p>Dosya: <code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="genel">Genel</h3>
+<table>
+<thead>
+<tr>
+<th>Ayar</th>
+<th>Varsayılan</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>Ana anahtar</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>Uygularken toz + vuruş</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>TerrainForge Asasını (Çekicin bir klonu) renklendirir, böylece vanilla Çekiçten kolayca ayırt edilir</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>Asa hex rengi (model + simge). Örn. <code>#FFC400</code> altın, <code>#8BC34A</code> yeşil</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frca">Fırça</h3>
+<table>
+<thead>
+<tr>
+<th>Ayar</th>
+<th>Varsayılan</th>
+<th>Aralık</th>
+<th>Açıklama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>Fırça yarıçapı (m)</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>Ayar yaparken min yarıçap</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>Ayar yaparken maks yarıçap</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>Tuş/tekerlek başına yarıçap değişimi</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>Kenar yumuşaklığı (0 = sert, 100 = çok yumuşak)</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>Düşüş üssü (yalnız Sivri modu)</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>Yükselt/Alçalt uygulaması başına metre</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>Boya gücü</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>Başlangıç işlemi</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>Başlangıç şekli</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>Başlangıç boyası</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>Sabit rampa açısı (derece)</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>Su üstü kıyı payı (m)</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>Sabit yükseklik kullan (damlalık durumu)</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>Tam Düzleştirme yüksekliği (m)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vanilla-entegrasyon">Vanilla / entegrasyon</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false — asa kuşanılıyken vanilla çapa/kültivatör arazi düzenlemesini yok sayar. Ayrıca AYARLAR'da bir anahtar vardır.</li>
+</ul>
+<h3 id="girdi">Girdi</h3>
+<p>Tüm kısayollar TUŞLAR sekmesinde yeniden atanabilir. Öne çıkanlar:
+- <code>ApplyKey</code> (Mouse1), <code>RadiusUp/Down</code> (=/-), <code>CycleOp/Shape/Paint</code> (,/.//)
+- <code>UndoKey</code> (Ctrl+Z), <code>RedoKey</code> (Ctrl+Y), <code>EyedropKey</code> (G), <code>RampModeKey</code> (H)
+- <code>RadialKey</code> (Q), <code>AdjustModeKey</code> (V), <code>GiveToolKey</code> (F8), <code>RebindMenuKey</code> (F5)
+- <strong>Doğrudan işlem tuşları</strong> (9, varsayılan yok): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>, <code>CycleStampKey</code>, <code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool (varsayılan)
+- <code>AutoGiveTool</code>: true (katılırken asayı verir)</p>
+<h3 id="stamps">Stamps</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool (varsayılan Same as Brush)</li>
+</ul>
+<h3 id="onizleme">Önizleme</h3>
+<ul>
+<li><code>ShowPreview</code>: true, <code>ShowGuides</code>: true (erişim kılavuzları, eğim tonu, seviye halkası)</li>
+</ul>
+<h3 id="gecmis_1">Geçmiş</h3>
+<ul>
+<li><code>UndoDepth</code>: 50 (0–500, 0 geçmişi devre dışı bırakır)</li>
+</ul>
+<h3 id="sunucu-config-sync-ile-yetkili">Sunucu (Config Sync ile Yetkili)</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true (ana anahtar)</li>
+<li><code>AdminOnlyEdits</code>: false (yalnızca yöneticiler)</li>
+<li><code>RespectWards</code>: true (yabancı ward'ları engeller)</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0 (kapalı) — sunucu tarafından uygulanan üst sınırlar</li>
+</ul>
+<h3 id="performans">Performans</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4 (1–32 döşeme/kare)</li>
+</ul>
+<hr>
+<h2 id="sorun-giderme">🐛 Sorun Giderme</h2>
+<table>
+<thead>
+<tr>
+<th>Sorun</th>
+<th>Çözüm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Menü görünmüyor / görünmez imleç</strong></td>
+<td>Oyunu kapatın. <code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\</code> ve <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code> dizinlerini silin. TMM'i yeniden başlatın, güncellemeleri kontrol edin.</td>
+</tr>
+<tr>
+<td><strong>Güncelleme TMM'de görünmüyor</strong></td>
+<td>TMM → Settings → "Refresh mod list" (Ctrl+R). TMM'i kapatıp yeniden açın. Doğru profili doğrulayın.</td>
+</tr>
+<tr>
+<td><strong>Thunderstore sürüm çakışması</strong></td>
+<td>Sürümü (0.3.3 → 0.3.4) <code>.csproj</code>, <code>Plugin.cs</code>, <code>manifest.json</code> içinde yükseltin. Yeniden derleyin + yeniden yükleyin.</td>
+</tr>
+<tr>
+<td><strong>Stamp kopyala/yapıştır hiçbir şey yapmıyor</strong></td>
+<td>HUD: <code>STAMP READY [X/Y]</code> = hazır. "tool not equipped" diyorsa aracı kuşanın (AYARLAR → Stamp aracı).</td>
+</tr>
+<tr>
+<td><strong>Önizleme su altında görünmez</strong></td>
+<td>0.3.2'de düzeltildi — önizleme yüzeyde yüzer. Güncelleyin.</td>
+</tr>
+<tr>
+<td><strong>Çizgi/Dikt/Çokgen üzerinde daireler</strong></td>
+<td>0.3.2'de düzeltildi — yalnızca işaretli dış çizgi gösterilir. Güncelleyin.</td>
+</tr>
+<tr>
+<td><strong>Radyal tekerlek çalışmıyor</strong></td>
+<td>0.3.2 (<code>ZInput.GetMouseScrollWheel()</code>) ve 0.3.4'te (seçim artık merkezlenmiş imleçle silinmiyor) düzeltildi. Güncelleyin.</td>
+</tr>
+<tr>
+<td><strong>Config kaydedilmiyor</strong></td>
+<td>Otomatik kaydetmek için menüyü kapatın (F5). Veya <code>BepInEx/config/com.terrainforge.valheim.cfg</code> dosyasını doğrudan düzenleyin.</td>
+</tr>
+<tr>
+<td><strong>Çok oyunculu desync</strong></td>
+<td>İstemci+sunucuda mod. İkisinde de <code>UnlockDeltaLimit</code>. Aynı <code>MaxUpDelta</code>/<code>MaxDownDelta</code>.</td>
+</tr>
+<tr>
+<td><strong>Derleme başarısız</strong></td>
+<td><code>.csproj</code> veya CLI üzerinden <code>ValheimDir</code>, <code>BepInExCoreDir</code> yollarını kontrol edin. .NET SDK 8+ gerekir.</td>
+</tr>
+<tr>
+<td><strong>Derleme / paketleme</strong></td>
+<td><code>dotnet build -c Release</code> (<code>build/</code> içinde DLL), <code>-p:Deploy=true</code> (profile kurar) veya <code>-p:Package=true</code> (<code>build/</code> içinde zip).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="baglantlar">🔗 Bağlantılar</h2>
+<ul>
+<li><strong>Thunderstore sayfası:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>GitHub deposu:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>Bağışlar:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>Değişiklik günlüğü:</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge — Valheim'i sınırsızca şekillendir.</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

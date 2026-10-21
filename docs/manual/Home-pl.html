@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Polski · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="wiki-terrainforge">Wiki TerrainForge</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <em>Polski</em> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-poprawka-do-037">TerrainForge 0.3.8 — poprawka do 0.3.7</h3>
+<blockquote>
+<p>Koło Q ma osobny tryb Kopiuj/Wklej. Prostokąt wyznacza A/B klawiszem Zastosuj; Linia dwa końce; Wielokąt dodaje wierzchołki i kopiuje po dwukrotnym naciśnięciu przy 3+ punktach; Koło/Kwadrat kopiuje obszar pędzla. HUD pokazuje następny krok. Śnieg jest w Maluj &gt; DeepSnow (przytrzymaj Shift, aby usunąć). F5 blokuje lokalny ruch i kamerę; Esc pauzuje cały świat w trybie jednoosobowym. 0.3.6: F5 układa karty w dwóch rzędach i pokazuje ustawienia wybranej operacji. Ramp udostępnia tryby Dwa punkty, Stały kąt i Połączona ścieżka; rampy kołowe są planowane na 0.4.0.</p>
+</blockquote>
+<h2 id="spis-tresci">Spis treści</h2>
+<ol>
+<li><a href="#-instalacja">Instalacja</a></li>
+<li><a href="#-szybki-start">Szybki start</a></li>
+<li><a href="#-sterowanie">Sterowanie</a></li>
+<li><a href="#-operacje">Operacje</a></li>
+<li><a href="#-kształty">Kształty</a></li>
+<li><a href="#-tryby-opadania-podnoszenieobniżanie">Tryby opadania</a></li>
+<li><a href="#-stemple-kopiujwklej">Stemple (Kopiuj/Wklej)</a></li>
+<li><a href="#-migawki-backupy">Migawki (Backupy)</a></li>
+<li><a href="#-profile">Profile</a></li>
+<li><a href="#-języki">Języki</a></li>
+<li><a href="#-wieloosobowość">Wieloosobowość</a></li>
+<li><a href="#-ustawienia">Ustawienia</a></li>
+<li><a href="#-rozwiązywanie-problemów">Rozwiązywanie problemów</a></li>
+</ol>
+<hr>
+<h2 id="instalacja">📥 Instalacja</h2>
+<h3 id="wymagania">Wymagania</h3>
+<ul>
+<li><strong>BepInEx 5</strong> (x64, Mono) na kliencie i serwerze. Użytkownicy Thunderstore już go mają.</li>
+</ul>
+<h3 id="kroki">Kroki</h3>
+<ol>
+<li>Pobierz <code>TerrainForge-&lt;version&gt;.zip</code> z Thunderstore lub GitHub Releases.</li>
+<li>Rozpakuj i umieść <code>TerrainForge.dll</code> w:
+   - <strong>Klient:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>Serwer:</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>Uruchom ponownie grę / serwer.</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>Musi być zainstalowany na kliencie ORAZ serwerze</strong> dla edycji większych niż ±8 m i poprawnej replikacji.</p>
+</blockquote>
+<hr>
+<h2 id="szybki-start">🚀 Szybki start</h2>
+<ol>
+<li>Dołącz do świata. <strong>Różdżka TerrainForge</strong> (klon Młota) zostaje automatycznie przyznana i założona.</li>
+<li>Naciśnij <code>F5</code>, aby otworzyć menu (lub kliknij przycisk <strong>TerrainForge</strong> w menu pauzy <code>ESC</code>).</li>
+<li>Załóż różdżkę, jeśli nie jest założona.</li>
+<li>Wyceluj w teren i przytrzymaj <strong>prawy przycisk myszy</strong> (<code>Mouse1</code>), aby rzeźbić.</li>
+<li>Użyj <code>,</code>, aby przełączać operacje, <code>.</code> dla kształtów, <code>/</code> dla farb.</li>
+<li>Przytrzymaj <code>Q</code> → menu radialne, puść, aby potwierdzić.</li>
+<li><code>Ctrl+Z</code> / <code>Ctrl+Y</code>, aby cofnąć/ponowić.</li>
+</ol>
+<hr>
+<h2 id="sterowanie">⌨️ Sterowanie</h2>
+<table>
+<thead>
+<tr>
+<th>Akcja</th>
+<th>Domyślny klawisz</th>
+<th>Opis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zastosuj pędzel</td>
+<td>Przytrzymaj <code>Mouse1</code> (prawy przycisk myszy)</td>
+<td>Rzeźbi teren pod celownikiem</td>
+</tr>
+<tr>
+<td>Promień +</td>
+<td><code>=</code> lub <code>Ctrl</code>+Rolka</td>
+<td>Zwiększa promień pędzla</td>
+</tr>
+<tr>
+<td>Promień −</td>
+<td><code>-</code> lub <code>Ctrl</code>+Rolka</td>
+<td>Zmniejsza promień pędzla</td>
+</tr>
+<tr>
+<td>Przełącz operację</td>
+<td><code>,</code></td>
+<td>Przełącza 9 operacji</td>
+</tr>
+<tr>
+<td>Przełącz kształt</td>
+<td><code>.</code></td>
+<td>Koło → Kwadrat → Linia → Prostokąt → Wielokąt</td>
+</tr>
+<tr>
+<td>Przełącz farbę</td>
+<td><code>/</code></td>
+<td>Przełącza 6 typów farb</td>
+</tr>
+<tr>
+<td>Wyrównaj do stóp</td>
+<td>Przytrzymaj <code>Left Shift</code></td>
+<td>Wyrównywanie używa wysokości gracza</td>
+</tr>
+<tr>
+<td>Cofnij</td>
+<td><code>Ctrl+Z</code></td>
+<td>Cofa ostatnie pociągnięcie</td>
+</tr>
+<tr>
+<td>Ponów</td>
+<td><code>Ctrl+Y</code></td>
+<td>Ponawia cofnięte pociągnięcie</td>
+</tr>
+<tr>
+<td>Kroplomierz</td>
+<td><code>G</code></td>
+<td>Ustala wysokość Wyrównywania w miejscu celownika (ponownie = zwolnij)</td>
+</tr>
+<tr>
+<td>Tryb rampy</td>
+<td><code>H</code></td>
+<td>Przełącza: Dwa punkty → Stały kąt → Ścieżka (lub wybierz 3 przyciskami w USTAWIENIACH)</td>
+</tr>
+<tr>
+<td>Stały kąt rampy</td>
+<td>Przytrzymaj <code>Alt</code> + promień/rolka</td>
+<td>Dostosowuje kąt w trybie stałym</td>
+</tr>
+<tr>
+<td>Menu radialne</td>
+<td>Przytrzymaj <code>Q</code></td>
+<td>Wybierz operację myszą, puszczenie potwierdza</td>
+</tr>
+<tr>
+<td>Tryb dostosowania</td>
+<td><code>V</code></td>
+<td>Rolka = promień, blokuje zoom/pasek/mapę</td>
+</tr>
+<tr>
+<td>Precyzyjna regulacja (0.1 m)</td>
+<td>Przytrzymaj <code>Shift</code> + rolka/promień</td>
+<td>Dokładna regulacja promienia</td>
+</tr>
+<tr>
+<td><strong>Kopiuj stempel</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>Kopiuje zaznaczony obszar do schowka</td>
+</tr>
+<tr>
+<td><strong>Wklej stempel</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>Widmowy podgląd, kliknięcie potwierdza</td>
+</tr>
+<tr>
+<td>Pobierz różdżkę</td>
+<td><code>F8</code></td>
+<td>Przyznaje Różdżkę TerrainForge</td>
+</tr>
+<tr>
+<td>Otwórz menu</td>
+<td><code>F5</code></td>
+<td>Otwiera menu klawiszy/pomocy/ustawień</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dodatkowe klawisze (brak domyślnych, przypisz je w KLAWISZACH):</strong>
+- Operacja bezpośrednia: Wyrównaj, Podnieś, Obniż, Wygładź, Maluj, Przywróć, Rampa, Brzeg, Śnieg
+- Następny / poprzedni profil
+- Następny / poprzedni stempel (historia)</p>
+<p><strong>Sekcja "Szybkie akcje" (zakładka KLAWISZE):</strong> przyciski dla funkcji bez obowiązkowego skrótu — Cofnij, Ponów, Ustal wysokość, Kopiuj/Wklej stempel, Poprzedni stempel, Wyczyść znaczniki, mapy cieplne i Diagnostyka materiału (zrzuca shader + sloty tekstur do loga).</p>
+<hr>
+<h2 id="operacje">🔄 Operacje</h2>
+<table>
+<thead>
+<tr>
+<th>Operacja</th>
+<th>Opis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Wyrównaj</strong></td>
+<td>Wyrównuje do wskazanej wysokości (Shift = na wysokości twoich stóp). Stała wysokość przez Kroplomierz (<code>G</code>) lub pole tekstowe USTAWIEŃ.</td>
+</tr>
+<tr>
+<td><strong>Podnieś</strong></td>
+<td>Podnosi teren o <code>RaiseDelta</code> na zastosowanie. Tryb opadania nadaje mu kształt.</td>
+</tr>
+<tr>
+<td><strong>Obniż</strong></td>
+<td>Obniża teren o <code>RaiseDelta</code> na zastosowanie. Tryb opadania nadaje mu kształt.</td>
+</tr>
+<tr>
+<td><strong>Wygładź</strong></td>
+<td>Prawdziwe rozmycie: uśrednia każdy wierzchołek z jego 8 sąsiadami. Przytrzymaj dla efektu progresywnego. <strong>Tryby:</strong> Pełny (oba), Tylko grzbiety (obniża), Tylko zagłębienia (podnosi). Kształt Linia = wygładza ścieżkę.</td>
+</tr>
+<tr>
+<td><strong>Rampa</strong></td>
+<td><strong>3 tryby</strong> (przełącz <code>H</code>):<br>• <strong>Dwa punkty</strong>: zaznacz A i B → prosta pochyłość łączy wysokości.<br>• <strong>Stały kąt</strong>: B = kierunek/długość; wysokość = <code>SlopeAngle</code> (w górę/w dół zależnie od celownika). Dostosuj przez <code>Alt</code>+promień.<br>• <strong>Ścieżka</strong>: zaznacz krzywą A→B→C… (podwójne naciśnięcie przy 3+ zamyka) → gładka Catmull-Rom.<br>Szerokość = promień pędzla. Miękkość = blend tylko na bocznych krawędziach. Podgląd: wypełniony korytarz + pierścienie wysokości w A/B.</td>
+</tr>
+<tr>
+<td><strong>Brzeg</strong></td>
+<td>Wyrównuje w stronę poziomu wody + margines <code>ShoreOffset</code> (plaże). Miękkość jak Wyrównywanie.</td>
+</tr>
+<tr>
+<td><strong>Maluj</strong></td>
+<td>Typy: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Regulowana siła.</td>
+</tr>
+<tr>
+<td><strong>Przywróć</strong></td>
+<td>Przywraca teren do stanu pierwotnego (wysokość + farba).</td>
+</tr>
+<tr>
+<td><strong>Kopiuj/Wklej</strong></td>
+<td>Osobny tryb koła Q do zaznaczania terenu i umieszczania stampów.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="ksztaty">📐 Kształty</h2>
+<p>Przełączaj klawiszem <code>.</code>. Wszystkie obsługują cofanie.</p>
+<table>
+<thead>
+<tr>
+<th>Kształt</th>
+<th>Zaznaczanie</th>
+<th>Zastosowanie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Koło</strong></td>
+<td>Pojedyncze kliknięcie (środek pędzla)</td>
+<td>Ogólne rzeźbienie</td>
+</tr>
+<tr>
+<td><strong>Kwadrat</strong></td>
+<td>Pojedyncze kliknięcie (środek)</td>
+<td>Platformy, fundamenty</td>
+</tr>
+<tr>
+<td><strong>Linia</strong></td>
+<td>2 kliknięcia (A → B)</td>
+<td>Ścieżki, mury, szlaki. Połowa szerokości = promień.</td>
+</tr>
+<tr>
+<td><strong>Prostokąt</strong></td>
+<td>2 kliknięcia (przeciwległe rogi)</td>
+<td>Fundamenty, farmy, platformy. Miękkie krawędzie.</td>
+</tr>
+<tr>
+<td><strong>Wielokąt</strong></td>
+<td>Kliknięcie na wierzchołek, podwójne kliknięcie zamyka (3+ wierzchołki)</td>
+<td>Złożone kształty, własne obszary</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Kształty inne niż koło pokazują <strong>tylko zaznaczony kontur</strong> (bez okrągłych pierścieni).</li>
+<li>Miękkość wpływa na blend krawędzi we wszystkich kształtach.</li>
+</ul>
+<hr>
+<h2 id="tryby-opadania-podnoszenieobnizanie">⚙️ Tryby opadania (Podnoszenie/Obniżanie)</h2>
+<p>Konfiguracja w USTAWIENIACH → "Opadanie Raise/Lower":</p>
+<table>
+<thead>
+<tr>
+<th>Tryb</th>
+<th>Zachowanie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Spiczasty</strong></td>
+<td>Centralny szczyt. Kontrolowany suwakiem "Potęga opadania" (1–5).</td>
+</tr>
+<tr>
+<td><strong>Płaski</strong></td>
+<td>Równomierny dysk — ten sam ciężar na całym promieniu.</td>
+</tr>
+<tr>
+<td><strong>Gładki</strong></td>
+<td>Dzwon kosinusowy — płynne przejście, bez twardej krawędzi.</td>
+</tr>
+<tr>
+<td><strong>Liniowy</strong></td>
+<td>Proste zwężenie od środka do krawędzi.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="stemple-kopiujwklej">🧱 Stemple (Kopiuj/Wklej)</h2>
+<p>Potężna funkcja do replikowania struktur terenu.</p>
+<h3 id="wybierz-obszar-do-skopiowania">Wybierz obszar do skopiowania</h3>
+<p>Wybierz Kopiuj/Wklej w kole Q. Zastosuj wyznacza obszar: dwa rogi dla Prostokąta, dwa końce dla Linii, wierzchołki dla Wielokąta (dwuklik po 3+ punktach) lub obszar pędzla dla Koła/Kwadratu. HUD podpowiada następny krok.</p>
+<h3 id="przebieg-pracy">Przebieg pracy</h3>
+<ol>
+<li><strong>Zaznacz obszar</strong>: użyj dowolnego kształtu (Koło, Prostokąt, Linia, Wielokąt, Rampa) — lub selekcji prostokątem powyżej.</li>
+<li><strong>Kopiuj</strong>: <code>Ctrl+Shift+C</code> → "Skopiowano stempel: X kafelków" (schowek w RAM).</li>
+<li><strong>Podgląd wklejania</strong>: <code>Ctrl+Shift+V</code> → widmowa siatka w miejscu celownika.
+   - <code>Q</code>/<code>E</code> = obrót ±15°
+   - <code>Alt</code>+Rolka = ciągły obrót
+   - <code>Shift</code>+Rolka = skala 0.25×–4×
+   - <code>Esc</code> = anuluj</li>
+<li><strong>Potwierdź</strong>: Naciśnij ponownie klawisz wklejania, aby zatwierdzić podgląd.</li>
+</ol>
+<blockquote>
+<p>Stemple selekcji zapisują <strong>tylko wewnątrz skopiowanego obszaru</strong>; teren poza nim pozostaje nietknięty.</p>
+</blockquote>
+<h3 id="historia">Historia</h3>
+<ul>
+<li>Do <strong>10 stempli</strong> w RAM (najnowsze najpierw).</li>
+<li>Klawisze <code>Następny stempel</code> / <code>Poprzedni stempel</code> (przypisywalne) przełączają je.</li>
+<li>Komunikat: "Historia stempli: Copy: 3 kafelki [2/5]"</li>
+</ul>
+<h3 id="trwaosc">Trwałość</h3>
+<ul>
+<li><strong>USTAWIENIA → STEMPLE</strong>:</li>
+<li>Zapisz bieżący stempel na dysk (<code>.stamp</code> w <code>BepInEx/config/TerrainForge/stamps/</code>, maks. 12).</li>
+<li>Wczytaj stempel do schowka.</li>
+<li>Wyświetl/usuń zapisane stemple.</li>
+</ul>
+<h3 id="narzedzie-stempla">Narzędzie stempla</h3>
+<ul>
+<li>USTAWIENIA → "Narzędzie stempla" (4 opcje):</li>
+<li><code>Same as brush</code> (domyślnie) — używa tego samego narzędzia co pędzel</li>
+<li><code>Any</code> — brak wymagań</li>
+<li><code>Pickaxe</code> — wymaga założonego kilofa</li>
+<li><code>TerrainForge Rod</code> — wymaga różdżki z moda</li>
+<li>HUD pokazuje <code>STEMP GOTOWY [2/5]</code>, gdy narzędzie jest założone + stemple znajdują się w schowku.</li>
+<li>Bez narzędzia: <code>Stempel: narzędzie niezałożone</code>, kopiowanie/wklejanie zablokowane.</li>
+</ul>
+<hr>
+<h2 id="migawki-backupy">💾 Migawki (Backupy)</h2>
+<p>Pełny backup/przywracanie terenu.</p>
+<h3 id="zapisywanie">Zapisywanie</h3>
+<ol>
+<li>USTAWIENIA → <strong>SNAPSHOTS</strong>.</li>
+<li>Nazwa (pusta = automatyczna data/godzina).</li>
+<li><strong>Zapisz</strong> → edytowane kafelki do <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code> (maks. 12).</li>
+</ol>
+<h3 id="wczytywanie">Wczytywanie</h3>
+<ol>
+<li>Wybierz migawkę.</li>
+<li><strong>Wczytaj</strong> → przywraca kafelki wraz z własnością, <strong>1 krok cofania</strong>.</li>
+<li>Niewczytane kafelki ostrzegają w czytelny sposób — importuj blisko pierwotnej lokalizacji.</li>
+</ol>
+<h3 id="cechy">Cechy</h3>
+<ul>
+<li>Wersjonowany format binarny (<code>.dat</code>).</li>
+<li>Przywraca wysokość + smooth + farbę + własność.</li>
+<li>Import można cofnąć (<code>Ctrl+Z</code> wycofuje import).</li>
+<li>Niewczytane kafelki ostrzegają w czytelny sposób.</li>
+</ul>
+<hr>
+<h2 id="profile">💾 Profile</h2>
+<p>Zapisuj/wczytuj pełne konfiguracje pędzla.</p>
+<ul>
+<li>USTAWIENIA → <strong>PROFILE</strong>.</li>
+<li>Nazwa + <strong>Zapisz</strong> → promień, miękkość, operacja, kształt, farba, tryb rampy, kąt, tryb wygładzania, raise delta, siła farby, falloff, shore offset.</li>
+<li><strong>Wczytaj</strong> → stosuje natychmiast.</li>
+<li>Maks. 12 profili (format niezależny od kultury w <code>Presets &gt; Slots</code>).</li>
+<li>Skrót: <code>Next Profile</code> (przypisz w KLAWISZACH), aby przełączać.</li>
+</ul>
+<hr>
+<h2 id="jezyki">🌐 Języki</h2>
+<p><strong>15 opcji:</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> — domyślnie <code>Auto</code>.</p>
+<h3 id="auto-wykrywanie">Auto-Wykrywanie</h3>
+<ul>
+<li>Domyślne <code>Auto</code> wykrywa język gry przez reflection: <code>Localization.instance.GetSelectedLanguage()</code>.</li>
+<li>Mapuje język Valheim → indeks wewnętrzny.</li>
+<li>Jeśli język nie ma pełnego tłumaczenia → następuje powrót do English.</li>
+<li>Konfigurowalne w USTAWIENIACH → "Język" (przełącza 15 opcji).</li>
+<li>Etykiety klawiszy są odbudowywane przy otwarciu menu.</li>
+</ul>
+<h3 id="status-tumaczen">Status tłumaczeń</h3>
+<ul>
+<li><strong>Pełne:</strong> English, Español</li>
+<li><strong>Powrót do English:</strong> Français, Deutsch, Русский, 中文, 繁體中文, 日本語, 한국어, Polski, Português, Türkçe, Українська, Italiano</li>
+<li>Tłumaczenia społeczności mile widziane przez PR.</li>
+</ul>
+<h3 id="ta-dokumentacja">Ta dokumentacja</h3>
+<p>Przetłumaczone strony wiki: <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>.</p>
+<hr>
+<h2 id="wieloosobowosc">🌍 Wieloosobowość</h2>
+<h3 id="wymagania_1">Wymagania</h3>
+<ul>
+<li><strong>Mod na kliencie ORAZ serwerze</strong> dla edycji większych niż ±8 m i poprawnej replikacji.</li>
+<li><code>UnlockDeltaLimit</code> również na serwerze, w przeciwnym razie serwer ogranicza teren.</li>
+</ul>
+<h3 id="autorytet-serwera-synchronizacja-konfiguracji">Autorytet serwera (Synchronizacja konfiguracji)</h3>
+<p>Gdy serwer uruchamia mod, jego sekcja <code>Server</code> ma pierwszeństwo:
+- <code>AllowTerrainEdits</code> (domyślnie <code>true</code>) — główny przełącznik; jeśli <code>false</code>, klienci nie mogą stosować/cofać/ponawiać.
+- <code>AdminOnlyEdits</code> (domyślnie <code>false</code>) — tylko admini/host mogą edytować.
+- <code>RespectWards</code> (domyślnie <code>true</code>) — blokuje edycje wewnątrz obcych wards.
+- <code>RadiusCap</code> / <code>DeltaCap</code> (0 = wyłączone) — limity narzucane przez serwer, widoczne w HUD+podglądzie.</p>
+<blockquote>
+<p>Serwery <strong>bez</strong> moda ignorują tę sekcję → klient działa do testów.</p>
+</blockquote>
+<h3 id="zapobieganie-desynchronizacji">Zapobieganie desynchronizacji</h3>
+<ul>
+<li>Utrzymuj spójne <code>MaxUpDelta</code> / <code>MaxDownDelta</code> na serwerze + klientach.</li>
+<li>Duże promienie mogą desynchronizować klientów bez moda.</li>
+</ul>
+<hr>
+<h2 id="ustawienia">⚙️ Ustawienia</h2>
+<p>Plik: <code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="ogolne">Ogólne</h3>
+<table>
+<thead>
+<tr>
+<th>Ustawienie</th>
+<th>Domyślnie</th>
+<th>Opis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>Główny przełącznik</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>Pył + trafienie przy zastosowaniu</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>Barwi Różdżkę TerrainForge (klon Młota), aby łatwo odróżnić ją od waniliowego Młota</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>Kolor hex różdżki (model + ikona). Np. <code>#FFC400</code> złoty, <code>#8BC34A</code> zielony</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pedzel">Pędzel</h3>
+<table>
+<thead>
+<tr>
+<th>Ustawienie</th>
+<th>Domyślnie</th>
+<th>Zakres</th>
+<th>Opis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>Promień pędzla (m)</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>Minimalny promień podczas dostosowywania</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>Maksymalny promień podczas dostosowywania</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>Zmiana promienia na klawisz/rolkę</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>Miękkość krawędzi (0 = twarda, 100 = bardzo miękka)</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>Wykładnik opadania (tylko tryb Spiczasty)</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>Metry na zastosowanie Podnieś/Obniż</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>Siła farby</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>Operacja początkowa</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>Kształt początkowy</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>Farba początkowa</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>Stały kąt rampy (stopnie)</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>Margines brzegu nad wodą (m)</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>Używaj stałej wysokości (stan kroplomierza)</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>Dokładna wysokość Wyrównywania (m)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vanilla-integracja">Vanilla / integracja</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false — przy założonej różdżce ignoruje edycję terenu waniliowej motyki/kultywatora. W USTAWIENIACH jest też przełącznik.</li>
+</ul>
+<h3 id="wejscie">Wejście</h3>
+<p>Wszystkie skróty są przypisywalne na zakładce KLAWISZE. Najważniejsze:
+- <code>ApplyKey</code> (Mouse1), <code>RadiusUp/Down</code> (=/-), <code>CycleOp/Shape/Paint</code> (,/.//)
+- <code>UndoKey</code> (Ctrl+Z), <code>RedoKey</code> (Ctrl+Y), <code>EyedropKey</code> (G), <code>RampModeKey</code> (H)
+- <code>RadialKey</code> (Q), <code>AdjustModeKey</code> (V), <code>GiveToolKey</code> (F8), <code>RebindMenuKey</code> (F5)
+- <strong>Bezpośrednie klawisze operacji</strong> (9, brak domyślnych): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>, <code>CycleStampKey</code>, <code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool (domyślnie)
+- <code>AutoGiveTool</code>: true (przyznaje różdżkę po dołączeniu)</p>
+<h3 id="stemple">Stemple</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool (domyślnie Same as Brush)</li>
+</ul>
+<h3 id="podglad">Podgląd</h3>
+<ul>
+<li><code>ShowPreview</code>: true, <code>ShowGuides</code>: true (prowadnice zasięgu, przyciemnienie nachylenia, pierścień poziomu)</li>
+</ul>
+<h3 id="historia_1">Historia</h3>
+<ul>
+<li><code>UndoDepth</code>: 50 (0–500, 0 wyłącza historię)</li>
+</ul>
+<h3 id="serwer-autorytatywny-przez-config-sync">Serwer (Autorytatywny przez Config Sync)</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true (główny przełącznik)</li>
+<li><code>AdminOnlyEdits</code>: false (tylko admini)</li>
+<li><code>RespectWards</code>: true (blokuje obce wards)</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0 (wyłączone) — limity narzucane przez serwer</li>
+</ul>
+<h3 id="wydajnosc">Wydajność</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4 (1–32 kafelków/klatkę)</li>
+</ul>
+<hr>
+<h2 id="rozwiazywanie-problemow">🐛 Rozwiązywanie problemów</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Rozwiązanie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Menu się nie pojawia / niewidoczny kursor</strong></td>
+<td>Zamknij grę. Usuń <code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\</code> i <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code>. Uruchom ponownie TMM, sprawdź aktualizacje.</td>
+</tr>
+<tr>
+<td><strong>Aktualizacja nie pojawia się w TMM</strong></td>
+<td>TMM → Settings → "Refresh mod list" (Ctrl+R). Zamknij/otwórz ponownie TMM. Sprawdź właściwy profil.</td>
+</tr>
+<tr>
+<td><strong>Konflikt wersji w Thunderstore</strong></td>
+<td>Podnieś wersję (0.3.3 → 0.3.4) w <code>.csproj</code>, <code>Plugin.cs</code>, <code>manifest.json</code>. Przebuduj + wgraj ponownie.</td>
+</tr>
+<tr>
+<td><strong>Kopiowanie/wklejanie stempla nic nie robi</strong></td>
+<td>HUD: <code>STEMP GOTOWY [X/Y]</code> = gotowe. Jeśli "narzędzie niezałożone", załóż narzędzie (USTAWIENIA → Narzędzie stempla).</td>
+</tr>
+<tr>
+<td><strong>Podgląd niewidoczny pod wodą</strong></td>
+<td>Naprawione w 0.3.2 — podgląd unosi się na powierzchni. Zaktualizuj.</td>
+</tr>
+<tr>
+<td><strong>Okręgi na Linii/Prostokącie/Wielokącie</strong></td>
+<td>Naprawione w 0.3.2 — pokazywany jest tylko zaznaczony kontur. Zaktualizuj.</td>
+</tr>
+<tr>
+<td><strong>Rolka radialna nie działa</strong></td>
+<td>Naprawione w 0.3.2 (<code>ZInput.GetMouseScrollWheel()</code>) i 0.3.4 (zaznaczenie nie jest już czyszczone przy wyśrodkowanym kursorze). Zaktualizuj.</td>
+</tr>
+<tr>
+<td><strong>Konfiguracja się nie zapisuje</strong></td>
+<td>Zamknij menu (F5), aby zapisać automatycznie. Albo edytuj <code>BepInEx/config/com.terrainforge.valheim.cfg</code> bezpośrednio.</td>
+</tr>
+<tr>
+<td><strong>Desynchronizacja w trybie wieloosobowym</strong></td>
+<td>Mod na kliencie+serwerze. <code>UnlockDeltaLimit</code> na obu. Te same <code>MaxUpDelta</code>/<code>MaxDownDelta</code>.</td>
+</tr>
+<tr>
+<td><strong>Budowanie kończy się niepowodzeniem</strong></td>
+<td>Sprawdź ścieżki <code>ValheimDir</code>, <code>BepInExCoreDir</code> w <code>.csproj</code> lub przez CLI. Wymagany .NET SDK 8+.</td>
+</tr>
+<tr>
+<td><strong>Kompilacja / pakowanie</strong></td>
+<td><code>dotnet build -c Release</code> (DLL w <code>build/</code>), <code>-p:Deploy=true</code> (instaluje w profilu) lub <code>-p:Package=true</code> (zip w <code>build/</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="linki">🔗 Linki</h2>
+<ul>
+<li><strong>Strona Thunderstore:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>Repozytorium GitHub:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>Dotacje:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>Dziennik zmian:</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge — Terraformuj Valheim bez ograniczeń.</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

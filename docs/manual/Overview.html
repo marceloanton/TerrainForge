@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Overview · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="terrainforge-overview">TerrainForge Overview</h1>
+<p><a href="Home.html">Manual (English)</a> · <a href="https://marceloanton.github.io/TerrainForge/">Project website</a> · <a href="Changelog.html">Changelog</a></p>
+<p><a href="https://cafecito.app/byrka"><img alt="Buy me a coffee at cafecito.app" src="https://cdn.cafecito.app/imgs/buttons/button_5.svg"></a></p>
+<p>A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build <strong>ramps</strong> (two-point, fixed-angle and path), shape <strong>shorelines</strong>, paint and restore terrain of any size — beyond the vanilla ±8 m limit — with undo/redo, five brush shapes, a radial menu, saved profiles, <strong>terrain stamps (copy/paste)</strong>, terrain snapshots and <strong>14 in-game languages with auto-detect</strong>.</p>
+<blockquote>
+<p>📖 <strong>Full documentation &amp; translations (14 languages):</strong> <a href="https://github.com/marceloanton/TerrainForge/wiki">Wiki</a> — see the <strong>Documentation languages</strong> list below.</p>
+</blockquote>
+<hr>
+<h2 id="038-hotfix-for-037">0.3.8 Hotfix for 0.3.7</h2>
+<p>The supplied 0.3.7 log showed repeated TerrainForge Rod network-prefab registration failures for an already-used stable hash (<code>506871212</code>) and invalid item entries during ObjectDB registration. It also contained a successful tool-registration message, so those log lines alone do not establish why the mod was unusable.</p>
+<p>This hotfix reuses an existing matching network prefab entry, removes invalid ObjectDB entries before rebuilding indexes, cleans up a clone after failed registration, and improves equipped-tool detection when free camera hides hand slots. <strong>These changes still need an in-game check: confirm the rod is handed out and terrain editing works before publishing.</strong></p>
+<hr>
+<h2 id="features-carried-forward-from-036">Features carried forward from 0.3.6</h2>
+<ul>
+<li>F5 now uses a two-row tab layout and operation-specific controls. Ramp mode keeps Two-Point, Fixed-Angle, and Connected Path visible with the relevant width, softness, and angle settings.</li>
+<li>The connected ramp mode is a continuous path through 3+ marked points; choose <strong>Connected</strong> in the F5 Ramp panel or cycle with <code>H</code>.</li>
+<li>Circular ramps (level ring or height-changing spiral) are proposed for 0.4.0; final behavior remains to be prototyped.</li>
+<li><strong>Unified operation UI</strong> — F5 glyphs also appear in the Q radial wheel and next to the terrain target, with a compact status card replacing the old long HUD text.</li>
+<li><strong>Dedicated Copy/Paste tab</strong> — F5 now has visible copy, paste-preview/confirm, clipboard-history, and saved-stamp controls in one place.</li>
+<li>Q wheel now includes a separate Copy/Paste mode. Rectangle uses two corners, Line two endpoints, Polygon vertices, and Circle/Square the brush footprint; the HUD prompts for each selection step.</li>
+<li>Snow is grouped under Paint as <code>DeepSnow</code> (hold the height modifier to remove it). F5 freezes local movement/camera look, dims the background, and adapts to screen size.</li>
+<li>
+<p>Plugin metadata was aligned at version 0.3.6. Rod registration supports rebuilt world databases, revalidates the live item index during gameplay, and retries network registration after item initialization.</p>
+</li>
+<li>
+<p><strong>Free camera (<code>F</code>) fixed</strong> — while flying, right-click no longer triggers lock-on, brush drift or a screenshot; <code>Ctrl</code>+wheel adjusts the brush radius; brush adjustments take priority.</p>
+</li>
+<li><strong>Docs &amp; wiki in 14 languages</strong> — README and CHANGELOG in English, and the full manual on the <a href="https://github.com/marceloanton/TerrainForge/wiki">Wiki</a> (<code>Home</code> + 13 translations).</li>
+</ul>
+<hr>
+<h2 id="description">Description</h2>
+<p>TerrainForge ships its own <strong>TerrainForge Rod</strong> (a Hammer clone) as the brush tool. It is handed to you automatically when you join a world and everything is explained in an in-game <strong>Help</strong> tab (menu key, default <code>F5</code>).</p>
+<hr>
+<h2 id="why-client-and-server">Why client AND server</h2>
+<p>Terrain edits are stored in the world and the server replicates them to every player. Because the game clamps edits to ±8 m, <strong>TerrainForge must also be installed on the server</strong>; otherwise the server regenerates the clamped terrain while clients see the full edit → desync.</p>
+<hr>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li><strong>BepInEx 5</strong> (x64, Mono) on both client and server. Thunderstore users already have it. TerrainForge registers its own tool; Jotunn is not required.</li>
+</ul>
+<hr>
+<h2 id="installation">Installation</h2>
+<ol>
+<li>Download the latest version from Thunderstore or GitHub Releases.</li>
+<li>Place it at:
+   - <strong>Client:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>Server:</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>Restart the game / server.</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>Must be on both</strong> (client and server) for edits greater than ±8 m and correct replication.</p>
+</blockquote>
+<hr>
+<h2 id="usage">Usage</h2>
+<p>Equip the <strong>TerrainForge Rod</strong> (given on world join; get it again with <code>F8</code>), aim at the ground and hold <strong>right-click</strong> to sculpt.</p>
+<p>While aiming, a solid ring marks the real brush area, with faint guides in the operation color (full-strength zone, max radius, max aim distance). For Ramp, the real A–B corridor is drawn while you mark. The HUD (bottom-right) shows operation, radius, shape, paint and undo/redo counters; a second line shows the aimed height, current target and local slope in degrees. Guides can be disabled in <code>Preview &gt; Show guides</code>.</p>
+<hr>
+<h2 id="controls">Controls</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Default key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Apply brush</td>
+<td>Hold <code>Mouse1</code> (right-click)</td>
+</tr>
+<tr>
+<td>Radius +</td>
+<td><code>=</code> (also <code>Ctrl</code> + wheel)</td>
+</tr>
+<tr>
+<td>Radius −</td>
+<td><code>-</code> (also <code>Ctrl</code> + wheel)</td>
+</tr>
+<tr>
+<td>Cycle operation</td>
+<td><code>,</code></td>
+</tr>
+<tr>
+<td>Cycle shape</td>
+<td><code>.</code></td>
+</tr>
+<tr>
+<td>Cycle paint</td>
+<td><code>/</code></td>
+</tr>
+<tr>
+<td>Use aimed height (instead of your feet) for Flatten</td>
+<td>Hold <code>Left Shift</code></td>
+</tr>
+<tr>
+<td>Undo last stroke</td>
+<td><code>Ctrl+Z</code></td>
+</tr>
+<tr>
+<td>Redo undone stroke</td>
+<td><code>Ctrl+Y</code></td>
+</tr>
+<tr>
+<td>Fix / release Flatten height (eyedropper)</td>
+<td><code>G</code></td>
+</tr>
+<tr>
+<td>Cycle ramp mode (two-point / fixed-angle / connected path)</td>
+<td><code>H</code></td>
+</tr>
+<tr>
+<td>Adjust fixed-ramp angle (with Ramp selected)</td>
+<td>Hold <code>Alt</code> + radius keys / wheel</td>
+</tr>
+<tr>
+<td>Radial operation menu (hold, release to confirm)</td>
+<td><code>Q</code></td>
+</tr>
+<tr>
+<td>Adjust mode (wheel = radius, zoom frozen)</td>
+<td><code>V</code></td>
+</tr>
+<tr>
+<td>Fine radius steps (0.1 m)</td>
+<td>Hold <code>Shift</code> + wheel / radius keys</td>
+</tr>
+<tr>
+<td><strong>Copy terrain (Stamp)</strong></td>
+<td><code>Ctrl+Shift+C</code> or Apply in the Q wheel's Copy/Paste mode</td>
+</tr>
+<tr>
+<td><strong>Paste terrain (Stamp)</strong></td>
+<td><code>Ctrl+Shift+V</code> (start/confirm preview)</td>
+</tr>
+<tr>
+<td>Get the TerrainForge Rod</td>
+<td><code>F8</code></td>
+</tr>
+<tr>
+<td>Open the keys + help menu</td>
+<td><code>F5</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Extra keys (no default, assign them in KEYS):</strong>
+- Direct operation: Flatten, Raise, Lower, Smooth, Paint, Restore, Ramp, Shore; the legacy Snow shortcut selects Paint + DeepSnow.
+- Next / previous profile
+- Next / previous stamp (history)</p>
+<hr>
+<h2 id="operations">Operations</h2>
+<p>The nine Q wheel modes are <code>Flatten</code>, <code>Raise</code>, <code>Lower</code>, <code>Smooth</code>, <code>Ramp</code>, <code>Paint</code>, <code>Restore</code>, <code>Shore</code>, and <code>Copy/Paste</code>. Snow is a Paint type (<code>DeepSnow</code>); hold <code>Shift</code> to remove it and restore the original ground.</p>
+<h3 id="details">Details</h3>
+<ul>
+<li><strong>Flatten</strong> — follows the ground <strong>under the crosshair</strong> by default and adapts to what you aim at (e.g. a ramp). Hold <code>Left Shift</code> to level at your feet.</li>
+<li><strong>Raise / Lower</strong> — raise or lower terrain according to the falloff mode and power.</li>
+<li><strong>Smooth</strong> — averages each point with its neighbours (a real blur), smoothing ridges, steps and noise. Hold to smooth progressively. Modes: <code>Full</code> (both ways), <code>Ridges only</code> (lowers only), <code>Dips only</code> (fills only). Shape Line + Smooth = smooth along a path.</li>
+<li><strong>Ramp</strong> — three modes (<code>H</code>): <strong>two-point</strong> (mark <strong>A</strong> and <strong>B</strong>, joins both heights with a straight slope), <strong>fixed-angle</strong> (<strong>B</strong> gives direction and length, height follows <code>Ramp angle</code>, adjustable with <code>Alt</code> + radius), and <strong>connected path</strong> (mark 3+ points for one continuous curve <strong>A→B→C…</strong>, then double-press to build it). The brush radius sets the ramp width and softness only softens the side edges. Preview: filled semi-transparent corridor + height rings at A and B.</li>
+<li><strong>Shore</strong> — flattens toward the water level + margin (beaches/coastlines), with softness blending like Flatten.</li>
+<li><strong>Paint</strong> — types: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset.</li>
+<li><strong>Restore</strong> — returns the terrain to its original state.</li>
+</ul>
+<hr>
+<h2 id="shapes">Shapes</h2>
+<p><code>Circle</code>, <code>Square</code>, <code>Line</code>, <code>Rectangle</code>, <code>Polygon</code> (key <code>.</code>).</p>
+<ul>
+<li><code>Line</code> / <code>Rectangle</code>: two Apply presses (A and B; line half-width = brush radius, corners define the area with soft edges).</li>
+<li><code>Polygon</code>: adds a vertex per press and closes on a double-press (3+ vertices).</li>
+<li>All area operations apply over these footprints with undo support.</li>
+</ul>
+<hr>
+<h2 id="falloff-modes-raiselower">Falloff modes (Raise/Lower)</h2>
+<p>Cycle in SETTINGS → "Raise/Lower falloff":</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pointy</strong> (original)</td>
+<td>Central peak, controlled by "Falloff power"</td>
+</tr>
+<tr>
+<td><strong>Flat</strong></td>
+<td>Uniform disc, same weight across the whole radius</td>
+</tr>
+<tr>
+<td><strong>Smooth</strong></td>
+<td>Cosine bell, smooth transition</td>
+</tr>
+<tr>
+<td><strong>Linear</strong></td>
+<td>Decreases in a straight line from centre to edge</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="in-game-languages">In-game languages</h2>
+<p><strong>15 options:</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> — default <code>Auto</code>.</p>
+<p><strong>Auto-detect:</strong> by default <code>Auto</code> detects the language configured in Valheim via reflection. If a language has no complete translation, it falls back to English.</p>
+<blockquote>
+<p>Documentation is available in other languages on the <a href="https://github.com/marceloanton/TerrainForge/wiki">Wiki</a>. See the <strong>Documentation languages</strong> list at the bottom of this page.</p>
+</blockquote>
+<hr>
+<h2 id="snapshots-backups">Snapshots (Backups)</h2>
+<p><strong>SNAPSHOTS</strong> tab in SETTINGS: give it a name to save all edited tiles to <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code>, then load it later (even in another save). Import restores with ownership and is undoable; unloaded tiles warn cleanly.</p>
+<hr>
+<h2 id="stamps-copypaste-terrain">Stamps (Copy/Paste Terrain)</h2>
+<p><strong>STAMPS</strong> tab in SETTINGS.</p>
+<ul>
+<li><strong>Copy a selected area:</strong> choose <code>Copy/Paste</code> in the Q wheel. <code>Rectangle</code> marks corners A and B with Apply; <code>Line</code> marks two endpoints; <code>Polygon</code> adds vertices and copies on a double-press after 3+ points; <code>Circle</code>/<code>Square</code> copy the aimed brush footprint. The HUD shows the next step. <code>Ctrl+Shift+C</code> follows the same selection flow.</li>
+<li><code>Ctrl+Shift+V</code> shows a ghost (wireframe) preview at the crosshair; <code>Q</code>/<code>E</code> rotate, <code>Alt</code>+wheel rotates continuously, <code>Shift</code>+wheel scales, use the paste shortcut again to confirm.</li>
+<li>Pasting writes <strong>only inside the copied region</strong>; it does not erase terrain outside it.</li>
+<li>History of 10 stamps in RAM: "Next stamp" / "Previous stamp" keys cycle them.</li>
+<li>Save a stamp to disk (<code>.stamp</code> in <code>BepInEx/config/TerrainForge/stamps/</code>, max 12), load it into the clipboard, list and delete from the UI.</li>
+<li><strong>Stamp tool</strong>: in SETTINGS → "Stamp tool" (4 options): <code>Same as brush</code> (default), <code>Any</code>, <code>Pickaxe</code>, <code>TerrainForge Rod</code>. The HUD shows <code>STAMP READY [2/5]</code> when the right tool is equipped and the clipboard has stamps; otherwise it warns <code>Stamp: tool not equipped</code>. <code>Ctrl+Shift+C/V</code> do nothing without the tool equipped.</li>
+</ul>
+<hr>
+<h2 id="preview">Preview</h2>
+<ul>
+<li>Solid ring: the real generated area.</li>
+<li>Faint guides: full-strength zone, max radius, max aim distance.</li>
+<li>For Ramp: the real A–B corridor (edges + semi-transparent fill) + height rings at A and B.</li>
+<li>For Flatten/Shore: a marker ring for the target level.</li>
+<li>Blocked by server/ward: guides in grey.</li>
+<li>Underwater: the preview floats on the surface.</li>
+</ul>
+<hr>
+<h2 id="in-game-menu-f5">In-game menu (<code>F5</code>)</h2>
+<p>6 tabs with a <strong>global scroll</strong> (mouse wheel):</p>
+<table>
+<thead>
+<tr>
+<th>Tab</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BRUSH</strong></td>
+<td>Choose the operation and shape, and tune brush parameters.</td>
+</tr>
+<tr>
+<td><strong>CONTROLS</strong></td>
+<td>Rebind keys: click → press a key/button; <code>Esc</code> cancels.</td>
+</tr>
+<tr>
+<td><strong>SAVED</strong></td>
+<td>Manage profiles, snapshots, and history.</td>
+</tr>
+<tr>
+<td><strong>OPTIONS</strong></td>
+<td>Configure tool, display, server rules, and language.</td>
+</tr>
+<tr>
+<td><strong>GUIDE</strong></td>
+<td>Reference for operations, controls, preview, multiplayer, and saving.</td>
+</tr>
+<tr>
+<td><strong>COPY/PASTE</strong></td>
+<td>Copy selected terrain, place/confirm paste previews, and manage stamps.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ESC button:</strong> the pause menu has a "TerrainForge" button that opens the panel. F5 freezes local movement and camera look; it does not pause the multiplayer world.</p>
+<hr>
+<h2 id="server-client">Server + Client</h2>
+<ul>
+<li><strong>Required on both</strong> for edits greater than ±8 m and correct replication.</li>
+<li><code>Server</code> section (authoritative via config sync):</li>
+<li><code>AllowTerrainEdits</code> (default on)</li>
+<li><code>AdminOnlyEdits</code> (default off)</li>
+<li><code>RespectWards</code> (default on)</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code> (0 = no limit)</li>
+<li>A server <strong>without</strong> the mod ignores the section → the client still works for testing.</li>
+</ul>
+<hr>
+<h2 id="performance">Performance</h2>
+<p><code>TilesPerFrame</code> (1–32, default 4): tiles per frame on large strokes. Prevents lag.</p>
+<hr>
+<h2 id="changelog">Changelog</h2>
+<p>See <a href="Changelog.html">Changelog</a>.</p>
+<hr>
+<h2 id="links">Links</h2>
+<ul>
+<li><strong>Thunderstore:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>GitHub repository:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>Wiki / documentation:</strong> https://github.com/marceloanton/TerrainForge/wiki</li>
+<li><strong>Donations:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+</ul>
+<h3 id="documentation-languages">Documentation languages</h3>
+<p><a href="Home.html">English manual</a> · <em>English overview</em> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-es">Español</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-fr">Français</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-de">Deutsch</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-ru">Русский</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-zh">中文</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-zh-tw">繁體中文</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-ja">日本語</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-ko">한국어</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-pl">Polski</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-pt">Português</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-tr">Türkçe</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-uk">Українська</a> · <a href="https://github.com/marceloanton/TerrainForge/wiki/Home-it">Italiano</a></p>
+<!--
+All 14 wiki pages are live: Home (en), Home-es, Home-fr, Home-de, Home-ru,
+Home-zh, Home-zh-tw, Home-ja, Home-ko, Home-pl, Home-pt, Home-tr, Home-uk, Home-it.
+When a new translated page is published, add it to the list above and to wiki/_Sidebar.md.
+--></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

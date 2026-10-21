@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>日本語 · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="terrainforge">TerrainForge ウィキ</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <em>日本語</em> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-037">TerrainForge 0.3.8 — 0.3.7の修正</h3>
+<blockquote>
+<p>Qホイールに専用のコピー/貼り付けモードを追加。矩形は適用キーでA/B、線は両端、多角形は頂点を指定して3点以上からダブル押しでコピー、円/四角形はブラシ範囲をコピーします。HUDが次の操作を表示します。雪は塗装 &gt; DeepSnow に統合（Shift長押しで除去）。F5中はローカルの移動とカメラを固定し、Escはシングルプレイ全体を一時停止します。 0.3.6: F5のタブを2行に整理し、選択中の操作に必要な設定だけを表示します。Rampには2点、固定角度、連結経路があり、円形ランプは0.4.0向けに計画中です。</p>
+</blockquote>
+<h2 id="_1">目次</h2>
+<ol>
+<li><a href="#-インストール">インストール</a></li>
+<li><a href="#-クイックスタート">クイックスタート</a></li>
+<li><a href="#-キー操作">キー操作</a></li>
+<li><a href="#-操作">操作</a></li>
+<li><a href="#-形状">形状</a></li>
+<li><a href="#-フォールオフモード-上昇下降">フォールオフモード (上昇/下降)</a></li>
+<li><a href="#-スタンプ-コピーペースト">スタンプ (コピー/ペースト)</a></li>
+<li><a href="#-スナップショット-バックアップ">スナップショット (バックアップ)</a></li>
+<li><a href="#-プロファイル">プロファイル</a></li>
+<li><a href="#-言語">言語</a></li>
+<li><a href="#-マルチプレイ">マルチプレイ</a></li>
+<li><a href="#-設定">設定</a></li>
+<li><a href="#-トラブルシューティング">トラブルシューティング</a></li>
+</ol>
+<hr>
+<h2 id="_2">📥 インストール</h2>
+<h3 id="_3">要件</h3>
+<ul>
+<li><strong>BepInEx 5</strong>（x64、Mono）をクライアントとサーバーの両方に。Thunderstore のユーザーはすでに導入済みです。</li>
+</ul>
+<h3 id="_4">手順</h3>
+<ol>
+<li>Thunderstore または GitHub Releases から <code>TerrainForge-&lt;version&gt;.zip</code> をダウンロードします。</li>
+<li>解凍して <code>TerrainForge.dll</code> を次の場所に配置します:
+   - <strong>クライアント:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>サーバー:</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>ゲーム / サーバーを再起動します。</li>
+</ol>
+<blockquote>
+<p>⚠️ ±8 m を超える編集と正しいレプリケーションには、<strong>クライアントとサーバーの両方に</strong>インストールする必要があります。</p>
+</blockquote>
+<hr>
+<h2 id="_5">🚀 クイックスタート</h2>
+<ol>
+<li>ワールドに参加します。<strong>TerrainForge の杖</strong>（ハンマーのクローン）が自動的に付与され、装備されます。</li>
+<li><code>F5</code> を押してメニューを開きます（または <code>ESC</code> ポーズメニューの <strong>TerrainForge</strong> ボタンをクリック）。</li>
+<li>杖を装備していない場合は装備します。</li>
+<li>地形を狙い、<strong>右クリック</strong>（<code>Mouse1</code>）を押し続けて掘削します。</li>
+<li><code>,</code> で操作を切り替え、<code>.</code> で形状、<code>/</code> で塗装を切り替えます。</li>
+<li><code>Q</code> を押し続ける → ラジアルメニュー、離して確定します。</li>
+<li><code>Ctrl+Z</code> / <code>Ctrl+Y</code> で元に戻す / やり直しします。</li>
+</ol>
+<hr>
+<h2 id="_6">⌨️ キー操作</h2>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>既定キー</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ブラシを適用</td>
+<td><code>Mouse1</code>（右クリック）を押し続ける</td>
+<td>クロスヘア下の地形を掘削します</td>
+</tr>
+<tr>
+<td>半径 +</td>
+<td><code>=</code> または <code>Ctrl</code>+ホイール</td>
+<td>ブラシ半径を拡大します</td>
+</tr>
+<tr>
+<td>半径 −</td>
+<td><code>-</code> または <code>Ctrl</code>+ホイール</td>
+<td>ブラシ半径を縮小します</td>
+</tr>
+<tr>
+<td>操作を切り替え</td>
+<td><code>,</code></td>
+<td>9 つの操作を切り替えます</td>
+</tr>
+<tr>
+<td>形状を切り替え</td>
+<td><code>.</code></td>
+<td>円 → 正方形 → 線 → 矩形 → 多角形</td>
+</tr>
+<tr>
+<td>塗装を切り替え</td>
+<td><code>/</code></td>
+<td>6 種類の塗装を切り替えます</td>
+</tr>
+<tr>
+<td>足元の高さに合わせる</td>
+<td><code>Left Shift</code> を押し続ける</td>
+<td>平坦化がプレイヤーの高さを使用します</td>
+</tr>
+<tr>
+<td>元に戻す</td>
+<td><code>Ctrl+Z</code></td>
+<td>最後のストロークを元に戻します</td>
+</tr>
+<tr>
+<td>やり直す</td>
+<td><code>Ctrl+Y</code></td>
+<td>元に戻したストロークをやり直します</td>
+</tr>
+<tr>
+<td>スポイト</td>
+<td><code>G</code></td>
+<td>クロスヘア位置で平坦化の高さを固定します（もう一度 = 解除）</td>
+</tr>
+<tr>
+<td>ランプモード</td>
+<td><code>H</code></td>
+<td>切り替え: 2点 → 固定角度 → パス（または設定の3つのボタンで選択）</td>
+</tr>
+<tr>
+<td>ランプの固定角度</td>
+<td><code>Alt</code> + 半径/ホイールを押し続ける</td>
+<td>固定モードで角度を調整します</td>
+</tr>
+<tr>
+<td>ラジアルメニュー</td>
+<td><code>Q</code> を押し続ける</td>
+<td>マウスで操作を選び、離して確定します</td>
+</tr>
+<tr>
+<td>調整モード</td>
+<td><code>V</code></td>
+<td>ホイール = 半径、ズーム/バー/マップを凍結します</td>
+</tr>
+<tr>
+<td>微調整 (0.1 m)</td>
+<td><code>Shift</code> + ホイール/半径を押し続ける</td>
+<td>半径を精密に調整します</td>
+</tr>
+<tr>
+<td><strong>スタンプをコピー</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>マークした領域をクリップボードにコピーします</td>
+</tr>
+<tr>
+<td><strong>スタンプを貼り付け</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>ゴーストプレビュー、クリックで確定</td>
+</tr>
+<tr>
+<td>杖を入手</td>
+<td><code>F8</code></td>
+<td>TerrainForge の杖を付与します</td>
+</tr>
+<tr>
+<td>メニューを開く</td>
+<td><code>F5</code></td>
+<td>キー/ヘルプ/設定メニューを開きます</td>
+</tr>
+</tbody>
+</table>
+<p><strong>追加キー（既定なし、キーで割り当て）:</strong>
+- 操作の直接指定: 平坦化、上昇、下降、スムーズ、塗装、復元、ランプ、岸、雪
+- 次の / 前のプロファイル
+- 次の / 前のスタンプ（履歴）</p>
+<p><strong>「クイックアクション」セクション（キータブ）:</strong> 必須ショートカットのない機能用のボタン — 元に戻す、やり直す、高さを固定、スタンプのコピー/貼り付け、前のスタンプ、マークをクリア、ヒートマップ、マテリアル診断（シェーダー + テクスチャスロットをログに出力）。</p>
+<hr>
+<h2 id="_7">🔄 操作</h2>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>平坦化</strong></td>
+<td>狙った高さに水平化します（Shift = 足元）。スポイト（<code>G</code>）または設定のテキストボックスで高さを固定できます。</td>
+</tr>
+<tr>
+<td><strong>上昇</strong></td>
+<td>1 回の適用ごとに地形を <code>RaiseDelta</code> だけ持ち上げます。フォールオフモードが形状を決めます。</td>
+</tr>
+<tr>
+<td><strong>下降</strong></td>
+<td>1 回の適用ごとに地形を <code>RaiseDelta</code> だけ下げます。フォールオフモードが形状を決めます。</td>
+</tr>
+<tr>
+<td><strong>スムーズ</strong></td>
+<td>本物のぼかし: 各頂点を隣接する 8 頂点と平均化します。押し続けると段階的に適用されます。<strong>モード:</strong> 全体（両方）、尾根のみ（下げる）、窪みのみ（上げる）。線形状 = パスを滑らかにします。</td>
+</tr>
+<tr>
+<td><strong>ランプ</strong></td>
+<td><strong>3 モード</strong>（<code>H</code> で切り替え）:<br>• <strong>2点</strong>: A と B をマーク → 直線的な傾斜が高さをつなぎます。<br>• <strong>固定角度</strong>: B = 方向/長さ、高さ = <code>SlopeAngle</code>（クロスヘアに応じて上下）。<code>Alt</code>+半径で調整します。<br>• <strong>パス</strong>: 曲線 A→B→C… をマーク（3 個以上でダブルプレスで閉じる）→ 滑らかな Catmull-Rom。<br>幅 = ブラシ半径。ソフトネス = 側面のエッジのみをブレンドします。プレビュー: 塗りつぶした回廊 + A/B の高さリング。</td>
+</tr>
+<tr>
+<td><strong>岸</strong></td>
+<td>水位 + <code>ShoreOffset</code> マージンに向かって平坦化します（ビーチ）。ソフトネスは平坦化と同様です。</td>
+</tr>
+<tr>
+<td><strong>塗装</strong></td>
+<td>種類: Dirt、Cultivated、Paved、ClearVegetation、DeepSnow、Reset。強度を調整できます。</td>
+</tr>
+<tr>
+<td><strong>復元</strong></td>
+<td>地形を元の状態（高さ + 塗装）に戻します。</td>
+</tr>
+<tr>
+<td><strong>コピー/貼り付け</strong></td>
+<td>地形範囲の選択とスタンプ配置を行うQホイール専用モード。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_8">📐 形状</h2>
+<p><code>.</code> キーで切り替えます。すべて元に戻すに対応しています。</p>
+<table>
+<thead>
+<tr>
+<th>形状</th>
+<th>マーク方法</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>円</strong></td>
+<td>シングルクリック（ブラシ中心）</td>
+<td>一般的な掘削</td>
+</tr>
+<tr>
+<td><strong>正方形</strong></td>
+<td>シングルクリック（中心）</td>
+<td>プラットフォーム、基礎</td>
+</tr>
+<tr>
+<td><strong>線</strong></td>
+<td>2 クリック（A → B）</td>
+<td>パス、壁、小道。半幅 = 半径。</td>
+</tr>
+<tr>
+<td><strong>矩形</strong></td>
+<td>2 クリック（対角の角）</td>
+<td>基礎、農場、プラットフォーム。エッジが滑らか。</td>
+</tr>
+<tr>
+<td><strong>多角形</strong></td>
+<td>頂点ごとにクリック、ダブルクリックで閉じる（3 頂点以上）</td>
+<td>複雑な形状、カスタム領域</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>円形以外の形状は<strong>マークした輪郭のみ</strong>を表示します（円形リングなし）。</li>
+<li>ソフトネスはすべての形状のエッジブレンドに影響します。</li>
+</ul>
+<hr>
+<h2 id="_9">⚙️ フォールオフモード (上昇/下降)</h2>
+<p>設定 → 「Raise/Lower falloff」で構成:</p>
+<table>
+<thead>
+<tr>
+<th>モード</th>
+<th>動作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>尖り (Pointy)</strong></td>
+<td>中央のピーク。「Falloff power」スライダー（1–5）で制御します。</td>
+</tr>
+<tr>
+<td><strong>フラット (Flat)</strong></td>
+<td>均一な円盤 — 半径全体で同じ重み。</td>
+</tr>
+<tr>
+<td><strong>スムーズ (Smooth)</strong></td>
+<td>コサインの鐘形 — 滑らかな遷移、ハードエッジなし。</td>
+</tr>
+<tr>
+<td><strong>リニア (Linear)</strong></td>
+<td>中心からエッジへの直線的なテーパー。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_10">🧱 スタンプ (コピー/ペースト)</h2>
+<p>地形構造を複製するための強力な機能です。</p>
+<h3 id="_11">矩形選択 (推奨)</h3>
+<p>Qホイールでコピー/貼り付けを選択します。適用キーで範囲を指定：矩形は2つの角、線は両端、多角形は頂点（3点以上でダブル押し）、円/四角形は現在のブラシ範囲です。HUDが次の操作を案内します。</p>
+<h3 id="_12">ワークフロー</h3>
+<ol>
+<li><strong>領域をマーク</strong>: 任意の形状（円、矩形、線、多角形、ランプ）を使用 — または上記の矩形選択。</li>
+<li><strong>コピー</strong>: <code>Ctrl+Shift+C</code> → 「Stamp copied: X tiles」（RAM クリップボード）。</li>
+<li><strong>貼り付けプレビュー</strong>: <code>Ctrl+Shift+V</code> → クロスヘア位置にゴーストワイヤーフレーム。
+   - <code>Q</code>/<code>E</code> = ±15° 回転
+   - <code>Alt</code>+ホイール = 連続回転
+   - <code>Shift</code>+ホイール = 0.25×–4× 拡大縮小
+   - <code>Esc</code> = キャンセル</li>
+<li><strong>確定</strong>: 貼り付けキーをもう一度押すとプレビューを確定します。</li>
+</ol>
+<blockquote>
+<p>選択スタンプは<strong>コピーした領域の内側にのみ</strong>書き込みます。その外側の地形は変更されません。</p>
+</blockquote>
+<h3 id="_13">履歴</h3>
+<ul>
+<li>RAM に最大 <strong>10 個のスタンプ</strong>（新しい順）。</li>
+<li>「次のスタンプ」/「前のスタンプ」キー（再割り当て可能）で切り替えます。</li>
+<li>フラッシュ: 「Stamp history: Copy: 3 tiles [2/5]」</li>
+</ul>
+<h3 id="_14">永続化</h3>
+<ul>
+<li><strong>設定 → STAMPS</strong>:</li>
+<li>現在のスタンプをディスクに保存（<code>BepInEx/config/TerrainForge/stamps/</code> 内の <code>.stamp</code>、最大 12）。</li>
+<li>スタンプをクリップボードに読み込みます。</li>
+<li>保存したスタンプを一覧表示/削除します。</li>
+</ul>
+<h3 id="_15">スタンプツール</h3>
+<ul>
+<li>設定 → 「Stamp tool」（4 つのオプション）:</li>
+<li><code>Same as brush</code>（既定）— ブラシと同じツールを使用します</li>
+<li><code>Any</code> — 要件なし</li>
+<li><code>Pickaxe</code> — ピッケルの装備が必要</li>
+<li><code>TerrainForge Rod</code> — MOD の杖が必要</li>
+<li>ツールを装備 + クリップボードにスタンプがある場合、HUD に <code>STAMP READY [2/5]</code> が表示されます。</li>
+<li>ツールなしの場合: <code>Stamp: tool not equipped</code>、コピー/貼り付けがブロックされます。</li>
+</ul>
+<hr>
+<h2 id="_16">💾 スナップショット (バックアップ)</h2>
+<p>地形の完全なバックアップ/復元。</p>
+<h3 id="_17">保存</h3>
+<ol>
+<li>設定 → <strong>SNAPSHOTS</strong>。</li>
+<li>名前（空 = 自動の日付/時刻）。</li>
+<li><strong>保存</strong> → 編集したタイルを <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code> に保存（最大 12）。</li>
+</ol>
+<h3 id="_18">読み込み</h3>
+<ol>
+<li>スナップショットを選択します。</li>
+<li><strong>読み込み</strong> → 所有権込みでタイルを復元、<strong>1 つの元に戻すステップ</strong>。</li>
+<li>未読み込みのタイルは明確に警告します — 元の場所の近くでインポートしてください。</li>
+</ol>
+<h3 id="_19">機能</h3>
+<ul>
+<li>バージョン管理されたバイナリ形式（<code>.dat</code>）。</li>
+<li>高さ + スムーズ + 塗装 + 所有権を復元します。</li>
+<li>インポートは元に戻せます（<code>Ctrl+Z</code> でインポートを巻き戻します）。</li>
+<li>未読み込みのタイルは明確に警告します。</li>
+</ul>
+<hr>
+<h2 id="_20">💾 プロファイル</h2>
+<p>完全なブラシ構成を保存/読み込みします。</p>
+<ul>
+<li>設定 → <strong>PROFILES</strong>。</li>
+<li>名前 + <strong>保存</strong> → 半径、ソフトネス、操作、形状、塗装、ランプモード、角度、スムーズモード、上昇量、塗装強度、フォールオフ、岸オフセット。</li>
+<li><strong>読み込み</strong> → 即座に適用します。</li>
+<li>最大 12 プロファイル（<code>Presets &gt; Slots</code> 内のカルチャ不変形式）。</li>
+<li>キーバインド: <code>Next Profile</code>（キーで割り当て）で切り替え。</li>
+</ul>
+<hr>
+<h2 id="_21">🌐 言語</h2>
+<p><strong>15 のオプション:</strong> <code>Auto</code>、<code>English</code>、<code>Español</code>、<code>Français</code>、<code>Deutsch</code>、<code>Русский</code>、<code>中文</code>、<code>繁體中文</code>、<code>日本語</code>、<code>한국어</code>、<code>Polski</code>、<code>Português</code>、<code>Türkçe</code>、<code>Українська</code>、<code>Italiano</code> — 既定は <code>Auto</code>。</p>
+<h3 id="_22">自動検出</h3>
+<ul>
+<li>既定の <code>Auto</code> はリフレクションでゲームの言語を検出します: <code>Localization.instance.GetSelectedLanguage()</code>。</li>
+<li>Valheim の言語 → 内部インデックスにマッピングします。</li>
+<li>言語に完全な翻訳がない場合 → English にフォールバックします。</li>
+<li>設定 → 「Language」で構成可能（15 のオプションを切り替え）。</li>
+<li>キーラベルはメニューを開くと再構築されます。</li>
+</ul>
+<h3 id="_23">翻訳状況</h3>
+<ul>
+<li><strong>完全:</strong> English、Español</li>
+<li><strong>English フォールバック:</strong> Français、Deutsch、Русский、中文、繁體中文、日本語、한국어、Polski、Português、Türkçe、Українська、Italiano</li>
+<li>コミュニティ翻訳は PR で歓迎します。</li>
+</ul>
+<h3 id="_24">このドキュメント</h3>
+<p>翻訳済みの Wiki ページ: <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>。</p>
+<hr>
+<h2 id="_25">🌍 マルチプレイ</h2>
+<h3 id="_26">要件</h3>
+<ul>
+<li>±8 m を超える編集と正しいレプリケーションには、<strong>クライアントとサーバーの両方に MOD</strong> が必要です。</li>
+<li>サーバー側にも <code>UnlockDeltaLimit</code>、そうでなければサーバーが地形をクランプします。</li>
+</ul>
+<h3 id="config-sync">サーバー権限 (Config Sync)</h3>
+<p>サーバーで MOD が動作している場合、その <code>Server</code> セクションが優先されます:
+- <code>AllowTerrainEdits</code>（既定 <code>true</code>）— マスタースイッチ、<code>false</code> の場合クライアントは適用/元に戻す/やり直しができません。
+- <code>AdminOnlyEdits</code>（既定 <code>false</code>）— 管理者/ホストのみが編集できます。
+- <code>RespectWards</code>（既定 <code>true</code>）— 他人の結界内での編集をブロックします。
+- <code>RadiusCap</code> / <code>DeltaCap</code>（0 = オフ）— サーバー適用の上限、HUD+プレビューに表示されます。</p>
+<blockquote>
+<p>MOD <strong>なし</strong>のサーバーはこのセクションを無視します → クライアントはテスト用に動作します。</p>
+</blockquote>
+<h3 id="_27">デシンク防止</h3>
+<ul>
+<li>サーバー + クライアントで <code>MaxUpDelta</code> / <code>MaxDownDelta</code> を一致させてください。</li>
+<li>大きな半径は MOD なしのクライアントをデシンクさせる可能性があります。</li>
+</ul>
+<hr>
+<h2 id="_28">⚙️ 設定</h2>
+<p>ファイル: <code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="_29">一般</h3>
+<table>
+<thead>
+<tr>
+<th>設定</th>
+<th>既定値</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>マスタースイッチ</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>適用時にほこり + ヒット</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>TerrainForge の杖（ハンマーのクローン）を着色し、バニラのハンマーと簡単に区別できるようにします</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>杖の 16 進カラー（モデル + アイコン）。例: <code>#FFC400</code> 金、<code>#8BC34A</code> 緑</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_30">ブラシ</h3>
+<table>
+<thead>
+<tr>
+<th>設定</th>
+<th>既定値</th>
+<th>範囲</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>ブラシ半径（m）</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>調整時の最小半径</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>調整時の最大半径</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>キー/ホイールごとの半径変化量</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>エッジのソフトネス（0 = 硬い、100 = 非常に柔らかい）</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>フォールオフ指数（尖りモードのみ）</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>上昇/下降 1 回あたりのメートル</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>塗装強度</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>開始時の操作</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>開始時の形状</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>開始時の塗装</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>固定ランプ角度（度）</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>水面より上の岸マージン（m）</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>固定高さを使用（スポイト状態）</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>平坦化の正確な高さ（m）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vanilla">Vanilla / 連携</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false — 杖を装備しているとき、バニラのクワ/カルティベーターの地形編集を無視します。設定にトグルもあります。</li>
+</ul>
+<h3 id="_31">入力</h3>
+<p>すべてのショートカットはキータブで再割り当て可能です。主なもの:
+- <code>ApplyKey</code> (Mouse1)、<code>RadiusUp/Down</code> (=/-)、<code>CycleOp/Shape/Paint</code> (,/.//)
+- <code>UndoKey</code> (Ctrl+Z)、<code>RedoKey</code> (Ctrl+Y)、<code>EyedropKey</code> (G)、<code>RampModeKey</code> (H)
+- <code>RadialKey</code> (Q)、<code>AdjustModeKey</code> (V)、<code>GiveToolKey</code> (F8)、<code>RebindMenuKey</code> (F5)
+- <strong>操作の直接キー</strong>（9 個、既定なし）: OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>、<code>CycleStampKey</code>、<code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool（既定）
+- <code>AutoGiveTool</code>: true（参加時に杖を付与）</p>
+<h3 id="_32">スタンプ</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool（既定 Same as Brush）</li>
+</ul>
+<h3 id="_33">プレビュー</h3>
+<ul>
+<li><code>ShowPreview</code>: true、<code>ShowGuides</code>: true（リーチガイド、傾斜の着色、レベルリング）</li>
+</ul>
+<h3 id="_34">履歴</h3>
+<ul>
+<li><code>UndoDepth</code>: 50（0–500、0 で履歴を無効化）</li>
+</ul>
+<h3 id="config-sync_1">サーバー (Config Sync による権威付け)</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true（マスタースイッチ）</li>
+<li><code>AdminOnlyEdits</code>: false（管理者のみ）</li>
+<li><code>RespectWards</code>: true（他人の結界をブロック）</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0（オフ）— サーバー適用の上限</li>
+</ul>
+<h3 id="_35">パフォーマンス</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4（1–32 タイル/フレーム）</li>
+</ul>
+<hr>
+<h2 id="_36">🐛 トラブルシューティング</h2>
+<table>
+<thead>
+<tr>
+<th>問題</th>
+<th>解決策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>メニューが表示されない / カーソルが見えない</strong></td>
+<td>ゲームを閉じます。<code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\</code> と <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code> を削除します。TMM を再起動し、更新を確認します。</td>
+</tr>
+<tr>
+<td><strong>TMM に更新が表示されない</strong></td>
+<td>TMM → Settings → 「Refresh mod list」（Ctrl+R）。TMM を閉じて再度開きます。正しいプロファイルを確認します。</td>
+</tr>
+<tr>
+<td><strong>Thunderstore のバージョン競合</strong></td>
+<td><code>.csproj</code>、<code>Plugin.cs</code>、<code>manifest.json</code> のバージョンを上げます（0.3.3 → 0.3.4）。リビルド + 再アップロード。</td>
+</tr>
+<tr>
+<td><strong>スタンプのコピー/貼り付けが機能しない</strong></td>
+<td>HUD: <code>STAMP READY [X/Y]</code> = 準備完了。「tool not equipped」の場合はツールを装備します（設定 → Stamp tool）。</td>
+</tr>
+<tr>
+<td><strong>プレビューが水中で見えない</strong></td>
+<td>0.3.2 で修正済み — プレビューは水面に浮きます。更新してください。</td>
+</tr>
+<tr>
+<td><strong>線/矩形/多角形に円が表示される</strong></td>
+<td>0.3.2 で修正済み — マークした輪郭のみが表示されます。更新してください。</td>
+</tr>
+<tr>
+<td><strong>ラジアルホイールが機能しない</strong></td>
+<td>0.3.2（<code>ZInput.GetMouseScrollWheel()</code>）と 0.3.4（カーソルが中央でも選択が消去されなくなりました）で修正済み。更新してください。</td>
+</tr>
+<tr>
+<td><strong>設定が保存されない</strong></td>
+<td>メニュー（F5）を閉じて自動保存します。または <code>BepInEx/config/com.terrainforge.valheim.cfg</code> を直接編集します。</td>
+</tr>
+<tr>
+<td><strong>マルチプレイのデシンク</strong></td>
+<td>クライアント+サーバーに MOD。両方に <code>UnlockDeltaLimit</code>。同じ <code>MaxUpDelta</code>/<code>MaxDownDelta</code>。</td>
+</tr>
+<tr>
+<td><strong>ビルドが失敗する</strong></td>
+<td><code>.csproj</code> または CLI で <code>ValheimDir</code>、<code>BepInExCoreDir</code> のパスを確認します。.NET SDK 8+ が必要です。</td>
+</tr>
+<tr>
+<td><strong>コンパイル / パッケージ</strong></td>
+<td><code>dotnet build -c Release</code>（DLL は <code>build/</code>）、<code>-p:Deploy=true</code>（プロファイルにインストール）または <code>-p:Package=true</code>（<code>build/</code> に zip）。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_37">🔗 リンク</h2>
+<ul>
+<li><strong>Thunderstore ページ:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>GitHub リポジトリ:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>寄付:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>変更履歴:</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge — 制限なく Valheim をテラフォーム。</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

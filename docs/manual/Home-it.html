@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Italiano · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="wiki-di-terrainforge">Wiki di TerrainForge</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <em>Italiano</em> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-hotfix-per-la-037">TerrainForge 0.3.8 — Hotfix per la 0.3.7</h3>
+<blockquote>
+<p>La ruota Q include la modalità Copia/Incolla. Rettangolo segna A/B con Applica; Linea segna due estremi; Poligono aggiunge vertici e copia con doppia pressione dopo 3+ punti; Cerchio/Quadrato copia l’impronta del pennello. L’HUD mostra il passo successivo. La neve è in Pittura &gt; DeepSnow (tieni Shift per rimuoverla). F5 blocca movimento e telecamera locali; Esc mette in pausa tutto il mondo in singolo. 0.3.6: F5 dispone le schede su due righe e mostra i controlli dell’operazione selezionata. Ramp offre Due punti, Angolo fisso e Connessa; le rampe circolari sono previste per la 0.4.0.</p>
+</blockquote>
+<h2 id="indice">Indice</h2>
+<ol>
+<li><a href="#-installazione">Installazione</a></li>
+<li><a href="#-avvio-rapido">Avvio Rapido</a></li>
+<li><a href="#-comandi">Comandi</a></li>
+<li><a href="#-operazioni">Operazioni</a></li>
+<li><a href="#-forme">Forme</a></li>
+<li><a href="#-modalità-di-caduta-alzaabbassa">Modalità di Caduta</a></li>
+<li><a href="#-stamps-copiaincolla">Stamps (Copia/Incolla)</a></li>
+<li><a href="#-snapshots-backup">Snapshots (Backup)</a></li>
+<li><a href="#-profili">Profili</a></li>
+<li><a href="#-lingue">Lingue</a></li>
+<li><a href="#-multigiocatore">Multigiocatore</a></li>
+<li><a href="#-impostazioni">Impostazioni</a></li>
+<li><a href="#-risoluzione-dei-problemi">Risoluzione dei Problemi</a></li>
+</ol>
+<hr>
+<h2 id="installazione">📥 Installazione</h2>
+<h3 id="requisiti">Requisiti</h3>
+<ul>
+<li><strong>BepInEx 5</strong> (x64, Mono) su client e server. Gli utenti Thunderstore ce l'hanno già.</li>
+</ul>
+<h3 id="passaggi">Passaggi</h3>
+<ol>
+<li>Scarica <code>TerrainForge-&lt;version&gt;.zip</code> da Thunderstore o GitHub Releases.</li>
+<li>Estrai e colloca <code>TerrainForge.dll</code> in:
+   - <strong>Client:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>Server:</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>Riavvia il gioco / il server.</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>Deve essere installato su client E server</strong> per modifiche superiori a ±8 m e una corretta replicazione.</p>
+</blockquote>
+<hr>
+<h2 id="avvio-rapido">🚀 Avvio Rapido</h2>
+<ol>
+<li>Entra in un mondo. La <strong>Bacchetta TerrainForge</strong> (un clone del Martello) viene fornita ed equipaggiata automaticamente.</li>
+<li>Premi <code>F5</code> per aprire il menu (o clicca il pulsante <strong>TerrainForge</strong> nel menu di pausa <code>ESC</code>).</li>
+<li>Equipaggia la bacchetta se non lo è.</li>
+<li>Mira al terreno e tieni premuto il <strong>clic destro</strong> (<code>Mouse1</code>) per scolpire.</li>
+<li>Usa <code>,</code> per scorrere le operazioni, <code>.</code> per le forme, <code>/</code> per le pitture.</li>
+<li>Tieni premuto <code>Q</code> → menu radiale, rilascia per confermare.</li>
+<li><code>Ctrl+Z</code> / <code>Ctrl+Y</code> per annullare/ripetere.</li>
+</ol>
+<hr>
+<h2 id="comandi">⌨️ Comandi</h2>
+<table>
+<thead>
+<tr>
+<th>Azione</th>
+<th>Tasto predefinito</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Applica pennello</td>
+<td>Tieni premuto <code>Mouse1</code> (clic destro)</td>
+<td>Scolpisce il terreno sotto il mirino</td>
+</tr>
+<tr>
+<td>Raggio +</td>
+<td><code>=</code> o <code>Ctrl</code>+Rotellina</td>
+<td>Aumenta il raggio del pennello</td>
+</tr>
+<tr>
+<td>Raggio −</td>
+<td><code>-</code> o <code>Ctrl</code>+Rotellina</td>
+<td>Riduce il raggio del pennello</td>
+</tr>
+<tr>
+<td>Cambia operazione</td>
+<td><code>,</code></td>
+<td>Scorre le 9 operazioni</td>
+</tr>
+<tr>
+<td>Cambia forma</td>
+<td><code>.</code></td>
+<td>Cerchio → Quadrato → Linea → Rett → Poli</td>
+</tr>
+<tr>
+<td>Cambia pittura</td>
+<td><code>/</code></td>
+<td>Scorre i 6 tipi di pittura</td>
+</tr>
+<tr>
+<td>Livella ai piedi</td>
+<td>Tieni premuto <code>Left Shift</code></td>
+<td>Appiattisci usa l'altezza del giocatore</td>
+</tr>
+<tr>
+<td>Annulla</td>
+<td><code>Ctrl+Z</code></td>
+<td>Annulla l'ultimo tratto</td>
+</tr>
+<tr>
+<td>Ripeti</td>
+<td><code>Ctrl+Y</code></td>
+<td>Ripete il tratto annullato</td>
+</tr>
+<tr>
+<td>Contagocce</td>
+<td><code>G</code></td>
+<td>Fissa l'altezza di Appiattisci sul mirino (di nuovo = rilascia)</td>
+</tr>
+<tr>
+<td>Modalità rampa</td>
+<td><code>H</code></td>
+<td>Scorre: Due Punti → Angolo Fisso → Percorso (o scegli con 3 pulsanti in IMPOSTAZIONI)</td>
+</tr>
+<tr>
+<td>Angolo rampa fissa</td>
+<td>Tieni premuto <code>Alt</code> + raggio/rotellina</td>
+<td>Regola l'angolo in modalità fissa</td>
+</tr>
+<tr>
+<td>Menu radiale</td>
+<td>Tieni premuto <code>Q</code></td>
+<td>Scegli un'operazione con il mouse, rilascia per confermare</td>
+</tr>
+<tr>
+<td>Modalità regolazione</td>
+<td><code>V</code></td>
+<td>Rotellina = raggio, blocca zoom/barra/mappa</td>
+</tr>
+<tr>
+<td>Regolazione fine (0,1 m)</td>
+<td>Tieni premuto <code>Shift</code> + rotellina/raggio</td>
+<td>Regolazione precisa del raggio</td>
+</tr>
+<tr>
+<td><strong>Copia Stamp</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>Copia l'area marcata negli appunti</td>
+</tr>
+<tr>
+<td><strong>Incolla Stamp</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>Anteprima fantasma, il clic conferma</td>
+</tr>
+<tr>
+<td>Ottieni Bacchetta</td>
+<td><code>F8</code></td>
+<td>Fornisce la Bacchetta TerrainForge</td>
+</tr>
+<tr>
+<td>Apri menu</td>
+<td><code>F5</code></td>
+<td>Apre il menu di tasti/aiuto/impostazioni</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tasti extra (nessun predefinito, assegnali in TASTI):</strong>
+- Operazione diretta: Appiattisci, Alza, Abbassa, Leviga, Pittura, Ripristina, Rampa, Costa, Neve
+- Profilo successivo / precedente
+- Stamp successivo / precedente (cronologia)</p>
+<p><strong>Sezione "Azioni rapide" (scheda TASTI):</strong> pulsanti per funzioni senza scorciatoia obbligatoria — Annulla, Ripeti, Fissa altezza, Copia/Incolla stamp, Stamp precedente, Cancella marcature, le mappe di calore e la Diagnostica materiale (scarica lo shader + gli slot delle texture nel log).</p>
+<hr>
+<h2 id="operazioni">🔄 Operazioni</h2>
+<table>
+<thead>
+<tr>
+<th>Operazione</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Appiattisci</strong></td>
+<td>Livella all'altezza mirata (Shift = ai tuoi piedi). Altezza fissa tramite il Contagocce (<code>G</code>) o la casella di testo in IMPOSTAZIONI.</td>
+</tr>
+<tr>
+<td><strong>Alza</strong></td>
+<td>Alza il terreno di <code>RaiseDelta</code> per applicazione. La modalità di caduta ne definisce la forma.</td>
+</tr>
+<tr>
+<td><strong>Abbassa</strong></td>
+<td>Abbassa il terreno di <code>RaiseDelta</code> per applicazione. La modalità di caduta ne definisce la forma.</td>
+</tr>
+<tr>
+<td><strong>Leviga</strong></td>
+<td>Vero blur: media ogni vertice con i suoi 8 vicini. Tieni premuto per progressivo. <strong>Modalità:</strong> Completa (entrambi), Solo Creste (abbassa), Solo Avvallamenti (alza). Forma Linea = leviga un percorso.</td>
+</tr>
+<tr>
+<td><strong>Rampa</strong></td>
+<td><strong>3 modalità</strong> (scorri <code>H</code>):<br>• <strong>Due Punti</strong>: marca A e B → una pendenza retta unisce le altezze.<br>• <strong>Angolo Fisso</strong>: B = direzione/lunghezza; altezza = <code>SlopeAngle</code> (su/giù in base al mirino). Regola con <code>Alt</code>+raggio.<br>• <strong>Percorso</strong>: marca una curva A→B→C… (doppio clic con 3+ chiude) → Catmull-Rom levigato.<br>Larghezza = raggio del pennello. Morbidezza = blend solo sui bordi laterali. Anteprima: corridoio riempito + anelli di altezza su A/B.</td>
+</tr>
+<tr>
+<td><strong>Costa</strong></td>
+<td>Appiattisce verso il livello dell'acqua + margine <code>ShoreOffset</code> (spiagge). Morbidezza come Appiattisci.</td>
+</tr>
+<tr>
+<td><strong>Pittura</strong></td>
+<td>Tipi: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Intensità regolabile.</td>
+</tr>
+<tr>
+<td><strong>Ripristina</strong></td>
+<td>Riporta il terreno al suo stato originale (altezza + pittura).</td>
+</tr>
+<tr>
+<td><strong>Copia/Incolla</strong></td>
+<td>Modalità dedicata della ruota Q per selezionare terreno e posizionare stamp.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="forme">📐 Forme</h2>
+<p>Scorri con il tasto <code>.</code>. Tutte supportano l'annullamento.</p>
+<table>
+<thead>
+<tr>
+<th>Forma</th>
+<th>Marcatura</th>
+<th>Caso d'uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cerchio</strong></td>
+<td>Clic singolo (centro del pennello)</td>
+<td>Scolpitura generale</td>
+</tr>
+<tr>
+<td><strong>Quadrato</strong></td>
+<td>Clic singolo (centro)</td>
+<td>Piattaforme, fondazioni</td>
+</tr>
+<tr>
+<td><strong>Linea</strong></td>
+<td>2 clic (A → B)</td>
+<td>Sentieri, muri, piste. Semilarghezza = raggio.</td>
+</tr>
+<tr>
+<td><strong>Rettangolo</strong></td>
+<td>2 clic (angoli opposti)</td>
+<td>Fondazioni, fattorie, piattaforme. Bordi morbidi.</td>
+</tr>
+<tr>
+<td><strong>Poligono</strong></td>
+<td>Clic per vertice, doppio clic chiude (3+ vertici)</td>
+<td>Forme complesse, aree personalizzate</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Le forme non circolari mostrano <strong>solo il contorno marcato</strong> (nessun anello circolare).</li>
+<li>La morbidezza influisce sul blend dei bordi su tutte le forme.</li>
+</ul>
+<hr>
+<h2 id="modalita-di-caduta-alzaabbassa">⚙️ Modalità di Caduta (Alza/Abbassa)</h2>
+<p>Config in IMPOSTAZIONI → "Caduta Raise/Lower":</p>
+<table>
+<thead>
+<tr>
+<th>Modalità</th>
+<th>Comportamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Appuntita</strong></td>
+<td>Picco centrale. Controllata dallo slider "Potenza caduta" (1–5).</td>
+</tr>
+<tr>
+<td><strong>Piatta</strong></td>
+<td>Disco uniforme — stesso peso su tutto il raggio.</td>
+</tr>
+<tr>
+<td><strong>Morbida</strong></td>
+<td>Campana coseno — transizione fluida, senza bordo netto.</td>
+</tr>
+<tr>
+<td><strong>Lineare</strong></td>
+<td>Rastremazione retta dal centro al bordo.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="stamps-copiaincolla">🧱 Stamps (Copia/Incolla)</h2>
+<p>Una funzione potente per replicare strutture del terreno.</p>
+<h3 id="selezione-rettangolare-consigliata">Selezione rettangolare (consigliata)</h3>
+<p>Scegli Copia/Incolla nella ruota Q. Applica marca l’area: due angoli per Rettangolo, due estremi per Linea, vertici per Poligono (doppia pressione dopo 3+ punti), o l’impronta del pennello per Cerchio/Quadrato. L’HUD indica il passo successivo.</p>
+<h3 id="flusso-di-lavoro">Flusso di lavoro</h3>
+<ol>
+<li><strong>Marca l'area</strong>: usa una qualsiasi forma (Cerchio, Rett, Linea, Poli, Rampa) — o la selezione rettangolare qui sopra.</li>
+<li><strong>Copia</strong>: <code>Ctrl+Shift+C</code> → "Stamp copiato: X tile" (appunti in RAM).</li>
+<li><strong>Anteprima Incolla</strong>: <code>Ctrl+Shift+V</code> → wireframe fantasma sul mirino.
+   - <code>Q</code>/<code>E</code> = ruota ±15°
+   - <code>Alt</code>+Rotellina = rotazione continua
+   - <code>Shift</code>+Rotellina = scala 0,25×–4×
+   - <code>Esc</code> = annulla</li>
+<li><strong>Confirm</strong>: Premi di nuovo il tasto Incolla per confermare l’anteprima.</li>
+</ol>
+<blockquote>
+<p>Gli stamp di selezione scrivono <strong>solo dentro la regione copiata</strong>; il terreno esterno resta intatto.</p>
+</blockquote>
+<h3 id="cronologia">Cronologia</h3>
+<ul>
+<li>Fino a <strong>10 stamp</strong> in RAM (più recente per primo).</li>
+<li>Tasti <code>Next stamp</code> / <code>Previous stamp</code> (riassegnabili) per scorrerli.</li>
+<li>Flash: "Cronologia stamp: Copy: 3 tile [2/5]"</li>
+</ul>
+<h3 id="persistenza">Persistenza</h3>
+<ul>
+<li><strong>IMPOSTAZIONI → STAMPS</strong>:</li>
+<li>Salva lo stamp corrente su disco (<code>.stamp</code> in <code>BepInEx/config/TerrainForge/stamps/</code>, max 12).</li>
+<li>Carica uno stamp negli appunti.</li>
+<li>Elenca/elimina gli stamp salvati.</li>
+</ul>
+<h3 id="strumento-stamp">Strumento stamp</h3>
+<ul>
+<li>IMPOSTAZIONI → "Stamp tool" (4 opzioni):</li>
+<li><code>Same as brush</code> (predefinito) — usa lo stesso strumento del pennello</li>
+<li><code>Any</code> — nessun requisito</li>
+<li><code>Pickaxe</code> — richiede un piccone equipaggiato</li>
+<li><code>TerrainForge Rod</code> — richiede la bacchetta della mod</li>
+<li>L'HUD mostra <code>STAMP READY [2/5]</code> quando lo strumento è equipaggiato + ci sono stamp negli appunti.</li>
+<li>Senza lo strumento: <code>Stamp: tool not equipped</code>, copia/incolla bloccati.</li>
+</ul>
+<hr>
+<h2 id="snapshots-backup">💾 Snapshots (Backup)</h2>
+<p>Backup/ripristino completo del terreno.</p>
+<h3 id="salva">Salva</h3>
+<ol>
+<li>IMPOSTAZIONI → <strong>SNAPSHOTS</strong>.</li>
+<li>Nome (vuoto = data/ora automatica).</li>
+<li><strong>Salva</strong> → tile modificati in <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code> (max 12).</li>
+</ol>
+<h3 id="carica">Carica</h3>
+<ol>
+<li>Seleziona uno snapshot.</li>
+<li><strong>Carica</strong> → ripristina i tile con ownership, <strong>1 passo di annulla</strong>.</li>
+<li>I tile non caricati avvisano in modo pulito — importa vicino alla posizione originale.</li>
+</ol>
+<h3 id="caratteristiche">Caratteristiche</h3>
+<ul>
+<li>Formato binario versionato (<code>.dat</code>).</li>
+<li>Ripristina altezza + smooth + pittura + ownership.</li>
+<li>L'importazione è annullabile (<code>Ctrl+Z</code> annulla l'importazione).</li>
+<li>I tile non caricati avvisano in modo pulito.</li>
+</ul>
+<hr>
+<h2 id="profili">💾 Profili</h2>
+<p>Salva/carica configurazioni complete del pennello.</p>
+<ul>
+<li>IMPOSTAZIONI → <strong>PROFILES</strong>.</li>
+<li>Nome + <strong>Salva</strong> → raggio, morbidezza, op, forma, pittura, modalità rampa, angolo, modalità levigatura, raise delta, intensità pittura, falloff, shore offset.</li>
+<li><strong>Carica</strong> → applica immediatamente.</li>
+<li>Max 12 profili (formato culture-invariant in <code>Presets &gt; Slots</code>).</li>
+<li>Scorciatoia: <code>Next Profile</code> (assegna in TASTI) per scorrere.</li>
+</ul>
+<hr>
+<h2 id="lingue">🌐 Lingue</h2>
+<p><strong>15 opzioni:</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> — predefinito <code>Auto</code>.</p>
+<h3 id="auto-detect">Auto-Detect</h3>
+<ul>
+<li>Il default <code>Auto</code> rileva la lingua del gioco tramite reflection: <code>Localization.instance.GetSelectedLanguage()</code>.</li>
+<li>Mappa la lingua di Valheim → indice interno.</li>
+<li>Se una lingua non ha una traduzione completa → fallback all'inglese.</li>
+<li>Configurabile in IMPOSTAZIONI → "Language" (scorre le 15 opzioni).</li>
+<li>Le etichette dei tasti vengono ricostruite all'apertura del menu.</li>
+</ul>
+<h3 id="stato-delle-traduzioni">Stato delle traduzioni</h3>
+<ul>
+<li><strong>Complete:</strong> English, Español</li>
+<li><strong>Fallback all'inglese:</strong> Français, Deutsch, Русский, 中文, 繁體中文, 日本語, 한국어, Polski, Português, Türkçe, Українська, Italiano</li>
+<li>Traduzioni della community benvenute via PR.</li>
+</ul>
+<h3 id="questa-documentazione">Questa documentazione</h3>
+<p>Pagine wiki tradotte: <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>.</p>
+<hr>
+<h2 id="multigiocatore">🌍 Multigiocatore</h2>
+<h3 id="requisiti_1">Requisiti</h3>
+<ul>
+<li><strong>Mod su client E server</strong> per modifiche superiori a ±8 m e una corretta replicazione.</li>
+<li><code>UnlockDeltaLimit</code> anche sul server, altrimenti il server limita il terreno.</li>
+</ul>
+<h3 id="autorita-del-server-config-sync">Autorità del Server (Config Sync)</h3>
+<p>Quando il server esegue la mod, la sua sezione <code>Server</code> prevale:
+- <code>AllowTerrainEdits</code> (default <code>true</code>) — interruttore principale; se <code>false</code>, i client non possono applicare/annullare/ripetere.
+- <code>AdminOnlyEdits</code> (default <code>false</code>) — solo admin/host possono modificare.
+- <code>RespectWards</code> (default <code>true</code>) — blocca le modifiche dentro ward altrui.
+- <code>RadiusCap</code> / <code>DeltaCap</code> (0 = off) — limiti imposti dal server, visibili in HUD+anteprima.</p>
+<blockquote>
+<p>I server <strong>senza</strong> la mod ignorano la sezione → il client funziona per i test.</p>
+</blockquote>
+<h3 id="prevenzione-del-desync">Prevenzione del Desync</h3>
+<ul>
+<li>Mantieni <code>MaxUpDelta</code> / <code>MaxDownDelta</code> coerenti su server + client.</li>
+<li>Raggi grandi possono desincronizzare i client senza la mod.</li>
+</ul>
+<hr>
+<h2 id="impostazioni">⚙️ Impostazioni</h2>
+<p>File: <code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="generale">Generale</h3>
+<table>
+<thead>
+<tr>
+<th>Impostazione</th>
+<th>Default</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>Interruttore principale</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>Polvere + colpo all'applicazione</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>Colora la Bacchetta TerrainForge (clone del Martello) per distinguerla facilmente dal Martello vanilla</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>Colore hex della bacchetta (modello + icona). Es.: <code>#FFC400</code> oro, <code>#8BC34A</code> verde</td>
+</tr>
+</tbody>
+</table>
+<h3 id="pennello">Pennello</h3>
+<table>
+<thead>
+<tr>
+<th>Impostazione</th>
+<th>Default</th>
+<th>Intervallo</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>Raggio del pennello (m)</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>Raggio minimo durante la regolazione</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>Raggio massimo durante la regolazione</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>Variazione di raggio per tasto/rotellina</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>Morbidezza dei bordi (0 = duro, 100 = molto morbido)</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>Esponente di caduta (solo modalità Appuntita)</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>Metri per applicazione di Alza/Abbassa</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>Intensità della pittura</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>Operazione iniziale</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>Forma iniziale</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>Pittura iniziale</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>Angolo della rampa fissa (gradi)</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>Margine della costa sopra l'acqua (m)</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>Usa un'altezza fissa (stato del contagocce)</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>Altezza esatta di Appiattisci (m)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vanilla-integrazione">Vanilla / integrazione</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false — con la bacchetta equipaggiata, ignora la modifica del terreno di zappa/coltivatore vanilla. C'è anche un interruttore in IMPOSTAZIONI.</li>
+</ul>
+<h3 id="input">Input</h3>
+<p>Tutte le scorciatoie sono riassegnabili nella scheda TASTI. In evidenza:
+- <code>ApplyKey</code> (Mouse1), <code>RadiusUp/Down</code> (=/-), <code>CycleOp/Shape/Paint</code> (,/.//)
+- <code>UndoKey</code> (Ctrl+Z), <code>RedoKey</code> (Ctrl+Y), <code>EyedropKey</code> (G), <code>RampModeKey</code> (H)
+- <code>RadialKey</code> (Q), <code>AdjustModeKey</code> (V), <code>GiveToolKey</code> (F8), <code>RebindMenuKey</code> (F5)
+- <strong>Tasti diretti op</strong> (9, nessun default): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>, <code>CycleStampKey</code>, <code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool (default)
+- <code>AutoGiveTool</code>: true (fornisce la bacchetta all'ingresso)</p>
+<h3 id="stamps">Stamps</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool (default Same as Brush)</li>
+</ul>
+<h3 id="anteprima">Anteprima</h3>
+<ul>
+<li><code>ShowPreview</code>: true, <code>ShowGuides</code>: true (guide di portata, tinta della pendenza, anello di livello)</li>
+</ul>
+<h3 id="cronologia_1">Cronologia</h3>
+<ul>
+<li><code>UndoDepth</code>: 50 (0–500, 0 disattiva la cronologia)</li>
+</ul>
+<h3 id="server-autoritativo-via-config-sync">Server (Autoritativo via Config Sync)</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true (interruttore principale)</li>
+<li><code>AdminOnlyEdits</code>: false (solo admin)</li>
+<li><code>RespectWards</code>: true (blocca ward altrui)</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0 (off) — limiti imposti dal server</li>
+</ul>
+<h3 id="prestazioni">Prestazioni</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4 (1–32 tile/frame)</li>
+</ul>
+<hr>
+<h2 id="risoluzione-dei-problemi">🐛 Risoluzione dei Problemi</h2>
+<table>
+<thead>
+<tr>
+<th>Problema</th>
+<th>Soluzione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Il menu non appare / cursore invisibile</strong></td>
+<td>Chiudi il gioco. Elimina <code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\</code> e <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code>. Riavvia TMM, controlla gli aggiornamenti.</td>
+</tr>
+<tr>
+<td><strong>L'aggiornamento non compare in TMM</strong></td>
+<td>TMM → Settings → "Refresh mod list" (Ctrl+R). Chiudi/riapri TMM. Verifica il profilo corretto.</td>
+</tr>
+<tr>
+<td><strong>Conflitto di versione su Thunderstore</strong></td>
+<td>Incrementa la versione (0.3.3 → 0.3.4) in <code>.csproj</code>, <code>Plugin.cs</code>, <code>manifest.json</code>. Ricompila + ricarica.</td>
+</tr>
+<tr>
+<td><strong>Copia/incolla stamp non fa nulla</strong></td>
+<td>HUD: <code>STAMP READY [X/Y]</code> = pronto. Se dice "tool not equipped", equipaggia lo strumento (IMPOSTAZIONI → Stamp tool).</td>
+</tr>
+<tr>
+<td><strong>Anteprima invisibile sott'acqua</strong></td>
+<td>Corretto in 0.3.2 — l'anteprima galleggia in superficie. Aggiorna.</td>
+</tr>
+<tr>
+<td><strong>Cerchi su Linea/Rett/Poli</strong></td>
+<td>Corretto in 0.3.2 — viene mostrato solo il contorno marcato. Aggiorna.</td>
+</tr>
+<tr>
+<td><strong>La rotellina radiale non funziona</strong></td>
+<td>Corretto in 0.3.2 (<code>ZInput.GetMouseScrollWheel()</code>) e 0.3.4 (la selezione non viene più cancellata con il cursore centrato). Aggiorna.</td>
+</tr>
+<tr>
+<td><strong>La config non si salva</strong></td>
+<td>Chiudi il menu (F5) per il salvataggio automatico. Oppure modifica direttamente <code>BepInEx/config/com.terrainforge.valheim.cfg</code>.</td>
+</tr>
+<tr>
+<td><strong>Desync in multigiocatore</strong></td>
+<td>Mod su client+server. <code>UnlockDeltaLimit</code> su entrambi. Stessi <code>MaxUpDelta</code>/<code>MaxDownDelta</code>.</td>
+</tr>
+<tr>
+<td><strong>La build fallisce</strong></td>
+<td>Controlla i percorsi <code>ValheimDir</code>, <code>BepInExCoreDir</code> in <code>.csproj</code> o tramite CLI. Richiesto .NET SDK 8+.</td>
+</tr>
+<tr>
+<td><strong>Compila / pacchetta</strong></td>
+<td><code>dotnet build -c Release</code> (DLL in <code>build/</code>), <code>-p:Deploy=true</code> (installa nel profilo) o <code>-p:Package=true</code> (zip in <code>build/</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="link">🔗 Link</h2>
+<ul>
+<li><strong>Pagina Thunderstore:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>Repository GitHub:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>Donazioni:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>Changelog:</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge — Trasforma Valheim senza limiti.</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

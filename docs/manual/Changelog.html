@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Changelog · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="changelog">Changelog</h1>
+<hr>
+<h2 id="038-hotfix-for-037">[0.3.8] - Hotfix for 0.3.7</h2>
+<h3 id="context">Context</h3>
+<ul>
+<li>The supplied 0.3.7 log showed repeated network prefab registration failures because stable hash <code>506871212</code> was already present, plus invalid item entries during ObjectDB registration. It also logged successful tool registration, so the exact cause of the reported gameplay failure remains unconfirmed.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Reuse a matching existing network prefab entry instead of adding its hash twice; report collisions with another prefab.</li>
+<li>Remove invalid item entries before rebuilding ObjectDB indexes and clean up the tool clone if registration fails.</li>
+<li>Detect the equipped tool from inventory data when free camera hides hand slots; stop brush editing and hide its HUD when the required tool is unequipped.</li>
+</ul>
+<h3 id="verification">Verification</h3>
+<ul>
+<li>Before publishing, verify in game that the rod is handed out, terrain editing works, and network registration warnings no longer repeat.</li>
+</ul>
+<hr>
+<h2 id="036-2026-10-21">[0.3.6] - 2026-10-21</h2>
+<h3 id="fixed_1">Fixed</h3>
+<ul>
+<li>Reworked the F5 panel layout: tabs are split into two rows, window sizing follows screen dimensions, and each operation only shows the controls it uses.</li>
+<li>Ramp now has a dedicated panel that keeps Two-Point, Fixed-Angle, and Connected Path visible, with width, softness, and fixed-angle controls grouped together.</li>
+<li>Circle and Square are hidden while Ramp is selected because ramp placement uses its own line/path geometry; both shapes remain available for brush and Copy/Paste selection.</li>
+<li>Renamed the Path ramp option to <strong>Connected</strong> in English and Spanish and clarified that 3+ marked points create one continuous ramp.</li>
+</ul>
+<h3 id="planned">Planned</h3>
+<ul>
+<li>Added <strong>Circular ramps</strong> to the 0.4.0 roadmap: prototype both a level ring/annular terrace and a connected spiral that rises or descends around a center.</li>
+</ul>
+<h3 id="ui">UI</h3>
+<ul>
+<li>Opening the F5 panel now freezes local player input and camera look, dims the game behind the panel, and opens at a larger resolution-aware size.</li>
+<li>Added a dedicated <strong>Copy / Paste</strong> brush mode to the Q wheel; Apply selects the area according to the active shape, while the configured paste shortcut opens or confirms the placement preview. Its HUD identifies the mode separately from Paint.</li>
+<li>Copy mode now honors the selected shape: mark two corners for Rectangle, endpoints for Line, or vertices for Polygon; Circle/Square copy the aimed brush footprint. The HUD shows the next selection step.</li>
+<li>Folded Snow into Paint as the DeepSnow paint type; the existing height modifier still removes snow. Existing configs that selected Snow migrate to Paint + DeepSnow.</li>
+<li>Added a dedicated Copy/Paste tab with visible terrain copy, paste-preview/confirm, clipboard history, and saved-stamp controls; copy/paste buttons close the menu so the requested world action can run immediately.</li>
+<li>Reused the F5 operation glyphs in the Q radial wheel, selected-operation hub, and an in-world aim badge.</li>
+<li>Replaced the long, crowded status text with a compact TerrainForge card showing operation, radius, shape, target height, undo/redo, and only relevant contextual status.</li>
+<li>Kept permission and server warnings visible with a distinct alert color.</li>
+<li>Free camera now clamps its height above sampled terrain, preventing downward flight through the world while preserving aim toward lower terrain.</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>TerrainForge now registers its own TerrainForge Rod prefab with Harmony. Jotunn is no longer required.</li>
+<li>Removed Jotunn from the Thunderstore dependencies; BepInEx is the only required mod dependency.</li>
+<li>Fixed plugin metadata to report version 0.3.6 consistently.</li>
+<li>Re-register the rod for each ObjectDB instance and retry network-prefab registration after ObjectDB is populated, covering startup-order and world reloads.</li>
+<li>Verify ObjectDB indexing and network-prefab insertion; report failures instead of silently claiming registration succeeded.</li>
+<li>Revalidate the rod against the live ObjectDB during gameplay so later database rebuilds by other mods cannot leave auto-give using a stale registration state.</li>
+</ul>
+<h2 id="035-2026-10-17">[0.3.5] - 2026-10-17</h2>
+<h3 id="added">Added</h3>
+<ul>
+<li><strong>Terrain stamps — dedicated shape selection</strong>: select Circle, Square, Line, Rectangle, or Polygon in the Q-wheel Copy/Paste mode; the HUD guides the selection. Paste uses a movable preview and explicit confirmation.</li>
+<li><strong>Free camera (<code>F</code>) reworked</strong>: while flying, right-click no longer triggers lock-on, brush drift or a screenshot; <code>Ctrl</code>+wheel adjusts the brush radius; brush adjustments keep priority over free-fly input; on-screen banner shows the fly distance.</li>
+</ul>
+<h3 id="changed_1">Changed</h3>
+<ul>
+<li><strong>Saved stamps</strong> now use version 2 (adds the selection mask); version 1 stamps still load.</li>
+<li><strong>Documentation</strong>: README and CHANGELOG are now in English, with a complete wiki manual available in <strong>14 languages</strong>. Internal roadmap added.</li>
+</ul>
+<h3 id="fixed_2">Fixed</h3>
+<ul>
+<li><strong>Free-fly camera vs. brush input</strong>: suppressed vanilla <code>SecondaryAttack</code> / <code>Block</code> / <code>Attack</code> handling and the scroll-wheel conflict while flying, so aiming, radius and adjustments work from the free camera.</li>
+<li>Preview of a region-cropped stamp now skips cells outside the copied rectangle.</li>
+</ul>
+<hr>
+<h2 id="034-2026-10-15">[0.3.4] - 2026-10-15</h2>
+<h3 id="added_1">Added</h3>
+<ul>
+<li><strong>Persistent HUD</strong>: position coordinates, current biome and nearby resources (with counts) always visible next to the tool status.</li>
+<li><strong>"Reset keybinds" button</strong>: in the keys tab, resets every keybind to its default value in one click.</li>
+<li><strong>Valheim-native UI</strong>: full UI redesign using the Averia typeface and Valheim's palette (gold, dark greys), with native-styled buttons, panels, tabs and scrollbars.</li>
+<li><strong>Native radial menu (Q)</strong>: working mouse wheel via <code>ZInput.GetMouseScrollWheel()</code>, fixed button hover (radius 34–130 px), identical to vanilla radial menus.</li>
+<li><strong>Forced visible cursor</strong>: in the F5 menu and the ESC button, the cursor is forced visible and unlocked every frame via <code>OnGUI()</code>.</li>
+<li><strong>Slope heatmap (H)</strong>: slope overlay: 🟢 0–15° → 🟡 15–30° → 🟠 30–45° → 🔴 45°+.</li>
+<li><strong>Height heatmap (J)</strong>: height overlay: 🔵 low → 🟢 mid → 🟡 high → 🔴 peak.</li>
+<li><strong>Stamp Preview Pro</strong>: contour lines in the stamp preview — draws a 1 m curve over the stamp area in Valheim gold.</li>
+<li><strong>Improved Shore operation</strong>: a dedicated falloff mode for Shore (<code>ShoreFalloffMode</code>: Linear, Smooth, Flat, Pointy), defaulting to Linear for more natural beaches; a linear falloff is used by default to reach the water level more reliably; configurable in SETTINGS → "Shore falloff".</li>
+<li><strong>Visible ramp-mode selector</strong>: the ramp mode (two-point / fixed-angle / path) is now shown as three selectable buttons instead of a single cycling button.</li>
+<li><strong>"Quick actions" section</strong> in the keys tab: buttons for Undo, Redo, Fix height, Copy/Paste stamp, Previous stamp, Clear marks and the heatmaps — no need to rely only on the hotkey.</li>
+<li><strong>Vanilla tool blocking</strong> (<code>BlockVanillaTerrainTools</code>): while the TerrainForge tool is equipped, vanilla hoe/cultivator terrain edits are ignored.</li>
+<li><strong>Material diagnostic (log)</strong>: a button that dumps the terrain shader and texture slots to the log, to assess the feasibility of non-biome textures.</li>
+<li><strong>Tool color</strong> (<code>ToolTint</code> / <code>ToolTintColor</code>): tints the model and icon of the TerrainForge Rod (a Hammer clone) to tell it apart from the vanilla Hammer at a glance. Only affects this mod's tool.</li>
+</ul>
+<h3 id="changed_2">Changed</h3>
+<ul>
+<li><strong>F5 panel reorganized</strong>: the SETTINGS tab now groups options into labeled sections (Tool, View, Vanilla, Server, General) instead of a single block of toggles; the tool tint (<code>ToolTint</code> / <code>ToolTintColor</code>) is editable directly in the UI.</li>
+</ul>
+<h3 id="fixed_3">Fixed</h3>
+<ul>
+<li>Preview: circles/square hidden on Line/Rect/Poly while marking point A.</li>
+<li>Cursor visible in the F5 menu and the ESC button (OnGUI forces it visible).</li>
+<li><strong>Radial menu (Q): the mouse wheel now keeps the selection.</strong> Previously, with a centered cursor, the pick was wiped instantly and the wheel looked unresponsive; now only the pointer over an option changes the selection.</li>
+<li><strong>Alt+Wheel (fixed height): more reliable</strong> wheel reading.</li>
+<li>Menu window: initial size 680×720, min scroll 460 px, wider keybind rows.</li>
+</ul>
+<hr>
+<h2 id="033-2026-10-15">[0.3.3] - 2026-10-15</h2>
+<h3 id="added_2">Added</h3>
+<ul>
+<li><strong>Professional bilingual documentation (ES/EN)</strong>: README, CHANGELOG and WIKI fully rewritten in both languages with professional formatting, tables and complete coverage of every feature.</li>
+</ul>
+<h3 id="fixed_4">Fixed</h3>
+<ul>
+<li>Radial menu (Q): working mouse wheel (uses native <code>ZInput.GetMouseScrollWheel</code>), fixed button hover.</li>
+<li>Preview: circles/square hidden on Line/Rect/Poly while marking point A.</li>
+<li>Cursor visible in the F5 menu and the ESC button (OnGUI forces it visible).</li>
+<li>Mouse wheel in the radial menu (Q) using Valheim's native API.</li>
+<li>Menu window: initial size 560×600, min scroll 400 px.</li>
+</ul>
+<hr>
+<h2 id="032-2026-10-14">[0.3.2] - 2026-10-14</h2>
+<h3 id="added_3">Added</h3>
+<ul>
+<li><strong>14 languages + auto-detect</strong>: automatic detection via reflection (<code>Localization.instance.GetSelectedLanguage()</code>). Languages: English, Español, Français, Deutsch, Русский, 中文, 繁體中文, 日本語, 한국어, Polski, Português, Türkçe, Українська, Italiano. Default <code>Auto</code>; falls back to English.</li>
+</ul>
+<h3 id="fixed_5">Fixed</h3>
+<ul>
+<li>Preview: circles/square hidden on Line/Rect/Poly while marking point A.</li>
+<li>Cursor visible in the F5 menu and the ESC button (OnGUI forces it visible).</li>
+<li>Mouse wheel in the radial menu (Q) using native <code>ZInput.GetMouseScrollWheel()</code>.</li>
+<li>Menu window: scroll view min height 400 px, initial window 560×600 px.</li>
+</ul>
+<hr>
+<h2 id="031-2026-10-14">[0.3.1] - 2026-10-14</h2>
+<ul>
+<li>Version fix to resolve a Thunderstore conflict.</li>
+</ul>
+<hr>
+<h2 id="030-2026-10-13">[0.3.0] - 2026-10-13</h2>
+<h3 id="added_4">Added</h3>
+<ul>
+<li><strong>Undo / Redo</strong> (<code>Ctrl+Z</code>/<code>Ctrl+Y</code>): every application stores exactly the vertices it touches. Configurable depth (0–500) with a slider + textbox in the KEYS tab. Live counters in the HUD. History is cleared when leaving the world.</li>
+<li><strong>Live HUD data</strong>: a second line with the aimed height, current target and local slope in degrees.</li>
+<li><strong>Eyedropper</strong> (<code>G</code>): fixes the Flatten height at the aimed point (takes priority over Shift). The HUD shows <code>fixed</code>.</li>
+<li><strong>Fixed-angle ramps</strong> (<code>H</code>): a <code>FixedAngle</code> mode where B gives direction/length and the height follows <code>SlopeAngle</code>. Adjust in-game with <code>Alt</code> + radius/wheel.</li>
+<li><strong>New shapes</strong>: <code>Line</code> (two-click capsule), <code>Rectangle</code> (two corners), <code>Polygon</code> (click per vertex, double-click closes). All with undo and preview.</li>
+<li><strong>In-game SETTINGS tab</strong> (F5): everything editable live — cyclers, sliders, toggles. Saved on close.</li>
+<li><strong>Smooth modes</strong>: <code>Full</code> / <code>Ridges only</code> / <code>Dips only</code> (cycle in SETTINGS). Line + Smooth = smooth along a path.</li>
+<li><strong>Shore operation</strong>: flattens toward the water level + margin (beaches). Softness blends like Flatten.</li>
+<li><strong>Preview improvements</strong>: the footprint edge tints red on slopes; Flatten/Shore show a target-level ring.</li>
+<li><strong>Feedback effects</strong>: native dust + hit effect on every application (throttled while holding). Toggle <code>General &gt; PlayEffects</code>.</li>
+<li><strong>EN/ES localization</strong>: <code>General &gt; Language</code> switches the menu, HUD, messages and help. Key labels are rebuilt when the menu opens.</li>
+<li><strong>Radial menu</strong> (<code>Q</code>): choose the operation with the mouse; release confirms, <code>Esc</code> cancels. Suppresses the brush while open.</li>
+<li><strong>Named profiles</strong>: save/load/delete up to 12 full setups (SETTINGS → Profiles).</li>
+<li><strong>Live measurements</strong>: the HUD shows line/ramp length, rise and angle, rectangle W×D+area, polygon perimeter+area.</li>
+<li><strong>Path ramps</strong> (<code>Path</code>): a curve A→B→C… (double-press closes) → smooth Catmull-Rom. Preview corridor + trail, live length, undo.</li>
+<li><strong>Target height by text</strong>: <code>UseFixedHeight</code>/<code>FixedHeight</code> in config + a Fix/Release textbox in SETTINGS. <code>G</code> captures in the same state.</li>
+<li><strong>Terrain snapshots</strong>: saves edited tiles in a versioned binary (<code>.dat</code> in <code>snapshots/</code>, max 12). Import restores arrays with ownership and is undoable; missing tiles warn.</li>
+<li><strong>Wards + server caps</strong>: <code>RespectWards</code> blocks foreign wards; <code>RadiusCap</code>/<code>DeltaCap</code> are server-enforced caps visible in the HUD/preview.</li>
+<li><strong>Chunked application</strong>: configurable tiles/frame (<code>TilesPerFrame</code>, 1–32). Terrain appears progressively, one undo per stroke, auto-continues if you release the key.</li>
+<li><strong>Server authority</strong>: <code>Server</code> section (<code>AllowTerrainEdits</code>, <code>AdminOnlyEdits</code>). Server values win via config sync; clients cannot apply/undo/redo against them (HUD <code>SERVER: BLOCKED</code>). Servers without the mod ignore the section.</li>
+</ul>
+<hr>
+<h2 id="010-2026-10-12">[0.1.0] - 2026-10-12</h2>
+<h3 id="added_5">Added</h3>
+<ul>
+<li>Free brush: <strong>Flatten</strong>, <strong>Raise</strong>, <strong>Lower</strong>, <strong>Smooth</strong>, <strong>Ramp</strong>, <strong>Paint</strong>, <strong>Restore</strong> under the crosshair. Flatten follows the aimed height (Shift = level at your feet); Smooth averages neighbours.</li>
+<li><strong>TerrainForge Rod</strong> (Hammer clone): auto-given/equipped on join, give key <code>F8</code>.</li>
+<li><strong>Two-point ramp</strong>: click A, click B → a straight slope joins both heights (radius = ramp width). A wide, flat corridor with a soft edge (softness = lateral blend).</li>
+<li>Configurable brush radius (60 m), <strong>shape</strong> (circle/square), <strong>paint</strong> cyclable in-game.</li>
+<li><strong>Live preview</strong>: a solid ring = the real area; faint guides in the operation color = full-strength zone, max radius, max aim distance. For Ramp: the real A–B corridor (both edges). Guides toggleable via <code>Preview &gt; ShowGuides</code>. Top-left HUD (op, radius, shape, paint).</li>
+<li><strong>In-game keybind menu</strong> (<code>F5</code>, configurable) with its own skin + an <strong>in-game help tab</strong>.</li>
+<li>Removal of the vanilla <strong>±8 m</strong> clamp (<code>UnlockDeltaLimit</code>). Must also be on the server.</li>
+<li>Optional vanilla tweaks: scaled hoe/cultivator radius, <strong>no build cost</strong>, edits in <strong>protected zones</strong>.</li>
+<li>The crosshair works over water (heightmap raymarch without a collider).</li>
+<li>Configurable <strong>required tool</strong> (<code>Any</code>, <code>Pickaxe</code>, <code>TerrainForgeTool</code>).</li>
+</ul>
+<h3 id="notes">Notes</h3>
+<ul>
+<li>Edits persist via the <code>TerrainComp</code> ZDO and replicate through the server → <strong>required on both client and server</strong>.</li>
+</ul></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

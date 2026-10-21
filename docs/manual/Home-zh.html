@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>简体中文 · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="terrainforge">TerrainForge 维基</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <em>中文</em> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-037">TerrainForge 0.3.8 — 0.3.7 修复版</h3>
+<blockquote>
+<p>Q 圓盤新增專用「複製/貼上」模式。矩形用「套用」標記 A/B；直線標記兩端；多邊形標記頂點並在 3 點以上雙擊複製；圓形/正方形複製筆刷範圍。HUD 會提示下一步。雪已整合至塗裝 &gt; DeepSnow（按住 Shift 可移除）。F5 會鎖定本機移動與鏡頭；Esc 會暫停單人世界。 0.3.6：F5 选项卡改为两行，并按当前操作显示对应设置。Ramp 提供两点、固定角度和连续路径模式；圆形坡道列入 0.4.0 计划。</p>
+</blockquote>
+<h2 id="_1">目录</h2>
+<ol>
+<li><a href="#-安装">安装</a></li>
+<li><a href="#-快速开始">快速开始</a></li>
+<li><a href="#-控制">控制</a></li>
+<li><a href="#-操作">操作</a></li>
+<li><a href="#-形状">形状</a></li>
+<li><a href="#-衰减模式">衰减模式</a></li>
+<li><a href="#-图章复制粘贴">图章（复制/粘贴）</a></li>
+<li><a href="#-快照备份">快照（备份）</a></li>
+<li><a href="#-配置方案">配置方案</a></li>
+<li><a href="#-语言">语言</a></li>
+<li><a href="#-多人游戏">多人游戏</a></li>
+<li><a href="#-设置">设置</a></li>
+<li><a href="#-故障排查">故障排查</a></li>
+</ol>
+<hr>
+<h2 id="_2">📥 安装</h2>
+<h3 id="_3">要求</h3>
+<ul>
+<li><strong>BepInEx 5</strong>（x64，Mono），客户端和服务器均需安装。Thunderstore 用户已自带。</li>
+</ul>
+<h3 id="_4">步骤</h3>
+<ol>
+<li>从 Thunderstore 或 GitHub Releases 下载 <code>TerrainForge-&lt;version&gt;.zip</code>。</li>
+<li>解压并将 <code>TerrainForge.dll</code> 放到：
+   - <strong>客户端：</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>服务器：</strong> <code>&lt;server&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>重启游戏 / 服务器。</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>必须同时安装在客户端和服务器</strong>，才能进行大于 ±8 m 的编辑并正确同步。</p>
+</blockquote>
+<hr>
+<h2 id="_5">🚀 快速开始</h2>
+<ol>
+<li>加入一个世界。<strong>TerrainForge 法杖</strong>（锤子的克隆）会自动给予并装备。</li>
+<li>按 <code>F5</code> 打开菜单（或点击 <code>ESC</code> 暂停菜单中的 <strong>TerrainForge</strong> 按钮）。</li>
+<li>如果法杖未装备，先装备它。</li>
+<li>瞄准地形并按住<strong>右键</strong>（<code>Mouse1</code>）进行雕刻。</li>
+<li>用 <code>,</code> 切换操作，<code>.</code> 切换形状，<code>/</code> 切换涂装。</li>
+<li>按住 <code>Q</code> → 径向菜单，松开确认。</li>
+<li><code>Ctrl+Z</code> / <code>Ctrl+Y</code> 撤销/重做。</li>
+</ol>
+<hr>
+<h2 id="_6">⌨️ 控制</h2>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>默认按键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>应用笔刷</td>
+<td>按住 <code>Mouse1</code>（右键）</td>
+<td>雕刻准星下的地形</td>
+</tr>
+<tr>
+<td>半径 +</td>
+<td><code>=</code> 或 <code>Ctrl</code>+滚轮</td>
+<td>增大笔刷半径</td>
+</tr>
+<tr>
+<td>半径 −</td>
+<td><code>-</code> 或 <code>Ctrl</code>+滚轮</td>
+<td>减小笔刷半径</td>
+</tr>
+<tr>
+<td>切换操作</td>
+<td><code>,</code></td>
+<td>循环切换 9 种操作</td>
+</tr>
+<tr>
+<td>切换形状</td>
+<td><code>.</code></td>
+<td>圆形 → 方形 → 直线 → 矩形 → 多边形</td>
+</tr>
+<tr>
+<td>切换涂装</td>
+<td><code>/</code></td>
+<td>循环切换 6 种涂装类型</td>
+</tr>
+<tr>
+<td>水平到脚下</td>
+<td>按住 <code>Left Shift</code></td>
+<td>平整使用玩家高度</td>
+</tr>
+<tr>
+<td>撤销</td>
+<td><code>Ctrl+Z</code></td>
+<td>撤销上一笔</td>
+</tr>
+<tr>
+<td>重做</td>
+<td><code>Ctrl+Y</code></td>
+<td>重做已撤销的一笔</td>
+</tr>
+<tr>
+<td>吸管</td>
+<td><code>G</code></td>
+<td>将平整高度固定在准星处（再按一次 = 解除）</td>
+</tr>
+<tr>
+<td>坡道模式</td>
+<td><code>H</code></td>
+<td>循环：两点 → 固定角度 → 路径（或在设置中用 3 个按钮选择）</td>
+</tr>
+<tr>
+<td>固定坡道角度</td>
+<td>按住 <code>Alt</code> + 半径/滚轮</td>
+<td>在固定模式下调整角度</td>
+</tr>
+<tr>
+<td>径向菜单</td>
+<td>按住 <code>Q</code></td>
+<td>用鼠标选择操作，松开确认</td>
+</tr>
+<tr>
+<td>调整模式</td>
+<td><code>V</code></td>
+<td>滚轮 = 半径，冻结缩放/快捷栏/地图</td>
+</tr>
+<tr>
+<td>精细调整（0.1 m）</td>
+<td>按住 <code>Shift</code> + 滚轮/半径</td>
+<td>精确调整半径</td>
+</tr>
+<tr>
+<td><strong>复制图章</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>将标记区域复制到剪贴板</td>
+</tr>
+<tr>
+<td><strong>粘贴图章</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>幽灵预览，点击确认</td>
+</tr>
+<tr>
+<td>获取法杖</td>
+<td><code>F8</code></td>
+<td>给予 TerrainForge 法杖</td>
+</tr>
+<tr>
+<td>打开菜单</td>
+<td><code>F5</code></td>
+<td>打开按键/帮助/设置菜单</td>
+</tr>
+</tbody>
+</table>
+<p><strong>额外按键（无默认值，在按键中分配）：</strong>
+- 直接操作：平整、抬高、降低、平滑、涂装、恢复、坡道、海岸、雪
+- 下一个 / 上一个配置方案
+- 下一个 / 上一个图章（历史记录）</p>
+<p><strong>“快捷操作”部分（按键标签页）：</strong> 为没有强制快捷键的功能提供按钮 —— 撤销、重做、固定高度、复制/粘贴图章、上一个图章、清除标记、热力图和材质诊断（将着色器 + 纹理槽转储到日志）。</p>
+<hr>
+<h2 id="_7">🔄 操作</h2>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>平整</strong></td>
+<td>平整到瞄准的高度（Shift = 到你脚下）。通过吸管（<code>G</code>）或设置文本框固定高度。</td>
+</tr>
+<tr>
+<td><strong>抬高</strong></td>
+<td>每次应用将地形抬高 <code>RaiseDelta</code>。衰减模式塑造其形状。</td>
+</tr>
+<tr>
+<td><strong>降低</strong></td>
+<td>每次应用将地形降低 <code>RaiseDelta</code>。衰减模式塑造其形状。</td>
+</tr>
+<tr>
+<td><strong>平滑</strong></td>
+<td>真正的模糊：将每个顶点与其 8 个相邻顶点取平均。按住可渐进。<strong>模式：</strong> 全部（两者）、仅山脊（降低）、仅凹陷（抬高）。直线形状 = 平滑一条路径。</td>
+</tr>
+<tr>
+<td><strong>坡道</strong></td>
+<td><strong>3 种模式</strong>（<code>H</code> 循环）：<br>• <strong>两点</strong>：标记 A 和 B → 一条直线斜坡连接两个高度。<br>• <strong>固定角度</strong>：B = 方向/长度；高度 = <code>SlopeAngle</code>（根据准星向上/向下）。用 <code>Alt</code>+半径调整。<br>• <strong>路径</strong>：标记曲线 A→B→C…（3+ 时双击闭合）→ 平滑 Catmull-Rom。<br>宽度 = 笔刷半径。柔和度 = 仅混合两侧边缘。预览：填充走廊 + A/B 处的高度环。</td>
+</tr>
+<tr>
+<td><strong>海岸</strong></td>
+<td>向水位 + <code>ShoreOffset</code> 边距平整（沙滩）。柔和度同平整。</td>
+</tr>
+<tr>
+<td><strong>涂装</strong></td>
+<td>类型：Dirt、Cultivated、Paved、ClearVegetation、DeepSnow、Reset。强度可调。</td>
+</tr>
+<tr>
+<td><strong>恢复</strong></td>
+<td>将地形恢复到原始状态（高度 + 涂装）。</td>
+</tr>
+<tr>
+<td><strong>複製/貼上</strong></td>
+<td>Q 圓盤中的專用模式，可選取地形並放置 stamp。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_8">📐 形状</h2>
+<p>用 <code>.</code> 键循环。全部支持撤销。</p>
+<table>
+<thead>
+<tr>
+<th>形状</th>
+<th>标记方式</th>
+<th>用例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>圆形</strong></td>
+<td>单击（笔刷中心）</td>
+<td>通用雕刻</td>
+</tr>
+<tr>
+<td><strong>方形</strong></td>
+<td>单击（中心）</td>
+<td>平台、地基</td>
+</tr>
+<tr>
+<td><strong>直线</strong></td>
+<td>2 次点击（A → B）</td>
+<td>路径、墙壁、小径。半宽 = 半径。</td>
+</tr>
+<tr>
+<td><strong>矩形</strong></td>
+<td>2 次点击（对角）</td>
+<td>地基、农场、平台。边缘柔和。</td>
+</tr>
+<tr>
+<td><strong>多边形</strong></td>
+<td>每个顶点点击一次，双击闭合（3+ 顶点）</td>
+<td>复杂形状、自定义区域</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>非圆形只显示<strong>标记的轮廓</strong>（无圆形环）。</li>
+<li>柔和度影响所有形状的边缘混合。</li>
+</ul>
+<hr>
+<h2 id="_9">⚙️ 衰减模式（抬高/降低）</h2>
+<p>在设置 → “抬高/降低衰减”中配置：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>尖峰</strong></td>
+<td>中央峰值。由“衰减幂”滑块控制（1–5）。</td>
+</tr>
+<tr>
+<td><strong>平坦</strong></td>
+<td>均匀圆盘 —— 整个半径的权重相同。</td>
+</tr>
+<tr>
+<td><strong>平滑</strong></td>
+<td>余弦钟形 —— 平滑过渡，无硬边缘。</td>
+</tr>
+<tr>
+<td><strong>线性</strong></td>
+<td>从中心到边缘的直线渐变。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_10">🧱 图章（复制/粘贴）</h2>
+<p>用于复制地形结构的强大功能。</p>
+<h3 id="_11">矩形选择（推荐）</h3>
+<p>在 Q 圓盤選擇「複製/貼上」。按「套用」標記範圍：矩形選兩個角、直線選兩端、多邊形選頂點（3 點以上雙擊），圓形/正方形則使用目前筆刷範圍。HUD 會提示下一步。</p>
+<h3 id="_12">工作流程</h3>
+<ol>
+<li><strong>标记区域</strong>：使用任意形状（圆形、矩形、直线、多边形、坡道）—— 或上面的矩形选择。</li>
+<li><strong>复制</strong>：<code>Ctrl+Shift+C</code> → “图章已复制：X 瓦片”（RAM 剪贴板）。</li>
+<li><strong>粘贴预览</strong>：<code>Ctrl+Shift+V</code> → 准星处的幽灵线框。
+   - <code>Q</code>/<code>E</code> = 旋转 ±15°
+   - <code>Alt</code>+滚轮 = 连续旋转
+   - <code>Shift</code>+滚轮 = 缩放 0.25×–4×
+   - <code>Esc</code> = 取消</li>
+<li><strong>确认</strong>：再次按下贴上快捷键以确认预览。</li>
+</ol>
+<blockquote>
+<p>选择图章<strong>只写入复制的区域内</strong>；其外的地形保持不变。</p>
+</blockquote>
+<h3 id="_13">历史记录</h3>
+<ul>
+<li>RAM 中最多 <strong>10 个图章</strong>（最新的在前）。</li>
+<li><code>下一个图章</code> / <code>上一个图章</code> 键（可重新绑定）循环切换。</li>
+<li>Flash: "图章历史：复制：3 瓦片 [2/5]"</li>
+</ul>
+<h3 id="_14">持久化</h3>
+<ul>
+<li><strong>设置 → 图章</strong>：</li>
+<li>将当前图章保存到磁盘（<code>.stamp</code> 位于 <code>BepInEx/config/TerrainForge/stamps/</code>，最多 12 个）。</li>
+<li>将图章加载到剪贴板。</li>
+<li>列出/删除已保存的图章。</li>
+</ul>
+<h3 id="_15">图章工具</h3>
+<ul>
+<li>设置 → “图章工具”（4 个选项）：</li>
+<li><code>Same as brush</code>（默认）—— 使用与笔刷相同的工具</li>
+<li><code>Any</code> —— 无要求</li>
+<li><code>Pickaxe</code> —— 需要装备镐</li>
+<li><code>TerrainForge Rod</code> —— 需要本模组的法杖</li>
+<li>装备了工具且剪贴板中有图章时，HUD 显示 <code>STAMP READY [2/5]</code>。</li>
+<li>没有工具时：<code>Stamp: tool not equipped</code>，复制/粘贴被阻止。</li>
+</ul>
+<hr>
+<h2 id="_16">💾 快照（备份）</h2>
+<p>完整的地形备份/恢复。</p>
+<h3 id="_17">保存</h3>
+<ol>
+<li>设置 → <strong>快照</strong>。</li>
+<li>名称（留空 = 自动日期/时间）。</li>
+<li><strong>保存</strong> → 编辑过的瓦片保存到 <code>BepInEx/config/TerrainForge/snapshots/&lt;name&gt;.dat</code>（最多 12 个）。</li>
+</ol>
+<h3 id="_18">加载</h3>
+<ol>
+<li>选择一个快照。</li>
+<li><strong>加载</strong> → 带所有权恢复瓦片，<strong>1 个撤销步骤</strong>。</li>
+<li>未加载的瓦片会明确警告 —— 请在原始位置附近导入。</li>
+</ol>
+<h3 id="_19">特性</h3>
+<ul>
+<li>带版本的二进制格式（<code>.dat</code>）。</li>
+<li>恢复高度 + 平滑 + 涂装 + 所有权。</li>
+<li>导入可撤销（<code>Ctrl+Z</code> 还原导入）。</li>
+<li>未加载的瓦片会明确警告。</li>
+</ul>
+<hr>
+<h2 id="_20">💾 配置方案</h2>
+<p>保存/加载完整的笔刷配置。</p>
+<ul>
+<li>设置 → <strong>配置方案</strong>。</li>
+<li>名称 + <strong>保存</strong> → 半径、柔和度、操作、形状、涂装、坡道模式、角度、平滑模式、抬高增量、涂装强度、衰减、海岸偏移。</li>
+<li><strong>加载</strong> → 立即应用。</li>
+<li>最多 12 个配置方案（<code>Presets &gt; Slots</code> 中的文化无关格式）。</li>
+<li>快捷键：<code>Next Profile</code>（在按键中分配）以循环切换。</li>
+</ul>
+<hr>
+<h2 id="_21">🌐 语言</h2>
+<p><strong>15 个选项：</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> —— 默认 <code>Auto</code>。</p>
+<h3 id="_22">自动检测</h3>
+<ul>
+<li>默认的 <code>Auto</code> 通过反射检测游戏语言：<code>Localization.instance.GetSelectedLanguage()</code>。</li>
+<li>将 Valheim 语言映射 → 内部索引。</li>
+<li>如果某语言没有完整翻译 → 回退到 English。</li>
+<li>可在设置 → “语言”中配置（循环切换 15 个选项）。</li>
+<li>打开菜单时会重建按键标签。</li>
+</ul>
+<h3 id="_23">翻译状态</h3>
+<ul>
+<li><strong>完整：</strong> English、Español</li>
+<li><strong>回退到 English：</strong> Français、Deutsch、Русский、中文、繁體中文、日本語、한국어、Polski、Português、Türkçe、Українська、Italiano</li>
+<li>欢迎通过 PR 提供社区翻译。</li>
+</ul>
+<h3 id="_24">本文档</h3>
+<p>已翻译的 wiki 页面： <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>。</p>
+<hr>
+<h2 id="_25">🌍 多人游戏</h2>
+<h3 id="_26">要求</h3>
+<ul>
+<li><strong>客户端和服务器都需安装模组</strong>，才能进行大于 ±8 m 的编辑并正确同步。</li>
+<li>服务器上也要 <code>UnlockDeltaLimit</code>，否则服务器会钳制地形。</li>
+</ul>
+<h3 id="config-sync">服务器权威（Config Sync）</h3>
+<p>当服务器运行模组时，其 <code>Server</code> 部分优先生效：
+- <code>AllowTerrainEdits</code>（默认 <code>true</code>）—— 主开关；如果为 <code>false</code>，客户端无法应用/撤销/重做。
+- <code>AdminOnlyEdits</code>（默认 <code>false</code>）—— 仅管理员/主机可编辑。
+- <code>RespectWards</code>（默认 <code>true</code>）—— 阻止在他人的结界（ward）内编辑。
+- <code>RadiusCap</code> / <code>DeltaCap</code>（0 = 关闭）—— 服务器强制上限，在 HUD+预览中可见。</p>
+<blockquote>
+<p><strong>没有</strong>模组的服务器会忽略该部分 → 客户端仍可用于测试。</p>
+</blockquote>
+<h3 id="_27">防止失步</h3>
+<ul>
+<li>在服务器 + 客户端上保持 <code>MaxUpDelta</code> / <code>MaxDownDelta</code> 一致。</li>
+<li>大半径可能导致没有模组的客户端失步。</li>
+</ul>
+<hr>
+<h2 id="_28">⚙️ 设置</h2>
+<p>文件：<code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="_29">常规</h3>
+<table>
+<thead>
+<tr>
+<th>设置</th>
+<th>默认</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>主开关</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>应用时的尘土 + 打击效果</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>为 TerrainForge 法杖（锤子的克隆）着色，便于与原生锤子区分</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>法杖十六进制颜色（模型 + 图标）。例如 <code>#FFC400</code> 金色，<code>#8BC34A</code> 绿色</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_30">笔刷</h3>
+<table>
+<thead>
+<tr>
+<th>设置</th>
+<th>默认</th>
+<th>范围</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>笔刷半径（m）</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>调整时的最小半径</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>调整时的最大半径</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>每次按键/滚轮的半径变化量</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>边缘柔和度（0 = 硬，100 = 非常柔）</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>衰减指数（仅尖峰模式）</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>每次抬高/降低的米数</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>涂装强度</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>起始操作</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>起始形状</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>起始涂装</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>固定坡道角度（度）</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>水位上方的海岸边距（m）</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>使用固定高度（吸管状态）</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>平整的精确高度（m）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_31">原生 / 集成</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false —— 装备法杖时，忽略原生锄头/耕具的地形编辑。设置中也有一个开关。</li>
+</ul>
+<h3 id="_32">输入</h3>
+<p>所有快捷键都可在按键标签页重新绑定。重点：
+- <code>ApplyKey</code>（Mouse1）、<code>RadiusUp/Down</code>（=/-）、<code>CycleOp/Shape/Paint</code>（,/.//）
+- <code>UndoKey</code>（Ctrl+Z）、<code>RedoKey</code>（Ctrl+Y）、<code>EyedropKey</code>（G）、<code>RampModeKey</code>（H）
+- <code>RadialKey</code>（Q）、<code>AdjustModeKey</code>（V）、<code>GiveToolKey</code>（F8）、<code>RebindMenuKey</code>（F5）
+- <strong>直接操作键</strong>（9 个，无默认值）：OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>、<code>CycleStampKey</code>、<code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool（默认）
+- <code>AutoGiveTool</code>: true（加入时给予法杖）</p>
+<h3 id="_33">图章</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool（默认 Same as Brush）</li>
+</ul>
+<h3 id="_34">预览</h3>
+<ul>
+<li><code>ShowPreview</code>: true，<code>ShowGuides</code>: true（触及范围参考、坡度着色、水平环）</li>
+</ul>
+<h3 id="_35">历史记录</h3>
+<ul>
+<li><code>UndoDepth</code>: 50（0–500，0 禁用历史记录）</li>
+</ul>
+<h3 id="config-sync_1">服务器（通过 Config Sync 具有权威性）</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true（主开关）</li>
+<li><code>AdminOnlyEdits</code>: false（仅管理员）</li>
+<li><code>RespectWards</code>: true（阻止他人的结界）</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0（关闭）—— 服务器强制上限</li>
+</ul>
+<h3 id="_36">性能</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4（1–32 瓦片/帧）</li>
+</ul>
+<hr>
+<h2 id="_37">🐛 故障排查</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>菜单不显示 / 光标不可见</strong></td>
+<td>关闭游戏。删除 <code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\</code> 和 <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code>。重启 TMM，检查更新。</td>
+</tr>
+<tr>
+<td><strong>TMM 中不显示更新</strong></td>
+<td>TMM → Settings → "Refresh mod list"（Ctrl+R）。关闭/重新打开 TMM。确认配置文件正确。</td>
+</tr>
+<tr>
+<td><strong>Thunderstore 版本冲突</strong></td>
+<td>在 <code>.csproj</code>、<code>Plugin.cs</code>、<code>manifest.json</code> 中提升版本号（0.3.3 → 0.3.4）。重新构建 + 重新上传。</td>
+</tr>
+<tr>
+<td><strong>图章复制/粘贴无反应</strong></td>
+<td>HUD：<code>STAMP READY [X/Y]</code> = 就绪。如果显示 “tool not equipped”，请装备工具（设置 → 图章工具）。</td>
+</tr>
+<tr>
+<td><strong>预览在水下不可见</strong></td>
+<td>已在 0.3.2 修复 —— 预览漂浮在水面上。请更新。</td>
+</tr>
+<tr>
+<td><strong>直线/矩形/多边形上出现圆形</strong></td>
+<td>已在 0.3.2 修复 —— 只显示标记的轮廓。请更新。</td>
+</tr>
+<tr>
+<td><strong>径向滚轮不工作</strong></td>
+<td>已在 0.3.2（<code>ZInput.GetMouseScrollWheel()</code>）和 0.3.4（光标居中时选择不再被清除）修复。请更新。</td>
+</tr>
+<tr>
+<td><strong>配置无法保存</strong></td>
+<td>关闭菜单（F5）以自动保存。或直接编辑 <code>BepInEx/config/com.terrainforge.valheim.cfg</code>。</td>
+</tr>
+<tr>
+<td><strong>多人游戏失步</strong></td>
+<td>客户端+服务器都安装模组。两者都设置 <code>UnlockDeltaLimit</code>。<code>MaxUpDelta</code>/<code>MaxDownDelta</code> 相同。</td>
+</tr>
+<tr>
+<td><strong>构建失败</strong></td>
+<td>检查 <code>.csproj</code> 中的 <code>ValheimDir</code>、<code>BepInExCoreDir</code> 路径或通过 CLI。需要 .NET SDK 8+。</td>
+</tr>
+<tr>
+<td><strong>编译 / 打包</strong></td>
+<td><code>dotnet build -c Release</code>（DLL 在 <code>build/</code>），<code>-p:Deploy=true</code>（安装到配置文件）或 <code>-p:Package=true</code>（zip 在 <code>build/</code>）。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_38">🔗 链接</h2>
+<ul>
+<li><strong>Thunderstore 页面：</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>GitHub 仓库：</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>捐赠：</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>更新日志：</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge —— 无限制地重塑 Valheim。</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>

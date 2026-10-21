@@ -1,0 +1,62 @@
+name: Sync wiki to website
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/sync-wiki.yml
+      - .github/scripts/sync_wiki.py
+      - docs/index.html
+      - docs/app.js
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: sync-wiki-to-website
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out website
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Markdown renderer
+        run: python -m pip install "Markdown==3.7"
+
+      - name: Copy and render the latest wiki pages
+        run: python .github/scripts/sync_wiki.py
+
+      - name: Publish changed manual pages
+        id: publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/manual docs/images
+          if git diff --cached --quiet; then
+            echo "The website manual already matches the wiki."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "docs: sync website manual from wiki"
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Request GitHub Pages rebuild
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api --method POST repos/marceloanton/TerrainForge/pages/builds -H "Accept: application/vnd.github+json"

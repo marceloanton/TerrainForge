@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111713">
+  <title>Русский · TerrainForge</title>
+  <link rel="icon" href="../icon.png" type="image/png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .wiki-shell{max-width:1100px;margin:0 auto;padding:34px clamp(20px,5vw,64px) 80px}
+    .wiki-top{border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:18px;margin-bottom:38px}
+    .wiki-top>a{color:#ffc36d;font:600 13px 'DM Mono',monospace}
+    .wiki-languages{margin-top:18px;color:#b9c2ba;font-size:13px;line-height:2.2}
+    .wiki-languages a{color:#e7c37e;margin-right:7px;white-space:nowrap}
+    .wiki-content{color:#e8e5d9;font:16px/1.75 'DM Sans',Arial,sans-serif}
+    .wiki-content h1,.wiki-content h2,.wiki-content h3,.wiki-content h4{color:#ffc36d;font-family:'Averia Serif Libre',Georgia,serif;line-height:1.25;margin:1.8em 0 .65em}
+    .wiki-content h1{font-size:clamp(32px,5vw,48px);margin-top:0}
+    .wiki-content h2{font-size:30px;border-bottom:1px solid rgba(231,224,202,.16);padding-bottom:9px}
+    .wiki-content h3{font-size:23px}
+    .wiki-content a{color:#55dce9;text-decoration:underline;text-underline-offset:3px}
+    .wiki-content img{max-width:100%;height:auto}
+    .wiki-content table{display:block;max-width:100%;overflow:auto;border-collapse:collapse}
+    .wiki-content th,.wiki-content td{border:1px solid rgba(231,224,202,.2);padding:9px 12px;text-align:left}
+    .wiki-content th{background:#1b2c31;color:#ffc36d}
+    .wiki-content blockquote{margin:1.4em 0;padding:5px 18px;border-left:3px solid #cf7634;background:#14232a;color:#c9d0c7}
+    .wiki-content pre{overflow:auto;padding:18px;background:#091116;border:1px solid rgba(231,224,202,.16);border-radius:5px}
+    .wiki-content code{font-family:'DM Mono',monospace;font-size:.9em}
+    .wiki-content li{margin:.3em 0}
+    @media(max-width:600px){.wiki-content{font-size:15px}.wiki-content h2{font-size:25px}}
+  </style>
+</head>
+<body>
+  <header class="wiki-shell wiki-top">
+    <a href="../index.html">← TerrainForge</a>
+    <nav class="wiki-languages" aria-label="Manual languages"><a href="Home.html" lang="en">English</a> · <a href="Home-es.html" lang="es">Español</a> · <a href="Home-fr.html" lang="fr">Français</a> · <a href="Home-de.html" lang="de">Deutsch</a> · <a href="Home-ru.html" lang="ru">Русский</a> · <a href="Home-zh.html" lang="zh">简体中文</a> · <a href="Home-zh-tw.html" lang="zh-Hant">繁體中文</a> · <a href="Home-ja.html" lang="ja">日本語</a> · <a href="Home-ko.html" lang="ko">한국어</a> · <a href="Home-pl.html" lang="pl">Polski</a> · <a href="Home-pt.html" lang="pt">Português</a> · <a href="Home-tr.html" lang="tr">Türkçe</a> · <a href="Home-uk.html" lang="uk">Українська</a> · <a href="Home-it.html" lang="it">Italiano</a></nav>
+  </header>
+  <main class="wiki-shell wiki-content"><h1 id="terrainforge">Вики TerrainForge</h1>
+<p><a href="Overview.html">Overview</a> · <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <em>Русский</em> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a> · <a href="https://marceloanton.github.io/TerrainForge/">Website</a></p>
+<hr>
+<h3 id="terrainforge-038-037">TerrainForge 0.3.8 — исправление для 0.3.7</h3>
+<blockquote>
+<p>В колесе Q появился отдельный режим «Копировать/вставить». Прямоугольник отмечает A/B клавишей «Применить», Линия — два конца, Многоугольник — вершины (двойное нажатие после 3+ точек), Круг/Квадрат копирует область кисти. HUD показывает следующий шаг. Снег теперь находится в «Покраска» &gt; DeepSnow (удерживайте Shift, чтобы убрать). F5 блокирует локальное движение и камеру; Esc приостанавливает весь мир в одиночной игре. 0.3.6: вкладки F5 расположены в два ряда, а настройки соответствуют выбранной операции. У Ramp есть режимы «Две точки», «Фиксированный угол» и «Непрерывная трасса»; круговые рампы запланированы для 0.4.0.</p>
+</blockquote>
+<h2 id="_1">Содержание</h2>
+<ol>
+<li><a href="#-установка">Установка</a></li>
+<li><a href="#-быстрый-старт">Быстрый старт</a></li>
+<li><a href="#-управление">Управление</a></li>
+<li><a href="#-операции">Операции</a></li>
+<li><a href="#-формы">Формы</a></li>
+<li><a href="#-режимы-затухания">Режимы затухания</a></li>
+<li><a href="#-штампы-копироватьвставить">Штампы (Копировать/Вставить)</a></li>
+<li><a href="#-снимки-резервные-копии">Снимки (Резервные копии)</a></li>
+<li><a href="#-профили">Профили</a></li>
+<li><a href="#-языки">Языки</a></li>
+<li><a href="#-мультиплеер">Мультиплеер</a></li>
+<li><a href="#-настройки">Настройки</a></li>
+<li><a href="#-решение-проблем">Решение проблем</a></li>
+</ol>
+<hr>
+<h2 id="_2">📥 Установка</h2>
+<h3 id="_3">Требования</h3>
+<ul>
+<li><strong>BepInEx 5</strong> (x64, Mono) на клиенте и сервере. У пользователей Thunderstore он уже есть.</li>
+</ul>
+<h3 id="_4">Шаги</h3>
+<ol>
+<li>Скачайте <code>TerrainForge-&lt;version&gt;.zip</code> с Thunderstore или GitHub Releases.</li>
+<li>Распакуйте и поместите <code>TerrainForge.dll</code> в:
+   - <strong>Клиент:</strong> <code>...\BepInEx\plugins\TerrainForge\TerrainForge.dll</code>
+   - <strong>Сервер:</strong> <code>&lt;сервер&gt;\BepInEx\plugins\TerrainForge\TerrainForge.dll</code></li>
+<li>Перезапустите игру / сервер.</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>Требуется установка на клиенте И сервере</strong> для правок больше ±8 м и корректной репликации.</p>
+</blockquote>
+<hr>
+<h2 id="_5">🚀 Быстрый старт</h2>
+<ol>
+<li>Зайдите в мир. <strong>Жезл TerrainForge</strong> (клон молота) выдаётся и экипируется автоматически.</li>
+<li>Нажмите <code>F5</code>, чтобы открыть меню (или кликните кнопку <strong>TerrainForge</strong> в меню паузы <code>ESC</code>).</li>
+<li>Экипируйте жезл, если он не экипирован.</li>
+<li>Наведитесь на местность и удерживайте <strong>правую кнопку мыши</strong> (<code>Mouse1</code>) для лепки.</li>
+<li>Используйте <code>,</code> для переключения операций, <code>.</code> для форм, <code>/</code> для красок.</li>
+<li>Удерживайте <code>Q</code> → радиальное меню, отпустите для подтверждения.</li>
+<li><code>Ctrl+Z</code> / <code>Ctrl+Y</code> для отмены/повтора.</li>
+</ol>
+<hr>
+<h2 id="_6">⌨️ Управление</h2>
+<table>
+<thead>
+<tr>
+<th>Действие</th>
+<th>Клавиша по умолчанию</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Применить кисть</td>
+<td>Удерживать <code>Mouse1</code> (правая кнопка)</td>
+<td>Лепит местность под прицелом</td>
+</tr>
+<tr>
+<td>Радиус +</td>
+<td><code>=</code> или <code>Ctrl</code>+Колесо</td>
+<td>Увеличивает радиус кисти</td>
+</tr>
+<tr>
+<td>Радиус −</td>
+<td><code>-</code> или <code>Ctrl</code>+Колесо</td>
+<td>Уменьшает радиус кисти</td>
+</tr>
+<tr>
+<td>Переключить операцию</td>
+<td><code>,</code></td>
+<td>Перебирает 9 операций</td>
+</tr>
+<tr>
+<td>Переключить форму</td>
+<td><code>.</code></td>
+<td>Круг → Квадрат → Линия → Прямоугольник → Полигон</td>
+</tr>
+<tr>
+<td>Переключить краску</td>
+<td><code>/</code></td>
+<td>Перебирает 6 типов краски</td>
+</tr>
+<tr>
+<td>Выравнивание по ногам</td>
+<td>Удерживать <code>Left Shift</code></td>
+<td>Выровнять использует высоту игрока</td>
+</tr>
+<tr>
+<td>Отмена</td>
+<td><code>Ctrl+Z</code></td>
+<td>Отменяет последний штрих</td>
+</tr>
+<tr>
+<td>Повтор</td>
+<td><code>Ctrl+Y</code></td>
+<td>Повторяет отменённый штрих</td>
+</tr>
+<tr>
+<td>Пипетка</td>
+<td><code>G</code></td>
+<td>Фиксирует высоту Выровнять на прицеле (повторно = снять)</td>
+</tr>
+<tr>
+<td>Режим пандуса</td>
+<td><code>H</code></td>
+<td>Перебирает: Две точки → Фиксированный угол → Путь (или выберите 3 кнопками в НАСТРОЙКАХ)</td>
+</tr>
+<tr>
+<td>Угол фиксированного пандуса</td>
+<td>Удерживать <code>Alt</code> + радиус/колесо</td>
+<td>Регулирует угол в фиксированном режиме</td>
+</tr>
+<tr>
+<td>Радиальное меню</td>
+<td>Удерживать <code>Q</code></td>
+<td>Выберите операцию мышью, отпустите для подтверждения</td>
+</tr>
+<tr>
+<td>Режим настройки</td>
+<td><code>V</code></td>
+<td>Колесо = радиус, замораживает зум/панель/карту</td>
+</tr>
+<tr>
+<td>Точная настройка (0.1 м)</td>
+<td>Удерживать <code>Shift</code> + колесо/радиус</td>
+<td>Точная регулировка радиуса</td>
+</tr>
+<tr>
+<td><strong>Копировать штамп</strong></td>
+<td><code>Ctrl+Shift+C</code></td>
+<td>Копирует отмеченную область в буфер обмена</td>
+</tr>
+<tr>
+<td><strong>Вставить штамп</strong></td>
+<td><code>Ctrl+Shift+V</code></td>
+<td>Призрачный предпросмотр, клик подтверждает</td>
+</tr>
+<tr>
+<td>Получить жезл</td>
+<td><code>F8</code></td>
+<td>Выдаёт жезл TerrainForge</td>
+</tr>
+<tr>
+<td>Открыть меню</td>
+<td><code>F5</code></td>
+<td>Открывает меню клавиш/справки/настроек</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Дополнительные клавиши (без значения по умолчанию, назначьте их в КЛАВИШАХ):</strong>
+- Прямая операция: Выровнять, Поднять, Опустить, Сгладить, Рисовать, Восстановить, Пандус, Берег, Снег
+- Следующий / предыдущий профиль
+- Следующий / предыдущий штамп (история)</p>
+<p><strong>Раздел «Быстрые действия» (вкладка КЛАВИШИ):</strong> кнопки для функций без обязательного сочетания — Отмена, Повтор, Зафиксировать высоту, Копировать/Вставить штамп, Предыдущий штамп, Очистить метки, тепловые карты и Диагностика материала (выводит шейдер + слоты текстур в лог).</p>
+<hr>
+<h2 id="_7">🔄 Операции</h2>
+<table>
+<thead>
+<tr>
+<th>Операция</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Выровнять</strong></td>
+<td>Выравнивает до указанной высоты (Shift = на уровне ваших ног). Фиксированная высота через Пипетку (<code>G</code>) или текстовое поле в НАСТРОЙКАХ.</td>
+</tr>
+<tr>
+<td><strong>Поднять</strong></td>
+<td>Поднимает местность на <code>RaiseDelta</code> за применение. Режим затухания задаёт форму.</td>
+</tr>
+<tr>
+<td><strong>Опустить</strong></td>
+<td>Опускает местность на <code>RaiseDelta</code> за применение. Режим затухания задаёт форму.</td>
+</tr>
+<tr>
+<td><strong>Сгладить</strong></td>
+<td>Настоящее размытие: усредняет каждую вершину с её 8 соседями. Удерживайте для постепенного эффекта. <strong>Режимы:</strong> Полный (оба), только гребни (понижает), только впадины (повышает). Форма Линия = сглаживание пути.</td>
+</tr>
+<tr>
+<td><strong>Пандус</strong></td>
+<td><strong>3 режима</strong> (переключение <code>H</code>):<br>• <strong>Две точки</strong>: отметьте A и B → прямая наклонная плоскость соединяет высоты.<br>• <strong>Фиксированный угол</strong>: B = направление/длина; высота = <code>SlopeAngle</code> (вверх/вниз в зависимости от прицела). Регулировка через <code>Alt</code>+радиус.<br>• <strong>Путь</strong>: отметьте кривую A→B→C… (двойное нажатие при 3+ закрывает) → плавный Catmull-Rom.<br>Ширина = радиус кисти. Мягкость = смешивание только по боковым краям. Предпросмотр: заполненный коридор + кольца высот у A/B.</td>
+</tr>
+<tr>
+<td><strong>Берег</strong></td>
+<td>Выравнивает к уровню воды + отступ <code>ShoreOffset</code> (пляжи). Мягкость как у Выровнять.</td>
+</tr>
+<tr>
+<td><strong>Рисовать</strong></td>
+<td>Типы: Dirt, Cultivated, Paved, ClearVegetation, DeepSnow, Reset. Регулируемая сила.</td>
+</tr>
+<tr>
+<td><strong>Восстановить</strong></td>
+<td>Возвращает местность в исходное состояние (высота + краска).</td>
+</tr>
+<tr>
+<td><strong>Копировать/вставить</strong></td>
+<td>Отдельный режим колеса Q для выбора участка земли и размещения штампов.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_8">📐 Формы</h2>
+<p>Переключение клавишей <code>.</code>. Все поддерживают отмену.</p>
+<table>
+<thead>
+<tr>
+<th>Форма</th>
+<th>Разметка</th>
+<th>Применение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Круг</strong></td>
+<td>Один клик (центр кисти)</td>
+<td>Обычная лепка</td>
+</tr>
+<tr>
+<td><strong>Квадрат</strong></td>
+<td>Один клик (центр)</td>
+<td>Платформы, фундаменты</td>
+</tr>
+<tr>
+<td><strong>Линия</strong></td>
+<td>2 клика (A → B)</td>
+<td>Дорожки, стены, тропы. Полуширина = радиус.</td>
+</tr>
+<tr>
+<td><strong>Прямоугольник</strong></td>
+<td>2 клика (противоположные углы)</td>
+<td>Фундаменты, фермы, платформы. Мягкие края.</td>
+</tr>
+<tr>
+<td><strong>Полигон</strong></td>
+<td>Клик по каждой вершине, двойной клик закрывает (3+ вершин)</td>
+<td>Сложные формы, пользовательские области</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Некруглые формы показывают <strong>только отмеченный контур</strong> (без круглых колец).</li>
+<li>Мягкость влияет на смешивание краёв у всех форм.</li>
+</ul>
+<hr>
+<h2 id="_9">⚙️ Режимы затухания (Поднять/Опустить)</h2>
+<p>Настройка в НАСТРОЙКАХ → "Затухание Raise/Lower":</p>
+<table>
+<thead>
+<tr>
+<th>Режим</th>
+<th>Поведение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Остроконечный</strong></td>
+<td>Центральный пик. Управляется слайдером "Сила затухания" (1–5).</td>
+</tr>
+<tr>
+<td><strong>Плоский</strong></td>
+<td>Равномерный диск — одинаковый вес по всему радиусу.</td>
+</tr>
+<tr>
+<td><strong>Плавный</strong></td>
+<td>Косинусный колокол — плавный переход, без резкого края.</td>
+</tr>
+<tr>
+<td><strong>Линейный</strong></td>
+<td>Прямое сужение от центра к краю.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_10">🧱 Штампы (Копировать/Вставить)</h2>
+<p>Мощная функция для копирования структур местности.</p>
+<h3 id="_11">Выделение прямоугольником (рекомендуется)</h3>
+<p>Выберите «Копировать/вставить» в колесе Q. Клавиша «Применить» задаёт область: два угла прямоугольника, два конца линии, вершины многоугольника (двойное нажатие после 3+ точек) или область кисти для круга/квадрата. HUD подсказывает следующий шаг.</p>
+<h3 id="_12">Рабочий процесс</h3>
+<ol>
+<li><strong>Отметьте область</strong>: используйте любую форму (Круг, Прямоугольник, Линия, Полигон, Пандус) — или выделение прямоугольником выше.</li>
+<li><strong>Копировать</strong>: <code>Ctrl+Shift+C</code> → "Штамп скопирован: X плиток" (буфер в ОЗУ).</li>
+<li><strong>Предпросмотр вставки</strong>: <code>Ctrl+Shift+V</code> → призрачный каркас на прицеле.
+   - <code>Q</code>/<code>E</code> = поворот ±15°
+   - <code>Alt</code>+Колесо = непрерывный поворот
+   - <code>Shift</code>+Колесо = масштаб 0.25×–4×
+   - <code>Esc</code> = отмена</li>
+<li><strong>Confirm</strong>: Нажмите клавишу вставки ещё раз, чтобы подтвердить предпросмотр.</li>
+</ol>
+<blockquote>
+<p>Штампы выделения записывают <strong>только внутри скопированной области</strong>; местность снаружи остаётся нетронутой.</p>
+</blockquote>
+<h3 id="_13">История</h3>
+<ul>
+<li>До <strong>10 штампов</strong> в ОЗУ (сначала самые новые).</li>
+<li>Клавиши <code>Следующий штамп</code> / <code>Предыдущий штамп</code> (переназначаемые) перебирают их.</li>
+<li>Вспышка: "История штампов: Copy: 3 плитки [2/5]"</li>
+</ul>
+<h3 id="_14">Хранение</h3>
+<ul>
+<li><strong>НАСТРОЙКИ → ШТАМПЫ</strong>:</li>
+<li>Сохранить текущий штамп на диск (<code>.stamp</code> в <code>BepInEx/config/TerrainForge/stamps/</code>, макс. 12).</li>
+<li>Загрузить штамп в буфер обмена.</li>
+<li>Список/удаление сохранённых штампов.</li>
+</ul>
+<h3 id="_15">Инструмент штампа</h3>
+<ul>
+<li>НАСТРОЙКИ → "Инструмент штампа" (4 варианта):</li>
+<li><code>Same as brush</code> (по умолчанию) — использует тот же инструмент, что и кисть</li>
+<li><code>Any</code> — без требований</li>
+<li><code>Pickaxe</code> — требуется экипированная кирка</li>
+<li><code>TerrainForge Rod</code> — требуется жезл мода</li>
+<li>HUD показывает <code>STAMP READY [2/5]</code>, когда инструмент экипирован + есть штампы в буфере.</li>
+<li>Без инструмента: <code>Stamp: tool not equipped</code>, копирование/вставка заблокированы.</li>
+</ul>
+<hr>
+<h2 id="_16">💾 Снимки (Резервные копии)</h2>
+<p>Полное резервное копирование/восстановление местности.</p>
+<h3 id="_17">Сохранить</h3>
+<ol>
+<li>НАСТРОЙКИ → <strong>СНИМКИ</strong>.</li>
+<li>Имя (пусто = авто дата/время).</li>
+<li><strong>Сохранить</strong> → правленые плитки в <code>BepInEx/config/TerrainForge/snapshots/&lt;имя&gt;.dat</code> (макс. 12).</li>
+</ol>
+<h3 id="_18">Загрузить</h3>
+<ol>
+<li>Выберите снимок.</li>
+<li><strong>Загрузить</strong> → восстанавливает плитки с правами владения, <strong>1 шаг отмены</strong>.</li>
+<li>Незагруженные плитки корректно предупреждают — импортируйте рядом с исходным местоположением.</li>
+</ol>
+<h3 id="_19">Возможности</h3>
+<ul>
+<li>Версионированный бинарный формат (<code>.dat</code>).</li>
+<li>Восстанавливает высоту + сглаживание + краску + права владения.</li>
+<li>Импорт можно отменить (<code>Ctrl+Z</code> откатывает импорт).</li>
+<li>Незагруженные плитки корректно предупреждают.</li>
+</ul>
+<hr>
+<h2 id="_20">💾 Профили</h2>
+<p>Сохранение/загрузка полных конфигураций кисти.</p>
+<ul>
+<li>НАСТРОЙКИ → <strong>ПРОФИЛИ</strong>.</li>
+<li>Имя + <strong>Сохранить</strong> → радиус, мягкость, операция, форма, краска, режим пандуса, угол, режим сглаживания, дельта подъёма, сила краски, затухание, смещение берега.</li>
+<li><strong>Загрузить</strong> → применяется мгновенно.</li>
+<li>Макс. 12 профилей (формат, независимый от культуры, в <code>Presets &gt; Slots</code>).</li>
+<li>Привязка клавиш: <code>Next Profile</code> (назначьте в КЛАВИШАХ) для переключения.</li>
+</ul>
+<hr>
+<h2 id="_21">🌐 Языки</h2>
+<p><strong>15 вариантов:</strong> <code>Auto</code>, <code>English</code>, <code>Español</code>, <code>Français</code>, <code>Deutsch</code>, <code>Русский</code>, <code>中文</code>, <code>繁體中文</code>, <code>日本語</code>, <code>한국어</code>, <code>Polski</code>, <code>Português</code>, <code>Türkçe</code>, <code>Українська</code>, <code>Italiano</code> — по умолчанию <code>Auto</code>.</p>
+<h3 id="_22">Автоопределение</h3>
+<ul>
+<li>Значение по умолчанию <code>Auto</code> определяет язык игры через рефлексию: <code>Localization.instance.GetSelectedLanguage()</code>.</li>
+<li>Сопоставляет язык Valheim → внутренний индекс.</li>
+<li>Если для языка нет полного перевода → откат к английскому.</li>
+<li>Настраивается в НАСТРОЙКАХ → "Язык" (перебирает 15 вариантов).</li>
+<li>Метки клавиш перестраиваются при открытии меню.</li>
+</ul>
+<h3 id="_23">Статус переводов</h3>
+<ul>
+<li><strong>Полные:</strong> English, Español</li>
+<li><strong>Откат к английскому:</strong> Français, Deutsch, Русский, 中文, 繁體中文, 日本語, 한국어, Polski, Português, Türkçe, Українська, Italiano</li>
+<li>Переводы сообщества приветствуются через PR.</li>
+</ul>
+<h3 id="_24">Эта документация</h3>
+<p>Переведённые страницы вики: <a href="Home.html">English</a> · <a href="Home-es.html">Español</a> · <a href="Home-fr.html">Français</a> · <a href="Home-de.html">Deutsch</a> · <a href="Home-ru.html">Русский</a> · <a href="Home-zh.html">中文</a> · <a href="Home-zh-tw.html">繁體中文</a> · <a href="Home-ja.html">日本語</a> · <a href="Home-ko.html">한국어</a> · <a href="Home-pl.html">Polski</a> · <a href="Home-pt.html">Português</a> · <a href="Home-tr.html">Türkçe</a> · <a href="Home-uk.html">Українська</a> · <a href="Home-it.html">Italiano</a>.</p>
+<hr>
+<h2 id="_25">🌍 Мультиплеер</h2>
+<h3 id="_26">Требования</h3>
+<ul>
+<li><strong>Мод на клиенте И сервере</strong> для правок больше ±8 м и корректной репликации.</li>
+<li><code>UnlockDeltaLimit</code> также на сервере, иначе сервер ограничивает местность.</li>
+</ul>
+<h3 id="_27">Авторитет сервера (синхронизация конфигурации)</h3>
+<p>Когда сервер использует мод, его секция <code>Server</code> имеет приоритет:
+- <code>AllowTerrainEdits</code> (по умолчанию <code>true</code>) — главный переключатель; если <code>false</code>, клиенты не могут применять/отменять/повторять.
+- <code>AdminOnlyEdits</code> (по умолчанию <code>false</code>) — редактировать могут только админы/хост.
+- <code>RespectWards</code> (по умолчанию <code>true</code>) — блокирует правки внутри чужих вардов.
+- <code>RadiusCap</code> / <code>DeltaCap</code> (0 = выкл.) — ограничения, применяемые сервером, видны в HUD+предпросмотре.</p>
+<blockquote>
+<p>Серверы <strong>без</strong> мода игнорируют секцию → клиент работает для тестирования.</p>
+</blockquote>
+<h3 id="_28">Предотвращение рассинхронизации</h3>
+<ul>
+<li>Держите <code>MaxUpDelta</code> / <code>MaxDownDelta</code> согласованными на сервере + клиентах.</li>
+<li>Большие радиусы могут рассинхронизировать клиентов без мода.</li>
+</ul>
+<hr>
+<h2 id="_29">⚙️ Настройки</h2>
+<p>Файл: <code>BepInEx/config/com.terrainforge.valheim.cfg</code></p>
+<h3 id="_30">Общие</h3>
+<table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>По умолчанию</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enabled</code></td>
+<td><code>true</code></td>
+<td>Главный переключатель</td>
+</tr>
+<tr>
+<td><code>PlayEffects</code></td>
+<td><code>true</code></td>
+<td>Пыль + попадание при применении</td>
+</tr>
+<tr>
+<td><code>Language</code></td>
+<td><code>Auto</code></td>
+<td>Auto / English / Español / Français / Deutsch / Русский / 中文 / 繁體中文 / 日本語 / 한국어 / Polski / Português / Türkçe / Українська / Italiano</td>
+</tr>
+<tr>
+<td><code>ToolTint</code></td>
+<td><code>true</code></td>
+<td>Окрашивает жезл TerrainForge (клон молота), чтобы его было легко отличить от ванильного молота</td>
+</tr>
+<tr>
+<td><code>ToolTintColor</code></td>
+<td><code>#4FC3F7</code></td>
+<td>Hex-цвет жезла (модель + иконка). Напр.: <code>#FFC400</code> золотой, <code>#8BC34A</code> зелёный</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_31">Кисть</h3>
+<table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>По умолчанию</th>
+<th>Диапазон</th>
+<th>Описание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Radius</code></td>
+<td>8</td>
+<td>1–100</td>
+<td>Радиус кисти (м)</td>
+</tr>
+<tr>
+<td><code>RadiusMin</code></td>
+<td>2</td>
+<td>—</td>
+<td>Мин. радиус при регулировке</td>
+</tr>
+<tr>
+<td><code>RadiusMax</code></td>
+<td>60</td>
+<td>—</td>
+<td>Макс. радиус при регулировке</td>
+</tr>
+<tr>
+<td><code>RadiusStep</code></td>
+<td>1</td>
+<td>—</td>
+<td>Изменение радиуса за клавишу/колесо</td>
+</tr>
+<tr>
+<td><code>Softness</code></td>
+<td>50</td>
+<td>0–100</td>
+<td>Мягкость края (0 = жёстко, 100 = очень мягко)</td>
+</tr>
+<tr>
+<td><code>FalloffPower</code></td>
+<td>3</td>
+<td>1–5</td>
+<td>Показатель затухания (только режим Остроконечный)</td>
+</tr>
+<tr>
+<td><code>RaiseLowerMeters</code></td>
+<td>2</td>
+<td>0.5–10</td>
+<td>Метров за применение Поднять/Опустить</td>
+</tr>
+<tr>
+<td><code>PaintStrength</code></td>
+<td>1</td>
+<td>0–1</td>
+<td>Сила краски</td>
+</tr>
+<tr>
+<td><code>DefaultOperation</code></td>
+<td>Flatten</td>
+<td>—</td>
+<td>Начальная операция</td>
+</tr>
+<tr>
+<td><code>Shape</code></td>
+<td>Circle</td>
+<td>—</td>
+<td>Начальная форма</td>
+</tr>
+<tr>
+<td><code>Paint</code></td>
+<td>Dirt</td>
+<td>—</td>
+<td>Начальная краска</td>
+</tr>
+<tr>
+<td><code>RampMode</code></td>
+<td>TwoPoint</td>
+<td>—</td>
+<td>TwoPoint / FixedAngle / Path</td>
+</tr>
+<tr>
+<td><code>SlopeAngle</code></td>
+<td>30</td>
+<td>5–60</td>
+<td>Угол фиксированного пандуса (градусы)</td>
+</tr>
+<tr>
+<td><code>SmoothMode</code></td>
+<td>Full</td>
+<td>—</td>
+<td>Full / Bumps / Dips</td>
+</tr>
+<tr>
+<td><code>FalloffMode</code></td>
+<td>Pointy</td>
+<td>—</td>
+<td>Pointy / Flat / Smooth / Linear</td>
+</tr>
+<tr>
+<td><code>ShoreOffset</code></td>
+<td>0.5</td>
+<td>-2–5</td>
+<td>Отступ берега над водой (м)</td>
+</tr>
+<tr>
+<td><code>UseFixedHeight</code></td>
+<td>false</td>
+<td>—</td>
+<td>Использовать фиксированную высоту (состояние пипетки)</td>
+</tr>
+<tr>
+<td><code>FixedHeight</code></td>
+<td>30</td>
+<td>-10–150</td>
+<td>Точная высота Выровнять (м)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vanilla">Vanilla / интеграция</h3>
+<ul>
+<li><code>BlockVanillaTerrainTools</code>: false — с экипированным жезлом игнорирует редактирование местности ванильной мотыгой/культиватором. Также есть переключатель в НАСТРОЙКАХ.</li>
+</ul>
+<h3 id="_32">Ввод</h3>
+<p>Все горячие клавиши переназначаются на вкладке КЛАВИШИ. Основное:
+- <code>ApplyKey</code> (Mouse1), <code>RadiusUp/Down</code> (=/-), <code>CycleOp/Shape/Paint</code> (,/.//)
+- <code>UndoKey</code> (Ctrl+Z), <code>RedoKey</code> (Ctrl+Y), <code>EyedropKey</code> (G), <code>RampModeKey</code> (H)
+- <code>RadialKey</code> (Q), <code>AdjustModeKey</code> (V), <code>GiveToolKey</code> (F8), <code>RebindMenuKey</code> (F5)
+- <strong>Прямые клавиши операций</strong> (9, без значения по умолчанию): OpFlatten/Raise/Lower/Smooth/Paint/Restore/Ramp/Shore/Snow
+- <code>CycleProfileKey</code>, <code>CycleStampKey</code>, <code>CycleStampBackKey</code>
+- <code>RequiredTool</code>: Any / Pickaxe / TerrainForgeTool (по умолчанию)
+- <code>AutoGiveTool</code>: true (выдаёт жезл при входе)</p>
+<h3 id="_33">Штампы</h3>
+<ul>
+<li><code>StampToolMode</code>: Same as Brush / Any / Pickaxe / TerrainForgeTool (по умолчанию Same as Brush)</li>
+</ul>
+<h3 id="_34">Предпросмотр</h3>
+<ul>
+<li><code>ShowPreview</code>: true, <code>ShowGuides</code>: true (направляющие досягаемости, оттенок уклона, кольцо уровня)</li>
+</ul>
+<h3 id="_35">История</h3>
+<ul>
+<li><code>UndoDepth</code>: 50 (0–500, 0 отключает историю)</li>
+</ul>
+<h3 id="_36">Сервер (авторитетно через синхронизацию конфигурации)</h3>
+<ul>
+<li><code>AllowTerrainEdits</code>: true (главный переключатель)</li>
+<li><code>AdminOnlyEdits</code>: false (только админы)</li>
+<li><code>RespectWards</code>: true (блокирует чужие варды)</li>
+<li><code>RadiusCap</code> / <code>DeltaCap</code>: 0 (выкл.) — ограничения, применяемые сервером</li>
+</ul>
+<h3 id="_37">Производительность</h3>
+<ul>
+<li><code>TilesPerFrame</code>: 4 (1–32 плитки/кадр)</li>
+</ul>
+<hr>
+<h2 id="_38">🐛 Решение проблем</h2>
+<table>
+<thead>
+<tr>
+<th>Проблема</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Меню не появляется / невидимый курсор</strong></td>
+<td>Закройте игру. Удалите <code>%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\ВашПрофиль\BepInEx\plugins\TerrainForge\</code> и <code>%APPDATA%\Thunderstore Mod Manager\PackageCache\</code>. Перезапустите TMM, проверьте обновления.</td>
+</tr>
+<tr>
+<td><strong>Обновление не отображается в TMM</strong></td>
+<td>TMM → Settings → "Refresh mod list" (Ctrl+R). Закройте/откройте TMM. Проверьте правильный профиль.</td>
+</tr>
+<tr>
+<td><strong>Конфликт версий в Thunderstore</strong></td>
+<td>Поднимите версию (0.3.3 → 0.3.4) в <code>.csproj</code>, <code>Plugin.cs</code>, <code>manifest.json</code>. Пересоберите + перезагрузите.</td>
+</tr>
+<tr>
+<td><strong>Копирование/вставка штампа ничего не делает</strong></td>
+<td>HUD: <code>STAMP READY [X/Y]</code> = готово. Если "инструмент не экипирован", экипируйте инструмент (НАСТРОЙКИ → Инструмент штампа).</td>
+</tr>
+<tr>
+<td><strong>Предпросмотр невидим под водой</strong></td>
+<td>Исправлено в 0.3.2 — предпросмотр плавает на поверхности. Обновитесь.</td>
+</tr>
+<tr>
+<td><strong>Круги на Линии/Прямоугольнике/Полигоне</strong></td>
+<td>Исправлено в 0.3.2 — показывается только отмеченный контур. Обновитесь.</td>
+</tr>
+<tr>
+<td><strong>Радиальное колесо не работает</strong></td>
+<td>Исправлено в 0.3.2 (<code>ZInput.GetMouseScrollWheel()</code>) и 0.3.4 (выделение больше не стирается при центрированном курсоре). Обновитесь.</td>
+</tr>
+<tr>
+<td><strong>Конфигурация не сохраняется</strong></td>
+<td>Закройте меню (F5) для автосохранения. Или отредактируйте <code>BepInEx/config/com.terrainforge.valheim.cfg</code> напрямую.</td>
+</tr>
+<tr>
+<td><strong>Рассинхронизация в мультиплеере</strong></td>
+<td>Мод на клиенте+сервере. <code>UnlockDeltaLimit</code> на обоих. Одинаковые <code>MaxUpDelta</code>/<code>MaxDownDelta</code>.</td>
+</tr>
+<tr>
+<td><strong>Сборка не удаётся</strong></td>
+<td>Проверьте пути <code>ValheimDir</code>, <code>BepInExCoreDir</code> в <code>.csproj</code> или через CLI. Требуется .NET SDK 8+.</td>
+</tr>
+<tr>
+<td><strong>Компиляция / упаковка</strong></td>
+<td><code>dotnet build -c Release</code> (DLL в <code>build/</code>), <code>-p:Deploy=true</code> (устанавливает в профиль) или <code>-p:Package=true</code> (zip в <code>build/</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_39">🔗 Ссылки</h2>
+<ul>
+<li><strong>Страница Thunderstore:</strong> https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/</li>
+<li><strong>Репозиторий GitHub:</strong> https://github.com/marceloanton/TerrainForge</li>
+<li><strong>Пожертвования:</strong> <a href="https://cafecito.app/byrka">cafecito.app/byrka</a></li>
+<li><strong>Список изменений:</strong> <a href="Changelog.html">Changelog</a></li>
+</ul>
+<hr>
+<p><em>TerrainForge — терраформируй Valheim без ограничений.</em></p></main>
+  <footer><a class="footer-brand" href="../index.html">TERRAINFORGE</a><span>Documentation synced from the GitHub Wiki.</span><a href="https://github.com/marceloanton/TerrainForge/wiki">GITHUB WIKI ↗</a></footer>
+</body>
+</html>
