@@ -1,6 +1,7 @@
 **TerrainForge Wiki**
 
 - [Overview](Overview)
+- [Project website](https://marceloanton.github.io/TerrainForge/)
 
 - [English](Home)
 - [Español](Home-es)
@@ -41,3 +42,6 @@
 - [Thunderstore](https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/)
 - [Changelog](Changelog)
 - [Repository](https://github.com/marceloanton/TerrainForge)
+
+- [In-game screenshots](Home#in-game-screenshots)
+- [Capturas dentro del juego](Home-es#capturas-dentro-del-juego)

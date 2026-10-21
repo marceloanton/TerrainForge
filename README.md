@@ -10,7 +10,13 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 
 ---
 
-## What's New in 0.3.6
+## What's New in 0.3.8 — Hotfix for 0.3.7
+
+- **Fixes for TerrainForge Rod registration** — the 0.3.7 logs showed repeated failures when its network prefab hash was already registered (`same key ... 506871212`), alongside invalid item entries during ObjectDB registration. This hotfix reuses a matching existing network entry, removes invalid ObjectDB entries before index rebuilding, and cleans up the tool clone if registration fails.
+- **Tool state cleanup** — terrain editing and its HUD stop when the required tool is unequipped, including while free camera remains active. Equipped-inventory detection covers cases where free camera hides hand slots; press `F` to exit free camera safely.
+- **Verification status:** these changes address the failures identified in the supplied logs. Confirm the rod is handed out and terrain editing works in Valheim before treating the hotfix as ready to publish.
+
+## Features carried forward from 0.3.6
 
 - **F5 layout refined** — six tabs use two clear rows; the window opens larger and adapts to the screen. Controls are grouped by the selected operation.
 - **Ramp tools surfaced** — the Ramp panel puts Two-Point, Fixed-Angle, and Connected Path modes up front, with width, softness, and fixed-angle controls where relevant. The Connected mode marks a continuous ramp through 3+ points.
@@ -22,7 +28,7 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 - F5 holds local player controls and camera still, dims the world, and uses a resolution-aware window. The ESC menu still pauses the whole world in single-player.
 - **Free camera safeguard** — flying camera is kept above terrain so descending controls cannot take it underneath the map.
 - TerrainForge now registers and synchronizes its own TerrainForge Rod. **Jotunn is no longer required.**
-- The rod registration is repeated for rebuilt world databases, and network registration is retried after the item database is ready. Plugin, project, and Thunderstore versions were aligned at 0.3.6.
+- The rod registration is repeated for rebuilt world databases, and network registration is retried after the item database is ready. Plugin, project, and Thunderstore versions were aligned at 0.3.6 at that time.
 - The live ObjectDB is also revalidated during gameplay to recover if another mod rebuilds its item index after TerrainForge's initial registration.
 
 - **Free camera (`F`) fixed** — while flying, right-click no longer triggers lock-on, brush drift or a screenshot; `Ctrl`+wheel adjusts the brush radius; brush adjustments take priority.

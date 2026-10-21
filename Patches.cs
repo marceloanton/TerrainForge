@@ -311,7 +311,7 @@ namespace TerrainForge
                 return true;
 
             ItemDrop.ItemData held = TerrainBrush.GetHeldItem(__instance);
-            if (!TerrainTool.IsEquipped(held))
+            if (!TerrainTool.IsEquipped(__instance, held))
                 return true;
 
             if (piece.GetComponentInChildren<TerrainOp>(true) == null &&

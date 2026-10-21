@@ -1,11 +1,17 @@
 # Wiki de TerrainForge
 
-[Overview](Overview) · [English](Home) · *Español* · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · *Español* · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Sitio web](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### Novedades de TerrainForge 0.3.6
+### Novedades de TerrainForge 0.3.8 — Hotfix de 0.3.7
+
+- **Registro de la varita:** evita repetir el registro de un prefab de red con la misma clave y limpia entradas inválidas de ObjectDB. Los logs de 0.3.7 mostraron esos fallos, aunque también informaron que la herramienta se registró; por eso aún hay que confirmar el funcionamiento dentro del juego.
+- **Estado de la herramienta:** la edición del terreno y su HUD se detienen al guardar o desequipar la herramienta, incluso con la cámara libre activa.
+- **Antes de publicar:** confirmar en Valheim que se entrega la varita, funciona la edición y no se repiten los avisos de registro.
+
+### Funciones incluidas desde 0.3.6
 
 - **Menú F5:** pestañas organizadas en dos filas, tamaño adaptable a la pantalla y controles contextuales según la operación.
 - **Rampa:** panel propio con Dos Puntos, Ángulo Fijo y Rampa Conectada, además de ancho, suavidad y ángulo donde corresponde.
@@ -18,9 +24,25 @@
 - Estamos explorando rampas circulares en dos variantes: un anillo o terraza a nivel, y una espiral conectada que sube o baja alrededor de un centro.
 - También están previstos un fantasma de colocación de blueprints con ajuste a grilla, una vista de contornos mejorada para stamps y un HUD de medición de distancia, área y pendiente. Los detalles pueden cambiar después de prototipar.
 
+## Capturas dentro del juego
+
+La portada siguiente es el arte de actualización 0.3.8. Las capturas muestran el menú F5, la vista previa de una rampa, una rampa terminada y una selección de Restaurar.
+
+| TerrainForge 0.3.8 | Menú de herramientas F5 |
+|---|---|
+| ![Arte de actualización TerrainForge 0.3.8](https://marceloanton.github.io/TerrainForge/terrainforge-update-0.3.8.png) | ![Menú F5 de TerrainForge en Valheim](https://marceloanton.github.io/TerrainForge/images/terrainforge-menu-f5.jpg) |
+
+| Vista previa de rampa | Rampa terminada |
+|---|---|
+| ![Vista previa de rampa TerrainForge](https://marceloanton.github.io/TerrainForge/images/terrainforge-ramp-preview.jpg) | ![Rampa TerrainForge construida en Valheim](https://marceloanton.github.io/TerrainForge/images/terrainforge-ramp-built.jpg) |
+
+| Selección para Restaurar |
+|---|
+| ![Vista previa de selección para Restaurar](https://marceloanton.github.io/TerrainForge/images/terrainforge-restore-preview.jpg) |
+
 ## Índice
 
-[Overview](Overview) · 1. [Instalación](#-instalación)
+1. [Instalación](#-instalación)
 2. [Inicio Rápido](#-inicio-rápido)
 3. [Controles](#-controles)
 4. [Operaciones](#-operaciones)
@@ -38,7 +60,7 @@
 
 ## 📥 Instalación
 
-[Overview](Overview) · ### Requisitos
+### Requisitos
 - **BepInEx 5** (x64, Mono) en cliente y servidor. Los usuarios de Thunderstore ya lo tienen. TerrainForge registra su propia herramienta; no requiere Jotunn.
 
 ### Pasos
@@ -54,7 +76,7 @@
 
 ## 🚀 Inicio Rápido
 
-[Overview](Overview) · 1. Entra a un mundo. La **Varita TerrainForge** (clon del martillo) se entrega y equipa automáticamente.
+1. Entra a un mundo. La **Varita TerrainForge** (clon del martillo) se entrega y equipa automáticamente.
 2. Pulsa `F5` para abrir el menú (o haz clic en el botón **TerrainForge** del menú de pausa `ESC`).
 3. Equipa la varita si no lo está.
 4. Apunta al terreno y mantén **clic derecho** (`Mouse1`) para esculpir.
@@ -66,7 +88,7 @@
 
 ## ⌨️ Controles
 
-[Overview](Overview) · | Acción | Tecla por defecto | Descripción |
+| Acción | Tecla por defecto | Descripción |
 |--------|-------------------|-------------|
 | Aplicar brocha | Mantener `Mouse1` (clic derecho) | Esculpe el terreno bajo la mira |
 | Subir radio | `=` o `Ctrl`+Rueda | Aumenta el radio de la brocha |
@@ -99,7 +121,7 @@
 
 ## 🔄 Operaciones
 
-[Overview](Overview) · | Operación | Descripción |
+| Operación | Descripción |
 |-----------|-------------|
 | **Aplanar** | Nivela a la altura apuntada (Shift = a tus pies). Altura fija vía Cuentagotas (`G`) o el textbox de AJUSTES. |
 | **Subir** | Eleva el terreno `RaiseDelta` por aplicación. El modo de caída le da forma. |
@@ -115,7 +137,7 @@
 
 ## 📐 Formas
 
-[Overview](Overview) · Cicla con la tecla `.`. Todas soportan deshacer.
+Cicla con la tecla `.`. Todas soportan deshacer.
 
 | Forma | Marcado | Caso de uso |
 |-------|---------|-------------|
@@ -132,7 +154,7 @@
 
 ## ⚙️ Modos de Caída (Subir/Bajar)
 
-[Overview](Overview) · Config en AJUSTES → "Caída Raise/Lower":
+Config en AJUSTES → "Caída Raise/Lower":
 
 | Modo | Comportamiento |
 |------|----------------|
@@ -145,7 +167,7 @@
 
 ## 🧱 Stamps (Copiar/Pegar)
 
-[Overview](Overview) · Función potente para replicar estructuras de terreno.
+Función potente para replicar estructuras de terreno.
 
 ### Selección por rectángulo (recomendado)
 
@@ -153,7 +175,7 @@ Elegí Copiar/Pegar en el wheel Q. Aplicar marca la selección: dos esquinas en 
 
 ### Flujo
 
-[Overview](Overview) · 1. **Marca el área**: usa cualquier forma (Círculo, Rect, Línea, Poli, Rampa) — o la selección por rectángulo de arriba.
+1. **Marca el área**: usa cualquier forma (Círculo, Rect, Línea, Poli, Rampa) — o la selección por rectángulo de arriba.
 2. **Copiar**: `Ctrl+Shift+C` → "Stamp copiado: X tiles" (portapapeles en RAM).
 3. **Preview Pegar**: `Ctrl+Shift+V` → wireframe fantasma en la mira.
    - `Q`/`E` = rotar ±15°
@@ -188,7 +210,7 @@ Elegí Copiar/Pegar en el wheel Q. Aplicar marca la selección: dos esquinas en 
 
 ## 💾 Snapshots (Backups)
 
-[Overview](Overview) · Backup/restore completo del terreno.
+Backup/restore completo del terreno.
 
 ### Guardar
 1. AJUSTES → **SNAPSHOTS**.
@@ -210,7 +232,7 @@ Elegí Copiar/Pegar en el wheel Q. Aplicar marca la selección: dos esquinas en 
 
 ## 💾 Perfiles
 
-[Overview](Overview) · Guarda/carga configuraciones completas de brocha.
+Guarda/carga configuraciones completas de brocha.
 
 - AJUSTES → **PERFILES**.
 - Nombre + **Guardar** → radio, suavidad, op, forma, pintura, modo de rampa, ángulo, modo de suavizado, raise delta, fuerza de pintura, falloff, shore offset.
@@ -222,7 +244,7 @@ Elegí Copiar/Pegar en el wheel Q. Aplicar marca la selección: dos esquinas en 
 
 ## 🌐 Idiomas
 
-[Overview](Overview) · **15 opciones:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
+**15 opciones:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
 
 ### Auto-Detect
 - El default `Auto` detecta el idioma del juego vía reflection: `Localization.instance.GetSelectedLanguage()`.
@@ -243,7 +265,7 @@ Páginas de la wiki traducidas: [English](Home) · [Español](Home-es) · [Fran�
 
 ## 🌍 Multijugador
 
-[Overview](Overview) · ### Requisitos
+### Requisitos
 - **Mod en cliente Y servidor** para edits mayores a ±8 m y una replicación correcta.
 - `UnlockDeltaLimit` también en el servidor, si no el servidor clampa el terreno.
 
@@ -264,7 +286,7 @@ Cuando el servidor corre el mod, su sección `Server` gana:
 
 ## ⚙️ Configuración
 
-[Overview](Overview) · Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
+Archivo: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### General
 | Setting | Default | Descripción |
@@ -332,11 +354,11 @@ Todos los atajos son reasignables en la pestaña TECLAS. Destacados:
 
 ## 🐛 Solución de Problemas
 
-[Overview](Overview) · | Problema | Solución |
+| Problema | Solución |
 |----------|----------|
 | **El menú no aparece / cursor invisible** | Cierra el juego. Borra `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\TuPerfil\BepInEx\plugins\TerrainForge\` y `%APPDATA%\Thunderstore Mod Manager\PackageCache\`. Reinicia TMM, check updates. |
 | **Update no aparece en TMM** | TMM → Settings → "Refresh mod list" (Ctrl+R). Cierra/reabre TMM. Verifica el perfil correcto. |
-| **Conflicto de versión en Thunderstore** | Bumpea la versión (0.3.3 → 0.3.4) en `.csproj`, `Plugin.cs`, `manifest.json`. Rebuild + re-upload. |
+| **Conflicto de versión en Thunderstore** | Usa la misma versión nueva `X.Y.Z` en `.csproj`, `Plugin.cs` y `manifest.json`; debe ser superior a la ya publicada. Vuelve a compilar y empaquetar. |
 | **Copiar/pegar stamp no hace nada** | HUD: `STAMP LISTO [X/Y]` = listo. Si dice "herramienta no equipada", equipa la tool (AJUSTES → Herramienta stamp). |
 | **Preview invisible bajo el agua** | Corregido en 0.3.2 — el preview flota en la superficie. Actualiza. |
 | **Círculos en Línea/Rect/Poli** | Corregido en 0.3.2 — se muestra solo el contorno marcado. Actualiza. |
@@ -350,8 +372,9 @@ Todos los atajos son reasignables en la pestaña TECLAS. Destacados:
 
 ## 🔗 Enlaces
 
-[Overview](Overview) · - **Página de Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
-- **Repositorio GitHub:** https://github.com/marceloanton/TerrainForge
+- **Sitio web del proyecto:** [marceloanton.github.io/TerrainForge](https://marceloanton.github.io/TerrainForge/)
+- **Página de Thunderstore:** [TerrainForge en Thunderstore](https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/)
+- **Repositorio GitHub:** [TerrainForge en GitHub](https://github.com/marceloanton/TerrainForge)
 - **Donaciones:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog:** [Changelog](Changelog)
 

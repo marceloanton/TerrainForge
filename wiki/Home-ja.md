@@ -1,17 +1,17 @@
 # TerrainForge ウィキ
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · *日本語* · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · *日本語* · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### TerrainForge 0.3.6 の更新
+### TerrainForge 0.3.8 — 0.3.7の修正
 
 > Qホイールに専用のコピー/貼り付けモードを追加。矩形は適用キーでA/B、線は両端、多角形は頂点を指定して3点以上からダブル押しでコピー、円/四角形はブラシ範囲をコピーします。HUDが次の操作を表示します。雪は塗装 > DeepSnow に統合（Shift長押しで除去）。F5中はローカルの移動とカメラを固定し、Escはシングルプレイ全体を一時停止します。 0.3.6: F5のタブを2行に整理し、選択中の操作に必要な設定だけを表示します。Rampには2点、固定角度、連結経路があり、円形ランプは0.4.0向けに計画中です。
 
 ## 目次
 
-[Overview](Overview) · 1. [インストール](#-インストール)
+1. [インストール](#-インストール)
 2. [クイックスタート](#-クイックスタート)
 3. [キー操作](#-キー操作)
 4. [操作](#-操作)
@@ -29,7 +29,7 @@
 
 ## 📥 インストール
 
-[Overview](Overview) · ### 要件
+### 要件
 - **BepInEx 5**（x64、Mono）をクライアントとサーバーの両方に。Thunderstore のユーザーはすでに導入済みです。
 
 ### 手順
@@ -45,7 +45,7 @@
 
 ## 🚀 クイックスタート
 
-[Overview](Overview) · 1. ワールドに参加します。**TerrainForge の杖**（ハンマーのクローン）が自動的に付与され、装備されます。
+1. ワールドに参加します。**TerrainForge の杖**（ハンマーのクローン）が自動的に付与され、装備されます。
 2. `F5` を押してメニューを開きます（または `ESC` ポーズメニューの **TerrainForge** ボタンをクリック）。
 3. 杖を装備していない場合は装備します。
 4. 地形を狙い、**右クリック**（`Mouse1`）を押し続けて掘削します。
@@ -57,7 +57,7 @@
 
 ## ⌨️ キー操作
 
-[Overview](Overview) · | 操作 | 既定キー | 説明 |
+| 操作 | 既定キー | 説明 |
 |--------|-------------|-------------|
 | ブラシを適用 | `Mouse1`（右クリック）を押し続ける | クロスヘア下の地形を掘削します |
 | 半径 + | `=` または `Ctrl`+ホイール | ブラシ半径を拡大します |
@@ -90,7 +90,7 @@
 
 ## 🔄 操作
 
-[Overview](Overview) · | 操作 | 説明 |
+| 操作 | 説明 |
 |-----------|-------------|
 | **平坦化** | 狙った高さに水平化します（Shift = 足元）。スポイト（`G`）または設定のテキストボックスで高さを固定できます。 |
 | **上昇** | 1 回の適用ごとに地形を `RaiseDelta` だけ持ち上げます。フォールオフモードが形状を決めます。 |
@@ -106,7 +106,7 @@
 
 ## 📐 形状
 
-[Overview](Overview) · `.` キーで切り替えます。すべて元に戻すに対応しています。
+`.` キーで切り替えます。すべて元に戻すに対応しています。
 
 | 形状 | マーク方法 | 用途 |
 |-------|---------|----------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ フォールオフモード (上昇/下降)
 
-[Overview](Overview) · 設定 → 「Raise/Lower falloff」で構成:
+設定 → 「Raise/Lower falloff」で構成:
 
 | モード | 動作 |
 |------|----------|
@@ -136,7 +136,7 @@
 
 ## 🧱 スタンプ (コピー/ペースト)
 
-[Overview](Overview) · 地形構造を複製するための強力な機能です。
+地形構造を複製するための強力な機能です。
 
 ### 矩形選択 (推奨)
 
@@ -144,7 +144,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ### ワークフロー
 
-[Overview](Overview) · 1. **領域をマーク**: 任意の形状（円、矩形、線、多角形、ランプ）を使用 — または上記の矩形選択。
+1. **領域をマーク**: 任意の形状（円、矩形、線、多角形、ランプ）を使用 — または上記の矩形選択。
 2. **コピー**: `Ctrl+Shift+C` → 「Stamp copied: X tiles」（RAM クリップボード）。
 3. **貼り付けプレビュー**: `Ctrl+Shift+V` → クロスヘア位置にゴーストワイヤーフレーム。
    - `Q`/`E` = ±15° 回転
@@ -179,7 +179,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## 💾 スナップショット (バックアップ)
 
-[Overview](Overview) · 地形の完全なバックアップ/復元。
+地形の完全なバックアップ/復元。
 
 ### 保存
 1. 設定 → **SNAPSHOTS**。
@@ -201,7 +201,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## 💾 プロファイル
 
-[Overview](Overview) · 完全なブラシ構成を保存/読み込みします。
+完全なブラシ構成を保存/読み込みします。
 
 - 設定 → **PROFILES**。
 - 名前 + **保存** → 半径、ソフトネス、操作、形状、塗装、ランプモード、角度、スムーズモード、上昇量、塗装強度、フォールオフ、岸オフセット。
@@ -213,7 +213,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## 🌐 言語
 
-[Overview](Overview) · **15 のオプション:** `Auto`、`English`、`Español`、`Français`、`Deutsch`、`Русский`、`中文`、`繁體中文`、`日本語`、`한국어`、`Polski`、`Português`、`Türkçe`、`Українська`、`Italiano` — 既定は `Auto`。
+**15 のオプション:** `Auto`、`English`、`Español`、`Français`、`Deutsch`、`Русский`、`中文`、`繁體中文`、`日本語`、`한국어`、`Polski`、`Português`、`Türkçe`、`Українська`、`Italiano` — 既定は `Auto`。
 
 ### 自動検出
 - 既定の `Auto` はリフレクションでゲームの言語を検出します: `Localization.instance.GetSelectedLanguage()`。
@@ -234,7 +234,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## 🌍 マルチプレイ
 
-[Overview](Overview) · ### 要件
+### 要件
 - ±8 m を超える編集と正しいレプリケーションには、**クライアントとサーバーの両方に MOD** が必要です。
 - サーバー側にも `UnlockDeltaLimit`、そうでなければサーバーが地形をクランプします。
 
@@ -255,7 +255,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## ⚙️ 設定
 
-[Overview](Overview) · ファイル: `BepInEx/config/com.terrainforge.valheim.cfg`
+ファイル: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### 一般
 | 設定 | 既定値 | 説明 |
@@ -323,7 +323,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## 🐛 トラブルシューティング
 
-[Overview](Overview) · | 問題 | 解決策 |
+| 問題 | 解決策 |
 |-------|----------|
 | **メニューが表示されない / カーソルが見えない** | ゲームを閉じます。`%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` と `%APPDATA%\Thunderstore Mod Manager\PackageCache\` を削除します。TMM を再起動し、更新を確認します。 |
 | **TMM に更新が表示されない** | TMM → Settings → 「Refresh mod list」（Ctrl+R）。TMM を閉じて再度開きます。正しいプロファイルを確認します。 |
@@ -341,7 +341,7 @@ Qホイールでコピー/貼り付けを選択します。適用キーで範囲
 
 ## 🔗 リンク
 
-[Overview](Overview) · - **Thunderstore ページ:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Thunderstore ページ:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **GitHub リポジトリ:** https://github.com/marceloanton/TerrainForge
 - **寄付:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **変更履歴:** [Changelog](Changelog)

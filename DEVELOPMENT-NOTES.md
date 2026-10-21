@@ -1,9 +1,6 @@
 # TerrainForge Roadmap – Cycle 2
 
-Follow-up to `ROADMAP.md` (all gameplay/visual phases there are DONE; the earlier
-decision to keep Jotunn was superseded in 0.3.6). This cycle adds measurement, numeric input,
-path ramps, terrain snapshots, deeper server authority, chunked application and
-the Thunderstore release.
+Archived internal implementation notes from Cycle 2. This file records historical phase planning and is not the current product roadmap. See [`wiki/Roadmap.md`](wiki/Roadmap.md) for the maintained public roadmap. Current releases and status are documented in `CHANGELOG.md` and `README.md`.
 
 ## Ideas for 0.4.0
 - **Circular ramp:** prototype both a level annular ramp/terrace and a connected spiral ramp that changes height around a center; settle the exact behavior after an in-game prototype.
@@ -235,3 +232,4 @@ reference incl. `General`/`Presets`/`Performance`).
 - Jotunn was removed in 0.3.6; the TerrainForge Rod is registered through Harmony.
 - Anything that writes terrain must record undo and carry `Loc` keys — no
   exceptions this cycle.
+

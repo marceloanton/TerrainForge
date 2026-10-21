@@ -1,11 +1,17 @@
 # TerrainForge Wiki
 
-[Overview](Overview) · *English* · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · *English* · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Project website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### What's new in TerrainForge 0.3.6
+### What's new in TerrainForge 0.3.8 — Hotfix for 0.3.7
+
+- **Rod registration:** avoids repeated duplicate network-prefab registration and cleans invalid ObjectDB entries. The 0.3.7 logs showed these failures, but successful tool-registration messages mean in-game behavior still needs confirmation.
+- **Tool state:** terrain editing and its HUD stop when the required tool is unequipped, including with free camera active.
+- **Before publishing:** confirm in Valheim that the rod is handed out and terrain editing works without repeated registration warnings.
+
+### Included features from 0.3.6
 
 - **F5 menu:** reorganized into two tab rows, adapts to screen size, and shows controls for the selected operation.
 - **Ramp:** the dedicated panel exposes Two-Point, Fixed-Angle, and Connected Path modes with width, softness, and angle controls.
@@ -18,9 +24,25 @@
 - Circular ramps are being explored as a level ring/terrace or a connected spiral that gains or loses height around a center.
 - Other planned tools include a blueprint placement ghost with grid snapping, improved stamp contour previews, and a live distance/area/slope measurement HUD. Details may change after prototyping.
 
+## In-game screenshots
+
+The cover below is the 0.3.8 update artwork. Screenshots show the F5 tool menu, ramp preview, a completed ramp, and a Restore selection.
+
+| TerrainForge 0.3.8 | F5 tool menu |
+|---|---|
+| ![TerrainForge 0.3.8 update artwork](https://marceloanton.github.io/TerrainForge/terrainforge-update-0.3.8.png) | ![TerrainForge F5 menu in Valheim](https://marceloanton.github.io/TerrainForge/images/terrainforge-menu-f5.jpg) |
+
+| Ramp preview | Completed ramp |
+|---|---|
+| ![TerrainForge ramp preview in Valheim](https://marceloanton.github.io/TerrainForge/images/terrainforge-ramp-preview.jpg) | ![TerrainForge ramp built in Valheim](https://marceloanton.github.io/TerrainForge/images/terrainforge-ramp-built.jpg) |
+
+| Restore selection |
+|---|
+| ![TerrainForge Restore selection preview](https://marceloanton.github.io/TerrainForge/images/terrainforge-restore-preview.jpg) |
+
 ## Table of Contents
 
-[Overview](Overview) · 1. [Installation](#-installation)
+1. [Installation](#-installation)
 2. [Quick Start](#-quick-start)
 3. [Controls](#-controls)
 4. [Operations](#-operations)
@@ -38,7 +60,7 @@
 
 ## 📥 Installation
 
-[Overview](Overview) · ### Requirements
+### Requirements
 - **BepInEx 5** (x64, Mono) on client and server. Thunderstore users already have it. TerrainForge registers its own tool; Jotunn is not required.
 
 ### Steps
@@ -54,7 +76,7 @@
 
 ## 🚀 Quick Start
 
-[Overview](Overview) · 1. Join a world. The **TerrainForge Rod** (a Hammer clone) is given and equipped automatically.
+1. Join a world. The **TerrainForge Rod** (a Hammer clone) is given and equipped automatically.
 2. Press `F5` to open the menu (or click the **TerrainForge** button in the `ESC` pause menu).
 3. Equip the rod if it is not equipped.
 4. Aim at the terrain and hold **right-click** (`Mouse1`) to sculpt.
@@ -66,7 +88,7 @@
 
 ## ⌨️ Controls
 
-[Overview](Overview) · | Action | Default key | Description |
+| Action | Default key | Description |
 |--------|-------------|-------------|
 | Apply brush | Hold `Mouse1` (Right Click) | Sculpts terrain under the crosshair |
 | Radius + | `=` or `Ctrl`+Wheel | Increases brush radius |
@@ -99,7 +121,7 @@
 
 ## 🔄 Operations
 
-[Overview](Overview) · | Operation | Description |
+| Operation | Description |
 |-----------|-------------|
 | **Flatten** | Levels to the aimed height (Shift = at your feet). Fixed height via the Eyedropper (`G`) or the SETTINGS textbox. |
 | **Raise** | Raises terrain by `RaiseDelta` per application. The falloff mode shapes it. |
@@ -115,7 +137,7 @@
 
 ## 📐 Shapes
 
-[Overview](Overview) · Cycle with the `.` key. All support undo.
+Cycle with the `.` key. All support undo.
 
 | Shape | Marking | Use case |
 |-------|---------|----------|
@@ -132,7 +154,7 @@
 
 ## ⚙️ Falloff Modes (Raise/Lower)
 
-[Overview](Overview) · Config in SETTINGS → "Raise/Lower falloff":
+Config in SETTINGS → "Raise/Lower falloff":
 
 | Mode | Behavior |
 |------|----------|
@@ -145,7 +167,7 @@
 
 ## 🧱 Stamps (Copy/Paste)
 
-[Overview](Overview) · A powerful feature for replicating terrain structures.
+A powerful feature for replicating terrain structures.
 
 ### Select the area to copy
 
@@ -153,7 +175,7 @@ Choose `Copy/Paste` in the Q wheel. `Rectangle` marks corners A and B with Apply
 
 ### Workflow
 
-[Overview](Overview) · 1. **Mark the area** with the selected shape as described above.
+1. **Mark the area** with the selected shape as described above.
 2. **Copy**: `Ctrl+Shift+C` or Apply in Copy/Paste mode → "Stamp copied: X tiles" (RAM clipboard).
 3. **Paste preview**: `Ctrl+Shift+V` → ghost wireframe at the crosshair.
    - `Q`/`E` = rotate ±15°
@@ -188,7 +210,7 @@ Choose `Copy/Paste` in the Q wheel. `Rectangle` marks corners A and B with Apply
 
 ## 💾 Snapshots (Backups)
 
-[Overview](Overview) · Full terrain backup/restore.
+Full terrain backup/restore.
 
 ### Save
 1. SETTINGS → **SNAPSHOTS**.
@@ -210,7 +232,7 @@ Choose `Copy/Paste` in the Q wheel. `Rectangle` marks corners A and B with Apply
 
 ## 💾 Profiles
 
-[Overview](Overview) · Save/load complete brush configurations.
+Save/load complete brush configurations.
 
 - SETTINGS → **PROFILES**.
 - Name + **Save** → radius, softness, op, shape, paint, ramp mode, angle, smooth mode, raise delta, paint strength, falloff, shore offset.
@@ -222,7 +244,7 @@ Choose `Copy/Paste` in the Q wheel. `Rectangle` marks corners A and B with Apply
 
 ## 🌐 Languages
 
-[Overview](Overview) · **15 options:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
+**15 options:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — default `Auto`.
 
 ### Auto-Detect
 - The default `Auto` detects the game language via reflection: `Localization.instance.GetSelectedLanguage()`.
@@ -243,7 +265,7 @@ Translated wiki pages: [English](Home) · [Español](Home-es) · [Français](Hom
 
 ## 🌍 Multiplayer
 
-[Overview](Overview) · ### Requirements
+### Requirements
 - **Mod on client AND server** for edits greater than ±8 m and correct replication.
 - `UnlockDeltaLimit` on the server too, otherwise the server clamps terrain.
 
@@ -264,7 +286,7 @@ When the server runs the mod, its `Server` section wins:
 
 ## ⚙️ Settings
 
-[Overview](Overview) · File: `BepInEx/config/com.terrainforge.valheim.cfg`
+File: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### General
 | Setting | Default | Description |
@@ -332,11 +354,11 @@ All shortcuts are rebindable in the KEYS tab. Highlights:
 
 ## 🐛 Troubleshooting
 
-[Overview](Overview) · | Issue | Solution |
+| Issue | Solution |
 |-------|----------|
 | **Menu does not appear / invisible cursor** | Close the game. Delete `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` and `%APPDATA%\Thunderstore Mod Manager\PackageCache\`. Restart TMM, check updates. |
 | **Update not showing in TMM** | TMM → Settings → "Refresh mod list" (Ctrl+R). Close/reopen TMM. Verify the correct profile. |
-| **Thunderstore version conflict** | Bump the version (0.3.3 → 0.3.4) in `.csproj`, `Plugin.cs`, `manifest.json`. Rebuild + re-upload. |
+| **Thunderstore version conflict** | Use the same new `X.Y.Z` version in `.csproj`, `Plugin.cs`, and `manifest.json`; it must be higher than the version already published. Rebuild and package again. |
 | **Stamp copy/paste does nothing** | HUD: `STAMP READY [X/Y]` = ready. If "tool not equipped", equip the tool (SETTINGS → Stamp tool). |
 | **Preview invisible under water** | Fixed in 0.3.2 — the preview floats on the surface. Update. |
 | **Circles on Line/Rect/Poly** | Fixed in 0.3.2 — only the marked outline is shown. Update. |
@@ -350,8 +372,9 @@ All shortcuts are rebindable in the KEYS tab. Highlights:
 
 ## 🔗 Links
 
-[Overview](Overview) · - **Thunderstore page:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
-- **GitHub repository:** https://github.com/marceloanton/TerrainForge
+- **Project website:** [marceloanton.github.io/TerrainForge](https://marceloanton.github.io/TerrainForge/)
+- **Thunderstore page:** [TerrainForge on Thunderstore](https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/)
+- **GitHub repository:** [TerrainForge on GitHub](https://github.com/marceloanton/TerrainForge)
 - **Donations:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog:** [Changelog](Changelog)
 

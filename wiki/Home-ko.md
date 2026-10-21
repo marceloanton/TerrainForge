@@ -1,17 +1,17 @@
 # TerrainForge 위키
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · *한국어* · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · *한국어* · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### TerrainForge 0.3.6 업데이트
+### TerrainForge 0.3.8 — 0.3.7 핫픽스
 
 > Q 휠에 전용 복사/붙여넣기 모드가 추가되었습니다. 사각형은 적용으로 A/B, 선은 양 끝점, 다각형은 꼭짓점을 지정하고 3개 이상에서 두 번 눌러 복사하며, 원/정사각형은 브러시 범위를 복사합니다. HUD가 다음 단계를 안내합니다. 눈은 페인트 > DeepSnow에 통합되었습니다(Shift를 누르면 제거). F5에서는 로컬 이동과 카메라가 고정되며, Esc는 싱글 플레이 세계 전체를 일시 정지합니다. 0.3.6: F5 탭을 두 줄로 정리하고 선택한 작업에 필요한 설정만 표시합니다. Ramp에는 두 점, 고정 각도, 연결 경로 모드가 있으며 원형 램프는 0.4.0 계획에 포함되었습니다.
 
 ## 목차
 
-[Overview](Overview) · 1. [설치](#-설치)
+1. [설치](#-설치)
 2. [빠른 시작](#-빠른-시작)
 3. [조작](#-조작)
 4. [작업](#-작업)
@@ -29,7 +29,7 @@
 
 ## 📥 설치
 
-[Overview](Overview) · ### 요구 사항
+### 요구 사항
 - **BepInEx 5** (x64, Mono) — 클라이언트와 서버 모두. Thunderstore 사용자는 이미 설치되어 있습니다.
 
 ### 단계
@@ -45,7 +45,7 @@
 
 ## 🚀 빠른 시작
 
-[Overview](Overview) · 1. 월드에 접속합니다. **TerrainForge 막대기**(망치 복제품)가 자동으로 지급되고 장착됩니다.
+1. 월드에 접속합니다. **TerrainForge 막대기**(망치 복제품)가 자동으로 지급되고 장착됩니다.
 2. `F5`를 눌러 메뉴를 엽니다 (`ESC` 일시정지 메뉴의 **TerrainForge** 버튼을 클릭해도 됩니다).
 3. 막대기가 장착되어 있지 않다면 장착합니다.
 4. 지형을 조준하고 **오른쪽 클릭**(`Mouse1`)을 길게 눌러 조형합니다.
@@ -57,7 +57,7 @@
 
 ## ⌨️ 조작
 
-[Overview](Overview) · | 동작 | 기본 키 | 설명 |
+| 동작 | 기본 키 | 설명 |
 |--------|-------------|-------------|
 | 브러시 적용 | `Mouse1` (오른쪽 클릭) 길게 | 크로스헤어 아래의 지형을 조형합니다 |
 | 반경 + | `=` 또는 `Ctrl`+휠 | 브러시 반경을 늘립니다 |
@@ -90,7 +90,7 @@
 
 ## 🔄 작업
 
-[Overview](Overview) · | 작업 | 설명 |
+| 작업 | 설명 |
 |-----------|-------------|
 | **평탄화** | 조준한 높이로 평탄화합니다 (Shift = 발 위치). 스포이트(`G`) 또는 SETTINGS 텍스트박스로 고정 높이를 지정합니다. |
 | **올리기** | 적용할 때마다 지형을 `RaiseDelta`만큼 올립니다. 감쇠 모드가 형태를 결정합니다. |
@@ -106,7 +106,7 @@
 
 ## 📐 모양
 
-[Overview](Overview) · `.` 키로 순환합니다. 모두 실행 취소를 지원합니다.
+`.` 키로 순환합니다. 모두 실행 취소를 지원합니다.
 
 | 모양 | 표시 | 용도 |
 |-------|---------|----------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ 감쇠 모드 (올리기/내리기)
 
-[Overview](Overview) · SETTINGS → "Raise/Lower falloff"에서 구성합니다:
+SETTINGS → "Raise/Lower falloff"에서 구성합니다:
 
 | 모드 | 동작 |
 |------|----------|
@@ -136,7 +136,7 @@
 
 ## 🧱 스탬프 (복사/붙여넣기)
 
-[Overview](Overview) · 지형 구조를 복제하는 강력한 기능입니다.
+지형 구조를 복제하는 강력한 기능입니다.
 
 ### 사각형 선택 (권장)
 
@@ -144,7 +144,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ### 워크플로
 
-[Overview](Overview) · 1. **영역 표시**: 아무 모양이나 사용합니다 (원, Rect, 선, 다각형, 램프) — 또는 위의 사각형 선택.
+1. **영역 표시**: 아무 모양이나 사용합니다 (원, Rect, 선, 다각형, 램프) — 또는 위의 사각형 선택.
 2. **복사**: `Ctrl+Shift+C` → "스탬프 복사됨: X tiles" (RAM 클립보드).
 3. **붙여넣기 미리보기**: `Ctrl+Shift+V` → 크로스헤어에 고스트 와이어프레임.
    - `Q`/`E` = ±15° 회전
@@ -179,7 +179,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## 💾 스냅샷 (백업)
 
-[Overview](Overview) · 전체 지형 백업/복원.
+전체 지형 백업/복원.
 
 ### 저장
 1. SETTINGS → **SNAPSHOTS**.
@@ -201,7 +201,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## 💾 프로필
 
-[Overview](Overview) · 완전한 브러시 구성을 저장/불러옵니다.
+완전한 브러시 구성을 저장/불러옵니다.
 
 - SETTINGS → **PROFILES**.
 - 이름 + **Save** → 반경, 부드러움, 작업, 모양, 페인트, 램프 모드, 각도, 스무딩 모드, 올리기 델타, 페인트 강도, 감쇠, 해안 오프셋.
@@ -213,7 +213,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## 🌐 언어
 
-[Overview](Overview) · **15가지 옵션:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — 기본값 `Auto`.
+**15가지 옵션:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — 기본값 `Auto`.
 
 ### 자동 감지
 - 기본값 `Auto`는 리플렉션을 통해 게임 언어를 감지합니다: `Localization.instance.GetSelectedLanguage()`.
@@ -234,7 +234,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## 🌍 멀티플레이어
 
-[Overview](Overview) · ### 요구 사항
+### 요구 사항
 - ±8 m를 초과하는 편집과 올바른 복제를 위해서는 **클라이언트와 서버 모두에 모드**가 필요합니다.
 - 서버에도 `UnlockDeltaLimit`를 설정해야 합니다, 그렇지 않으면 서버가 지형을 제한합니다.
 
@@ -255,7 +255,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## ⚙️ 설정
 
-[Overview](Overview) · 파일: `BepInEx/config/com.terrainforge.valheim.cfg`
+파일: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### 일반
 | 설정 | 기본값 | 설명 |
@@ -323,7 +323,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## 🐛 문제 해결
 
-[Overview](Overview) · | 문제 | 해결 방법 |
+| 문제 | 해결 방법 |
 |-------|----------|
 | **메뉴가 나타나지 않음 / 커서가 보이지 않음** | 게임을 종료합니다. `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` 및 `%APPDATA%\Thunderstore Mod Manager\PackageCache\`를 삭제합니다. TMM을 재시작하고 업데이트를 확인합니다. |
 | **TMM에 업데이트가 표시되지 않음** | TMM → Settings → "Refresh mod list" (Ctrl+R). TMM을 닫았다 다시 엽니다. 올바른 프로필인지 확인합니다. |
@@ -341,7 +341,7 @@ Q 휠에서 복사/붙여넣기를 선택하세요. 적용을 눌러 영역을 �
 
 ## 🔗 링크
 
-[Overview](Overview) · - **Thunderstore 페이지:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Thunderstore 페이지:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **GitHub 저장소:** https://github.com/marceloanton/TerrainForge
 - **후원:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog:** [Changelog](Changelog)

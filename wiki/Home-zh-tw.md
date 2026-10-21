@@ -1,17 +1,17 @@
 # TerrainForge Wiki
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · *繁體中文* · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · *繁體中文* · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### TerrainForge 0.3.6 更新
+### TerrainForge 0.3.8 — 0.3.7 修正版本
 
 > Q 圓盤新增專用「複製/貼上」模式。矩形用「套用」標記 A/B；直線標記兩端；多邊形標記頂點並在 3 點以上雙擊複製；圓形/正方形複製筆刷範圍。HUD 會提示下一步。雪已整合至塗裝 > DeepSnow（按住 Shift 可移除）。F5 會鎖定本機移動與鏡頭；Esc 會暫停單人世界。 0.3.6：F5 分頁改為兩列，並依目前操作顯示對應設定。Ramp 提供兩點、固定角度與連續路徑模式；圓形坡道列入 0.4.0 計畫。
 
 ## 目錄
 
-[Overview](Overview) · 1. [安裝](#-安裝)
+1. [安裝](#-安裝)
 2. [快速開始](#-快速開始)
 3. [控制](#-控制)
 4. [操作](#-操作)
@@ -29,7 +29,7 @@
 
 ## 📥 安裝
 
-[Overview](Overview) · ### 需求
+### 需求
 - **BepInEx 5**（x64、Mono）安裝於客戶端與伺服器。Thunderstore 使用者已內建。
 
 ### 步驟
@@ -45,7 +45,7 @@
 
 ## 🚀 快速開始
 
-[Overview](Overview) · 1. 加入一個世界。**TerrainForge 法杖**（鐵鎚的複製品）會自動給予並裝備。
+1. 加入一個世界。**TerrainForge 法杖**（鐵鎚的複製品）會自動給予並裝備。
 2. 按 `F5` 開啟選單（或點擊 `ESC` 暫停選單中的 **TerrainForge** 按鈕）。
 3. 若法杖尚未裝備，請裝備它。
 4. 瞄準地形並按住 **右鍵**（`Mouse1`）進行雕塑。
@@ -57,7 +57,7 @@
 
 ## ⌨️ 控制
 
-[Overview](Overview) · | 動作 | 預設按鍵 | 說明 |
+| 動作 | 預設按鍵 | 說明 |
 |--------|-------------|-------------|
 | 套用筆刷 | 按住 `Mouse1`（右鍵） | 在準心下方雕塑地形 |
 | 半徑 + | `=` 或 `Ctrl`+滾輪 | 增加筆刷半徑 |
@@ -90,7 +90,7 @@
 
 ## 🔄 操作
 
-[Overview](Overview) · | 操作 | 說明 |
+| 操作 | 說明 |
 |-----------|-------------|
 | **整平** | 整平至瞄準的高度（Shift = 在腳下）。透過取色器（`G`）或設定的文字方塊固定高度。 |
 | **升高** | 每次套用將地形升高 `RaiseDelta`。由衰減模式塑形。 |
@@ -106,7 +106,7 @@
 
 ## 📐 形狀
 
-[Overview](Overview) · 以 `.` 鍵循環。全部支援復原。
+以 `.` 鍵循環。全部支援復原。
 
 | 形狀 | 標記 | 用途 |
 |-------|---------|----------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ 衰減模式（升高/降低）
 
-[Overview](Overview) · 於設定 → 「升高/降低衰減」中配置：
+於設定 → 「升高/降低衰減」中配置：
 
 | 模式 | 行為 |
 |------|----------|
@@ -136,7 +136,7 @@
 
 ## 🧱 印記（複製/貼上）
 
-[Overview](Overview) · 用於複製地形結構的強大功能。
+用於複製地形結構的強大功能。
 
 ### 矩形選取（推薦）
 
@@ -144,7 +144,7 @@
 
 ### 工作流程
 
-[Overview](Overview) · 1. **標記區域**：使用任意形狀（圓形、矩形、線、多邊形、斜坡）— 或上述的矩形選取。
+1. **標記區域**：使用任意形狀（圓形、矩形、線、多邊形、斜坡）— 或上述的矩形選取。
 2. **複製**：`Ctrl+Shift+C` → 「Stamp copied: X tiles」（RAM 剪貼簿）。
 3. **貼上預覽**：`Ctrl+Shift+V` → 準心處的幽靈線框。
    - `Q`/`E` = 旋轉 ±15°
@@ -179,7 +179,7 @@
 
 ## 💾 快照（備份）
 
-[Overview](Overview) · 完整的地形備份/還原。
+完整的地形備份/還原。
 
 ### 儲存
 1. 設定 → **快照**。
@@ -201,7 +201,7 @@
 
 ## 💾 設定檔
 
-[Overview](Overview) · 儲存/載入完整的筆刷配置。
+儲存/載入完整的筆刷配置。
 
 - 設定 → **設定檔**。
 - 名稱 + **儲存** → 半徑、柔和度、操作、形狀、塗裝、斜坡模式、角度、平滑模式、升高增量、塗裝強度、衰減、海岸偏移。
@@ -213,7 +213,7 @@
 
 ## 🌐 語言
 
-[Overview](Overview) · **15 個選項：** `Auto`、`English`、`Español`、`Français`、`Deutsch`、`Русский`、`中文`、`繁體中文`、`日本語`、`한국어`、`Polski`、`Português`、`Türkçe`、`Українська`、`Italiano` — 預設 `Auto`。
+**15 個選項：** `Auto`、`English`、`Español`、`Français`、`Deutsch`、`Русский`、`中文`、`繁體中文`、`日本語`、`한국어`、`Polski`、`Português`、`Türkçe`、`Українська`、`Italiano` — 預設 `Auto`。
 
 ### 自動偵測
 - 預設的 `Auto` 透過反射偵測遊戲語言：`Localization.instance.GetSelectedLanguage()`。
@@ -234,7 +234,7 @@
 
 ## 🌍 多人遊戲
 
-[Overview](Overview) · ### 需求
+### 需求
 - **客戶端與伺服器皆需安裝模組**，以進行大於 ±8 m 的編輯並正確同步。
 - 伺服器也需 `UnlockDeltaLimit`，否則伺服器會夾限地形。
 
@@ -255,7 +255,7 @@
 
 ## ⚙️ 設定
 
-[Overview](Overview) · 檔案：`BepInEx/config/com.terrainforge.valheim.cfg`
+檔案：`BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### 一般
 | 設定 | 預設 | 說明 |
@@ -323,7 +323,7 @@
 
 ## 🐛 疑難排解
 
-[Overview](Overview) · | 問題 | 解決方法 |
+| 問題 | 解決方法 |
 |-------|----------|
 | **選單未出現 / 游標不可見** | 關閉遊戲。刪除 `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` 與 `%APPDATA%\Thunderstore Mod Manager\PackageCache\`。重新啟動 TMM，檢查更新。 |
 | **TMM 未顯示更新** | TMM → Settings → 「Refresh mod list」（Ctrl+R）。關閉/重新開啟 TMM。確認正確的設定檔。 |
@@ -341,7 +341,7 @@
 
 ## 🔗 連結
 
-[Overview](Overview) · - **Thunderstore 頁面：** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Thunderstore 頁面：** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **GitHub 儲存庫：** https://github.com/marceloanton/TerrainForge
 - **贊助：** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **更新日誌：** [Changelog](Changelog)

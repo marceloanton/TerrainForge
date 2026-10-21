@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TerrainForge
 {
-    [BepInPlugin(Guid, "TerrainForge", "0.3.6")]
+    [BepInPlugin(Guid, "TerrainForge", "0.3.8")]
     public class TerrainForgePlugin : BaseUnityPlugin
     {
         public const string Guid = "com.terrainforge.valheim";

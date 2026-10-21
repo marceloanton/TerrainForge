@@ -1,17 +1,17 @@
 # Wiki di TerrainForge
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · *Italiano*
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · *Italiano* · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### Novità TerrainForge 0.3.6
+### TerrainForge 0.3.8 — Hotfix per la 0.3.7
 
 > La ruota Q include la modalità Copia/Incolla. Rettangolo segna A/B con Applica; Linea segna due estremi; Poligono aggiunge vertici e copia con doppia pressione dopo 3+ punti; Cerchio/Quadrato copia l’impronta del pennello. L’HUD mostra il passo successivo. La neve è in Pittura > DeepSnow (tieni Shift per rimuoverla). F5 blocca movimento e telecamera locali; Esc mette in pausa tutto il mondo in singolo. 0.3.6: F5 dispone le schede su due righe e mostra i controlli dell’operazione selezionata. Ramp offre Due punti, Angolo fisso e Connessa; le rampe circolari sono previste per la 0.4.0.
 
 ## Indice
 
-[Overview](Overview) · 1. [Installazione](#-installazione)
+1. [Installazione](#-installazione)
 2. [Avvio Rapido](#-avvio-rapido)
 3. [Comandi](#-comandi)
 4. [Operazioni](#-operazioni)
@@ -29,7 +29,7 @@
 
 ## 📥 Installazione
 
-[Overview](Overview) · ### Requisiti
+### Requisiti
 - **BepInEx 5** (x64, Mono) su client e server. Gli utenti Thunderstore ce l'hanno già.
 
 ### Passaggi
@@ -45,7 +45,7 @@
 
 ## 🚀 Avvio Rapido
 
-[Overview](Overview) · 1. Entra in un mondo. La **Bacchetta TerrainForge** (un clone del Martello) viene fornita ed equipaggiata automaticamente.
+1. Entra in un mondo. La **Bacchetta TerrainForge** (un clone del Martello) viene fornita ed equipaggiata automaticamente.
 2. Premi `F5` per aprire il menu (o clicca il pulsante **TerrainForge** nel menu di pausa `ESC`).
 3. Equipaggia la bacchetta se non lo è.
 4. Mira al terreno e tieni premuto il **clic destro** (`Mouse1`) per scolpire.
@@ -57,7 +57,7 @@
 
 ## ⌨️ Comandi
 
-[Overview](Overview) · | Azione | Tasto predefinito | Descrizione |
+| Azione | Tasto predefinito | Descrizione |
 |--------|-------------------|-------------|
 | Applica pennello | Tieni premuto `Mouse1` (clic destro) | Scolpisce il terreno sotto il mirino |
 | Raggio + | `=` o `Ctrl`+Rotellina | Aumenta il raggio del pennello |
@@ -90,7 +90,7 @@
 
 ## 🔄 Operazioni
 
-[Overview](Overview) · | Operazione | Descrizione |
+| Operazione | Descrizione |
 |-----------|-------------|
 | **Appiattisci** | Livella all'altezza mirata (Shift = ai tuoi piedi). Altezza fissa tramite il Contagocce (`G`) o la casella di testo in IMPOSTAZIONI. |
 | **Alza** | Alza il terreno di `RaiseDelta` per applicazione. La modalità di caduta ne definisce la forma. |
@@ -106,7 +106,7 @@
 
 ## 📐 Forme
 
-[Overview](Overview) · Scorri con il tasto `.`. Tutte supportano l'annullamento.
+Scorri con il tasto `.`. Tutte supportano l'annullamento.
 
 | Forma | Marcatura | Caso d'uso |
 |-------|---------|----------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ Modalità di Caduta (Alza/Abbassa)
 
-[Overview](Overview) · Config in IMPOSTAZIONI → "Caduta Raise/Lower":
+Config in IMPOSTAZIONI → "Caduta Raise/Lower":
 
 | Modalità | Comportamento |
 |------|----------|
@@ -136,7 +136,7 @@
 
 ## 🧱 Stamps (Copia/Incolla)
 
-[Overview](Overview) · Una funzione potente per replicare strutture del terreno.
+Una funzione potente per replicare strutture del terreno.
 
 ### Selezione rettangolare (consigliata)
 
@@ -144,7 +144,7 @@ Scegli Copia/Incolla nella ruota Q. Applica marca l’area: due angoli per Retta
 
 ### Flusso di lavoro
 
-[Overview](Overview) · 1. **Marca l'area**: usa una qualsiasi forma (Cerchio, Rett, Linea, Poli, Rampa) — o la selezione rettangolare qui sopra.
+1. **Marca l'area**: usa una qualsiasi forma (Cerchio, Rett, Linea, Poli, Rampa) — o la selezione rettangolare qui sopra.
 2. **Copia**: `Ctrl+Shift+C` → "Stamp copiato: X tile" (appunti in RAM).
 3. **Anteprima Incolla**: `Ctrl+Shift+V` → wireframe fantasma sul mirino.
    - `Q`/`E` = ruota ±15°
@@ -179,7 +179,7 @@ Scegli Copia/Incolla nella ruota Q. Applica marca l’area: due angoli per Retta
 
 ## 💾 Snapshots (Backup)
 
-[Overview](Overview) · Backup/ripristino completo del terreno.
+Backup/ripristino completo del terreno.
 
 ### Salva
 1. IMPOSTAZIONI → **SNAPSHOTS**.
@@ -201,7 +201,7 @@ Scegli Copia/Incolla nella ruota Q. Applica marca l’area: due angoli per Retta
 
 ## 💾 Profili
 
-[Overview](Overview) · Salva/carica configurazioni complete del pennello.
+Salva/carica configurazioni complete del pennello.
 
 - IMPOSTAZIONI → **PROFILES**.
 - Nome + **Salva** → raggio, morbidezza, op, forma, pittura, modalità rampa, angolo, modalità levigatura, raise delta, intensità pittura, falloff, shore offset.
@@ -213,7 +213,7 @@ Scegli Copia/Incolla nella ruota Q. Applica marca l’area: due angoli per Retta
 
 ## 🌐 Lingue
 
-[Overview](Overview) · **15 opzioni:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — predefinito `Auto`.
+**15 opzioni:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — predefinito `Auto`.
 
 ### Auto-Detect
 - Il default `Auto` rileva la lingua del gioco tramite reflection: `Localization.instance.GetSelectedLanguage()`.
@@ -234,7 +234,7 @@ Pagine wiki tradotte: [English](Home) · [Español](Home-es) · [Français](Home
 
 ## 🌍 Multigiocatore
 
-[Overview](Overview) · ### Requisiti
+### Requisiti
 - **Mod su client E server** per modifiche superiori a ±8 m e una corretta replicazione.
 - `UnlockDeltaLimit` anche sul server, altrimenti il server limita il terreno.
 
@@ -255,7 +255,7 @@ Quando il server esegue la mod, la sua sezione `Server` prevale:
 
 ## ⚙️ Impostazioni
 
-[Overview](Overview) · File: `BepInEx/config/com.terrainforge.valheim.cfg`
+File: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### Generale
 | Impostazione | Default | Descrizione |
@@ -323,7 +323,7 @@ Tutte le scorciatoie sono riassegnabili nella scheda TASTI. In evidenza:
 
 ## 🐛 Risoluzione dei Problemi
 
-[Overview](Overview) · | Problema | Soluzione |
+| Problema | Soluzione |
 |----------|----------|
 | **Il menu non appare / cursore invisibile** | Chiudi il gioco. Elimina `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` e `%APPDATA%\Thunderstore Mod Manager\PackageCache\`. Riavvia TMM, controlla gli aggiornamenti. |
 | **L'aggiornamento non compare in TMM** | TMM → Settings → "Refresh mod list" (Ctrl+R). Chiudi/riapri TMM. Verifica il profilo corretto. |
@@ -341,7 +341,7 @@ Tutte le scorciatoie sono riassegnabili nella scheda TASTI. In evidenza:
 
 ## 🔗 Link
 
-[Overview](Overview) · - **Pagina Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Pagina Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **Repository GitHub:** https://github.com/marceloanton/TerrainForge
 - **Donazioni:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog:** [Changelog](Changelog)

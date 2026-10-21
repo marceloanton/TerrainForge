@@ -192,11 +192,11 @@ namespace TerrainForge
             ItemDrop.ItemData weapon = GetHeldItem(player);
             bool equipped = IsToolEquipped(p, weapon);
 
-            // Free-fly "photo" camera (F): while it is active the player is frozen
-            // and the held item may be hidden by the game, so treat the tool as the
-            // dominant mode for the HUD, preview and editing regardless of equip.
+            // Free-fly "photo" camera (F) may stay active after changing items.
+            // Keep the camera available so it can be exited, but terrain tools
+            // must remain gated by the currently equipped item.
             bool freeCam = GameCamera.InFreeFly();
-            bool active = equipped || freeCam;
+            bool active = equipped;
             SuppressFreeFlyScreenshot = freeCam;
             SuppressFreeFlyLockon = freeCam;
 
@@ -208,10 +208,9 @@ namespace TerrainForge
                 TerrainForgePlugin.Message(Loc.T("tut.2"));
             }
 
-            // Free-fly camera: toggle while the brush is active. Allowed even when
-            // the tool is unequipped if the camera is already flying, so the same
-            // key can always be used to exit and never strands the player.
-            if (!blocked && active && p.FreeCameraKey.Value.IsDown())
+            // Allow F to enter with the rod and always allow exiting free-fly,
+            // while keeping brush operations disabled whenever the rod is absent.
+            if (!blocked && (equipped || freeCam) && p.FreeCameraKey.Value.IsDown())
                 ToggleFreeCamera();
 
             Vector3 aim;
@@ -1527,16 +1526,18 @@ namespace TerrainForge
 
         internal static bool IsToolEquipped(TerrainForgePlugin p, ItemDrop.ItemData weapon)
         {
+            if (p == null)
+                return false;
+
             switch (p.RequiredTool.Value)
             {
                 case ToolRequirement.Pickaxe:
                     return IsPickaxe(weapon);
 
                 case ToolRequirement.TerrainForgeTool:
-                    // If the custom item failed to register, stay usable instead of locking out.
                     if (!TerrainTool.Registered)
-                        return true;
-                    return TerrainTool.IsEquipped(weapon);
+                        return false;
+                    return TerrainTool.IsEquipped(Player.m_localPlayer, weapon);
 
                 default:
                     return true;
@@ -1567,8 +1568,8 @@ namespace TerrainForge
                     return IsPickaxe(weapon);
                 case ToolRequirement.TerrainForgeTool:
                     if (!TerrainTool.Registered)
-                        return true;
-                    return TerrainTool.IsEquipped(weapon);
+                        return false;
+                    return TerrainTool.IsEquipped(Player.m_localPlayer, weapon);
                 default:
                     return true;
             }
@@ -1690,14 +1691,15 @@ namespace TerrainForge
                 return;
 
             bool freeCam = GameCamera.InFreeFly();
-            if (!IsToolEquipped(p, GetHeldItem(player)) && !freeCam)
-                return;
-
+            bool equipped = IsToolEquipped(p, GetHeldItem(player));
             EnsureHudStyle();
+            if (!equipped)
+            {
+                if (freeCam)
+                    DrawFreeCamBanner();
+                return;
+            }
 
-            // The free-fly mode is self-explanatory and must be visible even when
-            // the tool is not equipped (the game freezes the player and may hide
-            // the held item), so the banner is drawn before anything else.
             if (freeCam)
                 DrawFreeCamBanner();
             DrawBrushHud(p, player);

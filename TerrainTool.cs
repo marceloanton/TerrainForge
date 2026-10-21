@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
@@ -47,8 +48,18 @@ namespace TerrainForge
                 return;
             }
 
+            GameObject prefab = null;
+            bool addedToDatabase = false;
             try
             {
+                // UpdateRegisters iterates every item prefab and dereferences its
+                // Unity object name. Other plugins can leave destroyed/null entries
+                // in m_items, which makes registration throw before our rod is indexed.
+                int invalidItems = db.m_items.RemoveAll(item => item == null);
+                if (invalidItems > 0)
+                    LogWarning("removed " + invalidItems + " invalid item prefab entr" +
+                        (invalidItems == 1 ? "y" : "ies") + " before ObjectDB registration.");
+
                 GameObject hammer = null;
                 foreach (GameObject item in db.m_items)
                 {
@@ -64,7 +75,7 @@ namespace TerrainForge
                     return;
                 }
 
-                GameObject prefab = UnityEngine.Object.Instantiate(hammer);
+                prefab = UnityEngine.Object.Instantiate(hammer);
                 prefab.name = PrefabName;
                 prefab.SetActive(false);
 
@@ -107,12 +118,15 @@ namespace TerrainForge
 
                 ApplyIcon(shared);
                 db.m_items.Add(prefab);
+                addedToDatabase = true;
                 AccessTools.Method(typeof(ObjectDB), "UpdateRegisters", Type.EmptyTypes)?.Invoke(db, null);
                 Registered = db.GetItemPrefab(PrefabName) != null;
                 if (!Registered)
                 {
                     db.m_items.Remove(prefab);
+                    addedToDatabase = false;
                     UnityEngine.Object.Destroy(prefab);
+                    prefab = null;
                     Shared = null;
                     LogWarning("ObjectDB did not index the registered tool; tool unavailable.");
                     return;
@@ -122,6 +136,10 @@ namespace TerrainForge
             }
             catch (Exception e)
             {
+                if (addedToDatabase && db.m_items != null)
+                    db.m_items.Remove(prefab);
+                if (prefab != null)
+                    UnityEngine.Object.Destroy(prefab);
                 Shared = null;
                 Registered = false;
                 LogError("registration failed: " + e);
@@ -154,26 +172,65 @@ namespace TerrainForge
             if (scene == null)
                 return;
             GameObject prefab = Prefab;
-            if (prefab == null || scene.GetPrefab(PrefabName) != null)
+            if (prefab == null)
                 return;
 
-            scene.m_prefabs.Add(prefab);
-            try
+            int hash = PrefabName.GetStableHashCode();
+            var namedPrefabs = AccessTools.Field(typeof(ZNetScene), "m_namedPrefabs")?.GetValue(scene)
+                as Dictionary<int, GameObject>;
+            if (namedPrefabs == null)
             {
-                var namedPrefabs = AccessTools.Field(typeof(ZNetScene), "m_namedPrefabs")?.GetValue(scene);
-                var add = namedPrefabs?.GetType().GetMethod("Add", new[] { typeof(int), typeof(GameObject) });
-                if (add == null)
+                LogWarning("network prefab registry is unavailable; tool will not synchronize.");
+                return;
+            }
+
+            GameObject existing;
+            if (namedPrefabs.TryGetValue(hash, out existing))
+            {
+                if (existing != null)
                 {
-                    scene.m_prefabs.Remove(prefab);
-                    LogWarning("could not find the network prefab index method; tool will not synchronize.");
+                    if (existing.name == PrefabName)
+                    {
+                        // ObjectDB/network rebuilds can leave this entry registered
+                        // even when GetPrefab(string) misses it. Treat the matching
+                        // hash/name pair as success instead of adding the key again.
+                        if (!scene.m_prefabs.Contains(existing))
+                            scene.m_prefabs.Add(existing);
+                        return;
+                    }
+
+                    LogWarning("network prefab hash collision for '" + PrefabName + "' with '" + existing.name + "'.");
                     return;
                 }
-                add.Invoke(namedPrefabs, new object[] { PrefabName.GetStableHashCode(), prefab });
+
+                // Remove a destroyed Unity object left behind under our stable hash.
+                namedPrefabs.Remove(hash);
+                scene.m_prefabs.RemoveAll(item => item == null);
+            }
+
+            GameObject byName = scene.GetPrefab(PrefabName);
+            if (byName != null)
+            {
+                if (!scene.m_prefabs.Contains(byName))
+                    scene.m_prefabs.Add(byName);
+                return;
+            }
+
+            bool addedToList = false;
+            try
+            {
+                if (!scene.m_prefabs.Contains(prefab))
+                {
+                    scene.m_prefabs.Add(prefab);
+                    addedToList = true;
+                }
+                namedPrefabs.Add(hash, prefab);
                 LogInfo("network prefab registered as '" + PrefabName + "'.");
             }
             catch (Exception e)
             {
-                scene.m_prefabs.Remove(prefab);
+                if (addedToList)
+                    scene.m_prefabs.Remove(prefab);
                 LogWarning("network prefab registration failed: " + e.GetBaseException().Message);
             }
         }
@@ -198,6 +255,32 @@ namespace TerrainForge
                 if (drop != null && drop.m_itemData != null && drop.m_itemData.m_shared == item.m_shared)
                     return true;
             }
+
+            return false;
+        }
+
+        /// <summary>Checks equipped inventory data as a fallback when free-fly hides hand slots.</summary>
+        public static bool IsEquipped(Player player, ItemDrop.ItemData heldItem)
+        {
+            if (IsEquipped(heldItem))
+                return true;
+            if (player == null)
+                return false;
+
+            Inventory inventory = player.GetInventory();
+            if (inventory == null)
+                return false;
+
+            try
+            {
+                List<ItemDrop.ItemData> equipped = inventory.GetEquippedItems();
+                if (equipped == null)
+                    return false;
+                for (int i = 0; i < equipped.Count; i++)
+                    if (IsEquipped(equipped[i]))
+                        return true;
+            }
+            catch { /* a missing inventory is not an equipped tool */ }
 
             return false;
         }

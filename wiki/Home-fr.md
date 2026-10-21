@@ -1,17 +1,17 @@
 # Wiki TerrainForge
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · *Français* · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · *Français* · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### Nouveautés TerrainForge 0.3.6
+### TerrainForge 0.3.8 — Correctif de 0.3.7
 
 > La roue Q propose un mode Copier/Coller dédié. Rectangle marque A/B avec Appliquer ; Ligne marque deux extrémités ; Polygone ajoute des sommets et copie par double pression après 3 points ; Cercle/Carré copie l’empreinte du pinceau. Le HUD indique l’étape suivante. La neige est dans Peinture > DeepSnow (maintenez Maj pour l’enlever). F5 bloque les déplacements et la caméra locale ; Échap met en pause tout le monde en solo. 0.3.6 : F5 répartit les onglets sur deux lignes et n’affiche que les commandes utiles à l’opération. Ramp propose Deux points, Angle fixe et Connectée ; la rampe circulaire est prévue pour la 0.4.0.
 
 ## Sommaire
 
-[Overview](Overview) · 1. [Installation](#-installation)
+1. [Installation](#-installation)
 2. [Démarrage Rapide](#-démarrage-rapide)
 3. [Contrôles](#-contrôles)
 4. [Opérations](#-opérations)
@@ -29,7 +29,7 @@
 
 ## 📥 Installation
 
-[Overview](Overview) · ### Prérequis
+### Prérequis
 - **BepInEx 5** (x64, Mono) sur le client et le serveur. Les utilisateurs de Thunderstore l'ont déjà.
 
 ### Étapes
@@ -45,7 +45,7 @@
 
 ## 🚀 Démarrage Rapide
 
-[Overview](Overview) · 1. Rejoignez un monde. La **Baguette TerrainForge** (un clone du marteau) est donnée et équipée automatiquement.
+1. Rejoignez un monde. La **Baguette TerrainForge** (un clone du marteau) est donnée et équipée automatiquement.
 2. Appuyez sur `F5` pour ouvrir le menu (ou cliquez sur le bouton **TerrainForge** dans le menu pause `ESC`).
 3. Équipez la baguette si elle ne l'est pas.
 4. Visez le terrain et maintenez le **clic droit** (`Mouse1`) pour sculpter.
@@ -57,7 +57,7 @@
 
 ## ⌨️ Contrôles
 
-[Overview](Overview) · | Action | Touche par défaut | Description |
+| Action | Touche par défaut | Description |
 |--------|-------------------|-------------|
 | Appliquer la brosse | Maintenir `Mouse1` (clic droit) | Sculpte le terrain sous le viseur |
 | Rayon + | `=` ou `Ctrl`+molette | Augmente le rayon de la brosse |
@@ -90,7 +90,7 @@
 
 ## 🔄 Opérations
 
-[Overview](Overview) · | Opération | Description |
+| Opération | Description |
 |-----------|-------------|
 | **Aplatir** | Nivelle à la hauteur visée (Shift = à vos pieds). Hauteur fixe via la Pipette (`G`) ou le champ de RÉGLAGES. |
 | **Monter** | Élève le terrain de `RaiseDelta` par application. Le mode d'atténuation lui donne sa forme. |
@@ -106,7 +106,7 @@
 
 ## 📐 Formes
 
-[Overview](Overview) · Défilez avec la touche `.`. Toutes prennent en charge l'annulation.
+Défilez avec la touche `.`. Toutes prennent en charge l'annulation.
 
 | Forme | Marquage | Cas d'usage |
 |-------|----------|-------------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ Modes d'Atténuation (Monter/Descendre)
 
-[Overview](Overview) · Config dans RÉGLAGES → « Atténuation Monter/Descendre » :
+Config dans RÉGLAGES → « Atténuation Monter/Descendre » :
 
 | Mode | Comportement |
 |------|----------------|
@@ -136,7 +136,7 @@
 
 ## 🧱 Stamps (Copier/Coller)
 
-[Overview](Overview) · Une fonctionnalité puissante pour répliquer des structures de terrain.
+Une fonctionnalité puissante pour répliquer des structures de terrain.
 
 ### Sélection par rectangle (recommandée)
 
@@ -144,7 +144,7 @@ Choisissez Copier/Coller dans la roue Q. Appliquer marque la zone : deux coins p
 
 ### Flux de travail
 
-[Overview](Overview) · 1. **Marquez la zone** : utilisez n'importe quelle forme (Cercle, Rect, Ligne, Poly, Rampe) — ou la sélection par rectangle ci-dessus.
+1. **Marquez la zone** : utilisez n'importe quelle forme (Cercle, Rect, Ligne, Poly, Rampe) — ou la sélection par rectangle ci-dessus.
 2. **Copier** : `Ctrl+Shift+C` → « Stamp copié : X tuiles » (presse-papiers en RAM).
 3. **Aperçu du collage** : `Ctrl+Shift+V` → filaire fantôme au viseur.
    - `Q`/`E` = rotation ±15°
@@ -179,7 +179,7 @@ Choisissez Copier/Coller dans la roue Q. Appliquer marque la zone : deux coins p
 
 ## 💾 Snapshots (Backups)
 
-[Overview](Overview) · Sauvegarde/restauration complète du terrain.
+Sauvegarde/restauration complète du terrain.
 
 ### Enregistrer
 1. RÉGLAGES → **SNAPSHOTS**.
@@ -201,7 +201,7 @@ Choisissez Copier/Coller dans la roue Q. Appliquer marque la zone : deux coins p
 
 ## 💾 Profils
 
-[Overview](Overview) · Enregistrez/chargez des configurations complètes de brosse.
+Enregistrez/chargez des configurations complètes de brosse.
 
 - RÉGLAGES → **PROFILS**.
 - Nom + **Enregistrer** → rayon, douceur, op, forme, peinture, mode de rampe, angle, mode de lissage, raise delta, force de peinture, falloff, shore offset.
@@ -213,7 +213,7 @@ Choisissez Copier/Coller dans la roue Q. Appliquer marque la zone : deux coins p
 
 ## 🌐 Langues
 
-[Overview](Overview) · **15 options :** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — par défaut `Auto`.
+**15 options :** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — par défaut `Auto`.
 
 ### Détection automatique
 - Le `Auto` par défaut détecte la langue du jeu via réflexion : `Localization.instance.GetSelectedLanguage()`.
@@ -234,7 +234,7 @@ Pages wiki traduites : [English](Home) · [Español](Home-es) · [Français](Hom
 
 ## 🌍 Multijoueur
 
-[Overview](Overview) · ### Prérequis
+### Prérequis
 - **Mod sur le client ET le serveur** pour les modifications supérieures à ±8 m et une réplication correcte.
 - `UnlockDeltaLimit` aussi sur le serveur, sinon le serveur limite le terrain.
 
@@ -255,7 +255,7 @@ Lorsque le serveur exécute le mod, sa section `Server` l'emporte :
 
 ## ⚙️ Configuration
 
-[Overview](Overview) · Fichier : `BepInEx/config/com.terrainforge.valheim.cfg`
+Fichier : `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### Général
 | Réglage | Défaut | Description |
@@ -323,7 +323,7 @@ Tous les raccourcis sont réassignables dans l'onglet TOUCHES. Points clés :
 
 ## 🐛 Dépannage
 
-[Overview](Overview) · | Problème | Solution |
+| Problème | Solution |
 |----------|----------|
 | **Le menu n'apparaît pas / curseur invisible** | Fermez le jeu. Supprimez `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` et `%APPDATA%\Thunderstore Mod Manager\PackageCache\`. Redémarrez TMM, vérifiez les mises à jour. |
 | **Mise à jour absente dans TMM** | TMM → Settings → « Refresh mod list » (Ctrl+R). Fermez/rouvrez TMM. Vérifiez le bon profil. |
@@ -341,7 +341,7 @@ Tous les raccourcis sont réassignables dans l'onglet TOUCHES. Points clés :
 
 ## 🔗 Liens
 
-[Overview](Overview) · - **Page Thunderstore :** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Page Thunderstore :** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **Dépôt GitHub :** https://github.com/marceloanton/TerrainForge
 - **Dons :** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog :** [Changelog](Changelog)

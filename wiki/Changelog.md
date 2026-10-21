@@ -2,6 +2,21 @@
 
 ---
 
+## [0.3.8] - Hotfix for 0.3.7
+
+### Context
+- The supplied 0.3.7 log showed repeated network prefab registration failures because stable hash `506871212` was already present, plus invalid item entries during ObjectDB registration. It also logged successful tool registration, so the exact cause of the reported gameplay failure remains unconfirmed.
+
+### Fixed
+- Reuse a matching existing network prefab entry instead of adding its hash twice; report collisions with another prefab.
+- Remove invalid item entries before rebuilding ObjectDB indexes and clean up the tool clone if registration fails.
+- Detect the equipped tool from inventory data when free camera hides hand slots; stop brush editing and hide its HUD when the required tool is unequipped.
+
+### Verification
+- Before publishing, verify in game that the rod is handed out, terrain editing works, and network registration warnings no longer repeat.
+
+---
+
 ## [0.3.6] - 2026-10-21
 
 ### Fixed

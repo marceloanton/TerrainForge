@@ -1,17 +1,21 @@
 # TerrainForge Wiki
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · *Deutsch* · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · *Deutsch* · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### TerrainForge 0.3.6 – Änderungen
+### TerrainForge 0.3.8 – Hotfix für 0.3.7
+
+> Die 0.3.7-Protokolle zeigten wiederholte Fehler bei der Netzwerk-Prefab-Registrierung mit einem bereits verwendeten Schlüssel sowie ungültige ObjectDB-Einträge. Da die Protokolle zugleich eine erfolgreiche Werkzeugregistrierung meldeten, muss die Funktion im Spiel noch überprüft werden. Der Hotfix bereinigt diese Registrierungspfade und beendet die Terrainbearbeitung, wenn das benötigte Werkzeug nicht ausgerüstet ist.
+
+### Enthaltene Funktionen aus 0.3.6
 
 > Das Q-Rad hat einen eigenen Kopieren/Einfügen-Modus. Rechteck markiert A/B mit Anwenden; Linie markiert zwei Endpunkte; Polygon fügt Eckpunkte hinzu und kopiert bei Doppeldruck ab 3 Punkten; Kreis/Quadrat kopiert den Pinselbereich. Das HUD zeigt den nächsten Schritt. Schnee ist jetzt Farbe > DeepSnow (Shift halten zum Entfernen). F5 hält lokale Bewegung und Kamera an; ESC pausiert die ganze Einzelspielerwelt. 0.3.6: F5 ordnet die Register in zwei Reihen und zeigt passende Werkzeuge je Operation. Ramp bietet Zwei Punkte, Festwinkel und Verbundener Pfad; kreisförmige Rampen sind für 0.4.0 geplant.
 
 ## Inhaltsverzeichnis
 
-[Overview](Overview) · 1. [Installation](#-installation)
+1. [Installation](#-installation)
 2. [Schnellstart](#-schnellstart)
 3. [Steuerung](#-steuerung)
 4. [Operationen](#-operationen)
@@ -29,7 +33,7 @@
 
 ## 📥 Installation
 
-[Overview](Overview) · ### Anforderungen
+### Anforderungen
 - **BepInEx 5** (x64, Mono) auf Client und Server. Thunderstore-Nutzer haben es bereits.
 
 ### Schritte
@@ -45,7 +49,7 @@
 
 ## 🚀 Schnellstart
 
-[Overview](Overview) · 1. Betrete eine Welt. Der **TerrainForge-Stab** (ein Hammer-Klon) wird automatisch übergeben und ausgerüstet.
+1. Betrete eine Welt. Der **TerrainForge-Stab** (ein Hammer-Klon) wird automatisch übergeben und ausgerüstet.
 2. Drücke `F5`, um das Menü zu öffnen (oder klicke im `ESC`-Pausenmenü auf die Schaltfläche **TerrainForge**).
 3. Rüste den Stab aus, falls er nicht ausgerüstet ist.
 4. Ziele auf das Gelände und halte die **rechte Maustaste** (`Mouse1`) gedrückt, um zu formen.
@@ -57,7 +61,7 @@
 
 ## ⌨️ Steuerung
 
-[Overview](Overview) · | Aktion | Standardtaste | Beschreibung |
+| Aktion | Standardtaste | Beschreibung |
 |--------|-------------|-------------|
 | Pinsel anwenden | `Mouse1` halten (Rechtsklick) | Formt das Gelände unter dem Fadenkreuz |
 | Radius + | `=` oder `Ctrl`+Mausrad | Erhöht den Pinselradius |
@@ -90,7 +94,7 @@
 
 ## 🔄 Operationen
 
-[Overview](Overview) · | Operation | Beschreibung |
+| Operation | Beschreibung |
 |-----------|-------------|
 | **Einebnen** | Nivelliert auf die angezielte Höhe (Shift = auf deine Füße). Feste Höhe über die Pipette (`G`) oder das EINSTELLUNGEN-Textfeld. |
 | **Anheben** | Hebt das Gelände um `RaiseDelta` pro Anwendung. Der Abfallmodus gibt die Form vor. |
@@ -106,7 +110,7 @@
 
 ## 📐 Formen
 
-[Overview](Overview) · Wechsle mit der Taste `.`. Alle unterstützen Rückgängig.
+Wechsle mit der Taste `.`. Alle unterstützen Rückgängig.
 
 | Form | Markierung | Anwendungsfall |
 |-------|---------|----------|
@@ -123,7 +127,7 @@
 
 ## ⚙️ Abfallmodi (Anheben/Absenken)
 
-[Overview](Overview) · Config in EINSTELLUNGEN → „Raise/Lower falloff“:
+Config in EINSTELLUNGEN → „Raise/Lower falloff“:
 
 | Modus | Verhalten |
 |------|----------|
@@ -136,7 +140,7 @@
 
 ## 🧱 Stamps (Kopieren/Einfügen)
 
-[Overview](Overview) · Eine leistungsstarke Funktion zum Replizieren von Geländestrukturen.
+Eine leistungsstarke Funktion zum Replizieren von Geländestrukturen.
 
 ### Rechteck-Auswahl (empfohlen)
 
@@ -144,7 +148,7 @@ Wähle Kopieren/Einfügen im Q-Rad. Anwenden markiert die Auswahl: zwei Ecken f�
 
 ### Workflow
 
-[Overview](Overview) · 1. **Markiere den Bereich**: Nutze eine beliebige Form (Kreis, Rechteck, Linie, Poly, Rampe) — oder die obige Rechteck-Auswahl.
+1. **Markiere den Bereich**: Nutze eine beliebige Form (Kreis, Rechteck, Linie, Poly, Rampe) — oder die obige Rechteck-Auswahl.
 2. **Kopieren**: `Ctrl+Shift+C` → „Stamp kopiert: X Tiles“ (RAM-Zwischenablage).
 3. **Einfüge-Vorschau**: `Ctrl+Shift+V` → Geister-Drahtgitter am Fadenkreuz.
    - `Q`/`E` = um ±15° drehen
@@ -179,7 +183,7 @@ Wähle Kopieren/Einfügen im Q-Rad. Anwenden markiert die Auswahl: zwei Ecken f�
 
 ## 💾 Snapshots (Backups)
 
-[Overview](Overview) · Vollständiges Gelände-Backup/Restore.
+Vollständiges Gelände-Backup/Restore.
 
 ### Speichern
 1. EINSTELLUNGEN → **SNAPSHOTS**.
@@ -201,7 +205,7 @@ Wähle Kopieren/Einfügen im Q-Rad. Anwenden markiert die Auswahl: zwei Ecken f�
 
 ## 💾 Profile
 
-[Overview](Overview) · Speichern/Laden vollständiger Pinselkonfigurationen.
+Speichern/Laden vollständiger Pinselkonfigurationen.
 
 - EINSTELLUNGEN → **PROFILES**.
 - Name + **Speichern** → Radius, Weichheit, Op, Form, Bemalung, Rampenmodus, Winkel, Glättungsmodus, Raise-Delta, Bemalstärke, Falloff, Shore-Offset.
@@ -213,7 +217,7 @@ Wähle Kopieren/Einfügen im Q-Rad. Anwenden markiert die Auswahl: zwei Ecken f�
 
 ## 🌐 Sprachen
 
-[Overview](Overview) · **15 Optionen:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — Standard `Auto`.
+**15 Optionen:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — Standard `Auto`.
 
 ### Auto-Erkennung
 - Der Standard `Auto` erkennt die Spielsprache via Reflection: `Localization.instance.GetSelectedLanguage()`.
@@ -234,7 +238,7 @@ Wähle Kopieren/Einfügen im Q-Rad. Anwenden markiert die Auswahl: zwei Ecken f�
 
 ## 🌍 Mehrspieler
 
-[Overview](Overview) · ### Anforderungen
+### Anforderungen
 - **Mod auf Client UND Server** für Bearbeitungen größer als ±8 m und eine korrekte Replikation.
 - `UnlockDeltaLimit` auch auf dem Server, sonst begrenzt der Server das Gelände.
 
@@ -255,7 +259,7 @@ Wenn der Server den Mod ausführt, gewinnt seine `Server`-Sektion:
 
 ## ⚙️ Einstellungen
 
-[Overview](Overview) · Datei: `BepInEx/config/com.terrainforge.valheim.cfg`
+Datei: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### Allgemein
 | Einstellung | Standard | Beschreibung |
@@ -323,7 +327,7 @@ Alle Tastenkürzel sind im TASTEN-Tab neu belegbar. Highlights:
 
 ## 🐛 Fehlerbehebung
 
-[Overview](Overview) · | Problem | Lösung |
+| Problem | Lösung |
 |-------|----------|
 | **Menü erscheint nicht / unsichtbarer Cursor** | Schließe das Spiel. Lösche `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\DeinProfil\BepInEx\plugins\TerrainForge\` und `%APPDATA%\Thunderstore Mod Manager\PackageCache\`. Starte TMM neu, prüfe Updates. |
 | **Update erscheint nicht in TMM** | TMM → Settings → „Refresh mod list“ (Ctrl+R). TMM schließen/neu öffnen. Prüfe das richtige Profil. |
@@ -341,7 +345,7 @@ Alle Tastenkürzel sind im TASTEN-Tab neu belegbar. Highlights:
 
 ## 🔗 Links
 
-[Overview](Overview) · - **Thunderstore-Seite:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Thunderstore-Seite:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **GitHub-Repository:** https://github.com/marceloanton/TerrainForge
 - **Spenden:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog:** [Changelog](Changelog)

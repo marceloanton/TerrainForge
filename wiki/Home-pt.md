@@ -1,17 +1,17 @@
 # Wiki do TerrainForge
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · *Português* · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · *Português* · [Türkçe](Home-tr) · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### Novidades do TerrainForge 0.3.6
+### TerrainForge 0.3.8 — correção da 0.3.7
 
 > A roda Q tem um modo dedicado de Copiar/Colar. Retângulo marca A/B com Aplicar; Linha marca duas pontas; Polígono adiciona vértices e copia com duplo toque após 3+ pontos; Círculo/Quadrado copia a área do pincel. O HUD mostra o próximo passo. Neve fica em Pintar > DeepSnow (segure Shift para remover). F5 congela movimento e câmera locais; Esc pausa o mundo inteiro no modo solo. 0.3.6: o F5 organiza as abas em duas linhas e mostra os controles da operação selecionada. Ramp inclui Dois Pontos, Ângulo Fixo e Conectada; rampas circulares estão planejadas para a 0.4.0.
 
 ## Índice
 
-[Overview](Overview) · 1. [Instalação](#-instalação)
+1. [Instalação](#-instalação)
 2. [Início Rápido](#-início-rápido)
 3. [Controles](#-controles)
 4. [Operações](#-operações)
@@ -29,7 +29,7 @@
 
 ## 📥 Instalação
 
-[Overview](Overview) · ### Requisitos
+### Requisitos
 - **BepInEx 5** (x64, Mono) no cliente e no servidor. Usuários do Thunderstore já o possuem.
 
 ### Passos
@@ -45,7 +45,7 @@
 
 ## 🚀 Início Rápido
 
-[Overview](Overview) · 1. Entre em um mundo. A **Varinha TerrainForge** (clone do Martelo) é entregue e equipada automaticamente.
+1. Entre em um mundo. A **Varinha TerrainForge** (clone do Martelo) é entregue e equipada automaticamente.
 2. Pressione `F5` para abrir o menu (ou clique no botão **TerrainForge** no menu de pausa `ESC`).
 3. Equipe a varinha se ela não estiver equipada.
 4. Mire no terreno e segure o **clique direito** (`Mouse1`) para esculpir.
@@ -57,7 +57,7 @@
 
 ## ⌨️ Controles
 
-[Overview](Overview) · | Ação | Tecla padrão | Descrição |
+| Ação | Tecla padrão | Descrição |
 |--------|-------------|-------------|
 | Aplicar pincel | Segurar `Mouse1` (clique direito) | Esculpe o terreno sob a mira |
 | Raio + | `=` ou `Ctrl`+Roda | Aumenta o raio do pincel |
@@ -90,7 +90,7 @@
 
 ## 🔄 Operações
 
-[Overview](Overview) · | Operação | Descrição |
+| Operação | Descrição |
 |-----------|-------------|
 | **Aplanar** | Nivela até a altura apontada (Shift = aos seus pés). Altura fixa via Conta-gotas (`G`) ou a caixa de texto de CONFIGURAÇÕES. |
 | **Levantar** | Eleva o terreno em `RaiseDelta` por aplicação. O modo de queda dá forma a ele. |
@@ -106,7 +106,7 @@
 
 ## 📐 Formas
 
-[Overview](Overview) · Alterne com a tecla `.`. Todas suportam desfazer.
+Alterne com a tecla `.`. Todas suportam desfazer.
 
 | Forma | Marcação | Caso de uso |
 |-------|---------|----------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ Modos de Queda (Levantar/Baixar)
 
-[Overview](Overview) · Configuração em CONFIGURAÇÕES → "Queda de Raise/Lower":
+Configuração em CONFIGURAÇÕES → "Queda de Raise/Lower":
 
 | Modo | Comportamento |
 |------|----------|
@@ -136,7 +136,7 @@
 
 ## 🧱 Stamps (Copiar/Colar)
 
-[Overview](Overview) · Uma função poderosa para replicar estruturas de terreno.
+Uma função poderosa para replicar estruturas de terreno.
 
 ### Seleção por retângulo (recomendada)
 
@@ -144,7 +144,7 @@ Escolha Copiar/Colar na roda Q. Aplicar marca a seleção: dois cantos no Retân
 
 ### Fluxo de trabalho
 
-[Overview](Overview) · 1. **Marque a área**: use qualquer forma (Círculo, Ret, Linha, Poli, Rampa) — ou a seleção por retângulo acima.
+1. **Marque a área**: use qualquer forma (Círculo, Ret, Linha, Poli, Rampa) — ou a seleção por retângulo acima.
 2. **Copiar**: `Ctrl+Shift+C` → "Stamp copiado: X tiles" (área de transferência na RAM).
 3. **Preview de colagem**: `Ctrl+Shift+V` → wireframe fantasma na mira.
    - `Q`/`E` = rotacionar ±15°
@@ -179,7 +179,7 @@ Escolha Copiar/Colar na roda Q. Aplicar marca a seleção: dois cantos no Retân
 
 ## 💾 Snapshots (Backups)
 
-[Overview](Overview) · Backup/restauração completa do terreno.
+Backup/restauração completa do terreno.
 
 ### Salvar
 1. CONFIGURAÇÕES → **SNAPSHOTS**.
@@ -201,7 +201,7 @@ Escolha Copiar/Colar na roda Q. Aplicar marca a seleção: dois cantos no Retân
 
 ## 💾 Perfis
 
-[Overview](Overview) · Salvar/carregar configurações completas de pincel.
+Salvar/carregar configurações completas de pincel.
 
 - CONFIGURAÇÕES → **PERFIS**.
 - Nome + **Salvar** → raio, suavidade, op, forma, pintura, modo de rampa, ângulo, modo de suavização, raise delta, força de pintura, falloff, shore offset.
@@ -213,7 +213,7 @@ Escolha Copiar/Colar na roda Q. Aplicar marca a seleção: dois cantos no Retân
 
 ## 🌐 Idiomas
 
-[Overview](Overview) · **15 opções:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — padrão `Auto`.
+**15 opções:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — padrão `Auto`.
 
 ### Auto-Detect
 - O `Auto` padrão detecta o idioma do jogo via reflection: `Localization.instance.GetSelectedLanguage()`.
@@ -234,7 +234,7 @@ Páginas da wiki traduzidas: [English](Home) · [Español](Home-es) · [Françai
 
 ## 🌍 Multijogador
 
-[Overview](Overview) · ### Requisitos
+### Requisitos
 - **Mod no cliente E no servidor** para edições maiores que ±8 m e replicação correta.
 - `UnlockDeltaLimit` também no servidor, caso contrário o servidor limita o terreno.
 
@@ -255,7 +255,7 @@ Quando o servidor roda o mod, sua seção `Server` prevalece:
 
 ## ⚙️ Configurações
 
-[Overview](Overview) · Arquivo: `BepInEx/config/com.terrainforge.valheim.cfg`
+Arquivo: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### Geral
 | Setting | Padrão | Descrição |
@@ -323,7 +323,7 @@ Todos os atalhos são reatribuíveis na aba TECLAS. Destaques:
 
 ## 🐛 Solução de Problemas
 
-[Overview](Overview) · | Problema | Solução |
+| Problema | Solução |
 |-------|----------|
 | **O menu não aparece / cursor invisível** | Feche o jogo. Exclua `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\SeuPerfil\BepInEx\plugins\TerrainForge\` e `%APPDATA%\Thunderstore Mod Manager\PackageCache\`. Reinicie o TMM, verifique as atualizações. |
 | **Atualização não aparece no TMM** | TMM → Settings → "Refresh mod list" (Ctrl+R). Feche/reabra o TMM. Verifique o perfil correto. |
@@ -341,7 +341,7 @@ Todos os atalhos são reatribuíveis na aba TECLAS. Destaques:
 
 ## 🔗 Links
 
-[Overview](Overview) · - **Página no Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Página no Thunderstore:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **Repositório no GitHub:** https://github.com/marceloanton/TerrainForge
 - **Doações:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Changelog:** [Changelog](Changelog)

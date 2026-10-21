@@ -2,6 +2,19 @@
 
 ---
 
+## [0.3.8] - Hotfix for 0.3.7
+
+### Context
+- The 0.3.7 log supplied for review showed repeated network prefab registration failures because the stable hash `506871212` was already present, plus invalid null item entries during ObjectDB registration. The log also showed the tool being registered, so the precise runtime failure still needs confirmation in game.
+
+### Fixed
+- Network prefab registration now reuses an existing entry when it matches `TerrainForgeTool`, instead of attempting to add the duplicate key again; hash collisions with another prefab are reported and left untouched.
+- Invalid null item entries are removed before rebuilding ObjectDB indexes, and the tool clone is cleaned up if registration fails.
+- Terrain editing and the brush HUD stop when the required tool is unequipped, including while free camera remains active; equipped inventory data is checked for cases where free camera hides hand slots.
+
+### Verification
+- The supplied log identifies the duplicate-key and ObjectDB symptoms, but does not confirm that the game hands out the rod or that terrain editing works after these changes. Test in Valheim before publishing this hotfix.
+
 ## [0.3.6] - 2026-10-21
 
 ### Fixed
@@ -27,7 +40,7 @@
 ### Changed
 - TerrainForge now registers its own TerrainForge Rod prefab with Harmony. Jotunn is no longer required.
 - Removed Jotunn from the Thunderstore dependencies; BepInEx is the only required mod dependency.
-- Fixed plugin metadata to report version 0.3.6 consistently.
+- Plugin metadata was aligned at version 0.3.6.
 - Re-register the rod for each ObjectDB instance and retry network-prefab registration after ObjectDB is populated, covering startup-order and world reloads.
 - Verify ObjectDB indexing and network-prefab insertion; report failures instead of silently claiming registration succeeded.
 - Revalidate the rod against the live ObjectDB during gameplay so later database rebuilds by other mods cannot leave auto-give using a stale registration state.

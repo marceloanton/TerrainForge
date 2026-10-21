@@ -1,17 +1,17 @@
 # TerrainForge Wiki
 
-[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · *Türkçe* · [Українська](Home-uk) · [Italiano](Home-it)
+[Overview](Overview) · [English](Home) · [Español](Home-es) · [Français](Home-fr) · [Deutsch](Home-de) · [Русский](Home-ru) · [中文](Home-zh) · [繁體中文](Home-zh-tw) · [日本語](Home-ja) · [한국어](Home-ko) · [Polski](Home-pl) · [Português](Home-pt) · *Türkçe* · [Українська](Home-uk) · [Italiano](Home-it) · [Website](https://marceloanton.github.io/TerrainForge/)
 
 ---
 
 
-### TerrainForge 0.3.6 yenilikleri
+### TerrainForge 0.3.8 — 0.3.7 düzeltmesi
 
 > Q tekerinde ayrı bir Kopyala/Yapıştır modu var. Dikdörtgen Uygula ile A/B köşelerini, Çizgi iki ucu işaretler; Çokgen 3+ noktadan sonra çift basışla kopyalar; Daire/Kare fırça alanını kopyalar. HUD sonraki adımı gösterir. Kar, Boya > DeepSnow içindedir (kaldırmak için Shift'i basılı tutun). F5 yerel hareketi ve kamerayı dondurur; Esc tek oyunculu dünyayı tamamen duraklatır. 0.3.6: F5 sekmeleri iki sıraya yerleştirir ve seçili işleme uygun ayarları gösterir. Ramp; İki Nokta, Sabit Açı ve Bağlantılı Yol modlarını sunar; dairesel rampalar 0.4.0 için planlandı.
 
 ## İçindekiler
 
-[Overview](Overview) · 1. [Kurulum](#-kurulum)
+1. [Kurulum](#-kurulum)
 2. [Hızlı Başlangıç](#-hızlı-başlangıç)
 3. [Kontroller](#-kontroller)
 4. [İşlemler](#-işlemler)
@@ -29,7 +29,7 @@
 
 ## 📥 Kurulum
 
-[Overview](Overview) · ### Gereksinimler
+### Gereksinimler
 - **BepInEx 5** (x64, Mono) istemci ve sunucuda. Thunderstore kullanıcılarında zaten vardır.
 
 ### Adımlar
@@ -45,7 +45,7 @@
 
 ## 🚀 Hızlı Başlangıç
 
-[Overview](Overview) · 1. Bir dünyaya katılın. **TerrainForge Asası** (Çekicin bir klonu) otomatik olarak verilir ve kuşanılır.
+1. Bir dünyaya katılın. **TerrainForge Asası** (Çekicin bir klonu) otomatik olarak verilir ve kuşanılır.
 2. Menüyü açmak için `F5` tuşuna basın (veya `ESC` duraklatma menüsündeki **TerrainForge** düğmesine tıklayın).
 3. Kuşanılı değilse asayı kuşanın.
 4. Araziye nişan alın ve şekillendirmek için **sağ tık** (`Mouse1`) tuşunu basılı tutun.
@@ -57,7 +57,7 @@
 
 ## ⌨️ Kontroller
 
-[Overview](Overview) · | Eylem | Varsayılan tuş | Açıklama |
+| Eylem | Varsayılan tuş | Açıklama |
 |--------|-------------|-------------|
 | Fırçayı uygula | `Mouse1` basılı tut (Sağ Tık) | Nişangah altındaki araziyi şekillendirir |
 | Yarıçap + | `=` veya `Ctrl`+Tekerlek | Fırça yarıçapını artırır |
@@ -90,7 +90,7 @@
 
 ## 🔄 İşlemler
 
-[Overview](Overview) · | İşlem | Açıklama |
+| İşlem | Açıklama |
 |-----------|-------------|
 | **Düzleştir** | Hedeflenen yüksekliğe düzler (Shift = ayaklarınızda). Damlalık (`G`) veya AYARLAR metin kutusu üzerinden sabit yükseklik. |
 | **Yükselt** | Araziyi uygulama başına `RaiseDelta` kadar yükseltir. Düşüş modu şeklini verir. |
@@ -106,7 +106,7 @@
 
 ## 📐 Şekiller
 
-[Overview](Overview) · `.` tuşuyla geçiş yapın. Hepsi geri almayı destekler.
+`.` tuşuyla geçiş yapın. Hepsi geri almayı destekler.
 
 | Şekil | İşaretleme | Kullanım alanı |
 |-------|---------|----------|
@@ -123,7 +123,7 @@
 
 ## ⚙️ Düşüş Modları (Yükselt/Alçalt)
 
-[Overview](Overview) · AYARLAR → "Yükselt/Alçalt düşüşü" içinde yapılandırma:
+AYARLAR → "Yükselt/Alçalt düşüşü" içinde yapılandırma:
 
 | Mod | Davranış |
 |------|----------|
@@ -136,7 +136,7 @@
 
 ## 🧱 Stamps (Kopyala/Yapıştır)
 
-[Overview](Overview) · Arazi yapılarını çoğaltmak için güçlü bir özellik.
+Arazi yapılarını çoğaltmak için güçlü bir özellik.
 
 ### Dikdörtgen seçimi (önerilir)
 
@@ -144,7 +144,7 @@ Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtg
 
 ### İş akışı
 
-[Overview](Overview) · 1. **Alanı işaretleyin**: herhangi bir şekil kullanın (Daire, Dikt, Çizgi, Çokgen, Rampa) — ya da yukarıdaki dikdörtgen seçimi.
+1. **Alanı işaretleyin**: herhangi bir şekil kullanın (Daire, Dikt, Çizgi, Çokgen, Rampa) — ya da yukarıdaki dikdörtgen seçimi.
 2. **Kopyala**: `Ctrl+Shift+C` → "Stamp kopyalandı: X döşeme" (RAM panosu).
 3. **Yapıştırma önizlemesi**: `Ctrl+Shift+V` → nişangahta hayalet tel kafes.
    - `Q`/`E` = ±15° döndür
@@ -179,7 +179,7 @@ Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtg
 
 ## 💾 Snapshots (Yedekler)
 
-[Overview](Overview) · Tam arazi yedekleme/geri yükleme.
+Tam arazi yedekleme/geri yükleme.
 
 ### Kaydet
 1. AYARLAR → **SNAPSHOTS**.
@@ -201,7 +201,7 @@ Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtg
 
 ## 💾 Profiller
 
-[Overview](Overview) · Eksiksiz fırça yapılandırmalarını kaydedin/yükleyin.
+Eksiksiz fırça yapılandırmalarını kaydedin/yükleyin.
 
 - AYARLAR → **PROFILES**.
 - Ad + **Kaydet** → yarıçap, yumuşaklık, işlem, şekil, boya, rampa modu, açı, yumuşatma modu, yükseltme deltası, boya gücü, düşüş, kıyı payı.
@@ -213,7 +213,7 @@ Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtg
 
 ## 🌐 Diller
 
-[Overview](Overview) · **15 seçenek:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — varsayılan `Auto`.
+**15 seçenek:** `Auto`, `English`, `Español`, `Français`, `Deutsch`, `Русский`, `中文`, `繁體中文`, `日本語`, `한국어`, `Polski`, `Português`, `Türkçe`, `Українська`, `Italiano` — varsayılan `Auto`.
 
 ### Otomatik Algılama
 - Varsayılan `Auto`, oyun dilini yansıma (reflection) ile algılar: `Localization.instance.GetSelectedLanguage()`.
@@ -234,7 +234,7 @@ Q tekerinden Kopyala/Yapıştır'ı seçin. Uygula seçimi işaretler: Dikdörtg
 
 ## 🌍 Çok Oyunculu
 
-[Overview](Overview) · ### Gereksinimler
+### Gereksinimler
 - **İstemci VE sunucuda mod** ±8 m'den büyük düzenlemeler ve doğru replikasyon için.
 - Sunucuda da `UnlockDeltaLimit`, aksi halde sunucu araziyi kısıtlar.
 
@@ -255,7 +255,7 @@ Sunucu modu çalıştırdığında, `Server` bölümü kazanır:
 
 ## ⚙️ Ayarlar
 
-[Overview](Overview) · Dosya: `BepInEx/config/com.terrainforge.valheim.cfg`
+Dosya: `BepInEx/config/com.terrainforge.valheim.cfg`
 
 ### Genel
 | Ayar | Varsayılan | Açıklama |
@@ -323,7 +323,7 @@ Tüm kısayollar TUŞLAR sekmesinde yeniden atanabilir. Öne çıkanlar:
 
 ## 🐛 Sorun Giderme
 
-[Overview](Overview) · | Sorun | Çözüm |
+| Sorun | Çözüm |
 |-------|----------|
 | **Menü görünmüyor / görünmez imleç** | Oyunu kapatın. `%APPDATA%\Thunderstore Mod Manager\DataFolder\Valheim\profiles\YourProfile\BepInEx\plugins\TerrainForge\` ve `%APPDATA%\Thunderstore Mod Manager\PackageCache\` dizinlerini silin. TMM'i yeniden başlatın, güncellemeleri kontrol edin. |
 | **Güncelleme TMM'de görünmüyor** | TMM → Settings → "Refresh mod list" (Ctrl+R). TMM'i kapatıp yeniden açın. Doğru profili doğrulayın. |
@@ -341,7 +341,7 @@ Tüm kısayollar TUŞLAR sekmesinde yeniden atanabilir. Öne çıkanlar:
 
 ## 🔗 Bağlantılar
 
-[Overview](Overview) · - **Thunderstore sayfası:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
+- **Thunderstore sayfası:** https://thunderstore.io/c/valheim/p/MRAnalytics/TerrainForge/
 - **GitHub deposu:** https://github.com/marceloanton/TerrainForge
 - **Bağışlar:** [cafecito.app/byrka](https://cafecito.app/byrka)
 - **Değişiklik günlüğü:** [Changelog](Changelog)

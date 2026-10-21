@@ -1,6 +1,6 @@
 # TerrainForge Overview
 
-[Manual (English)](Home) · [Changelog](Changelog)
+[Manual (English)](Home) · [Project website](https://marceloanton.github.io/TerrainForge/) · [Changelog](Changelog)
 
 [![Buy me a coffee at cafecito.app](https://cdn.cafecito.app/imgs/buttons/button_5.svg)](https://cafecito.app/byrka)
 
@@ -10,7 +10,15 @@ A free-form terrain brush for Valheim. Flatten, raise, lower, smooth, build **ra
 
 ---
 
-## What's New in 0.3.6
+## 0.3.8 Hotfix for 0.3.7
+
+The supplied 0.3.7 log showed repeated TerrainForge Rod network-prefab registration failures for an already-used stable hash (`506871212`) and invalid item entries during ObjectDB registration. It also contained a successful tool-registration message, so those log lines alone do not establish why the mod was unusable.
+
+This hotfix reuses an existing matching network prefab entry, removes invalid ObjectDB entries before rebuilding indexes, cleans up a clone after failed registration, and improves equipped-tool detection when free camera hides hand slots. **These changes still need an in-game check: confirm the rod is handed out and terrain editing works before publishing.**
+
+---
+
+## Features carried forward from 0.3.6
 
 - F5 now uses a two-row tab layout and operation-specific controls. Ramp mode keeps Two-Point, Fixed-Angle, and Connected Path visible with the relevant width, softness, and angle settings.
 - The connected ramp mode is a continuous path through 3+ marked points; choose **Connected** in the F5 Ramp panel or cycle with `H`.
